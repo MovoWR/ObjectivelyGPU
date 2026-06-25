@@ -29,36 +29,195 @@
 
 #include <ObjectivelyGPU/Types.h>
 
+/**
+ * @file
+ * @brief RenderPass wraps an `SDL_GPURenderPass` for recording draw commands.
+ */
+
 typedef struct RenderPass RenderPass;
 typedef struct RenderPassInterface RenderPassInterface;
 
+/**
+ * @brief A scoped render pass for recording draw commands into a CommandBuffer.
+ *
+ * Obtain a RenderPass from `CommandBuffer::beginRenderPass`. When all draw
+ * commands have been recorded, release the pass — `dealloc` calls
+ * `SDL_EndGPURenderPass` automatically so no explicit `end` is required:
+ *
+ * @code
+ *   RenderPass *pass = $(cmd, beginRenderPass, colorTargets, numTargets, NULL);
+ *   $(pass, bindGraphicsPipeline, pipeline);
+ *   $(pass, drawPrimitives, vertexCount, 1, 0, 0);
+ *   release(pass);  // ends the pass
+ * @endcode
+ *
+ * @extends Object
+ */
 struct RenderPass {
+
+  /**
+   * @brief The superclass.
+   */
   Object object;
+
+  /**
+   * @brief The interface.
+   * @protected
+   */
   RenderPassInterface *interface;
+
+  /**
+   * @brief The underlying SDL render pass.
+   * @details Set to NULL by `dealloc` after `SDL_EndGPURenderPass` is called.
+   * @private
+   */
   SDL_GPURenderPass *pass;
 };
 
+/**
+ * @brief The RenderPass interface.
+ */
 struct RenderPassInterface {
+
+  /**
+   * @brief The superclass interface.
+   */
   ObjectInterface objectInterface;
 
+  /**
+   * @fn void RenderPass::bindFragmentSamplers(const RenderPass *self, Uint32 firstSlot, const SDL_GPUTextureSamplerBinding *bindings, Uint32 num)
+   * @brief Binds texture-sampler pairs for the fragment stage.
+   * @memberof RenderPass
+   */
   void (*bindFragmentSamplers)(const RenderPass *self, Uint32 firstSlot, const SDL_GPUTextureSamplerBinding *bindings, Uint32 num);
+
+  /**
+   * @fn void RenderPass::bindFragmentStorageBuffers(const RenderPass *self, Uint32 firstSlot, SDL_GPUBuffer *const *buffers, Uint32 num)
+   * @brief Binds read-only storage buffers for the fragment stage.
+   * @memberof RenderPass
+   */
   void (*bindFragmentStorageBuffers)(const RenderPass *self, Uint32 firstSlot, SDL_GPUBuffer *const *buffers, Uint32 num);
+
+  /**
+   * @fn void RenderPass::bindFragmentStorageTextures(const RenderPass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num)
+   * @brief Binds read-only storage textures for the fragment stage.
+   * @memberof RenderPass
+   */
   void (*bindFragmentStorageTextures)(const RenderPass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num);
+
+  /**
+   * @fn void RenderPass::bindGraphicsPipeline(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline)
+   * @brief Binds a graphics pipeline for subsequent draw calls.
+   * @memberof RenderPass
+   */
   void (*bindGraphicsPipeline)(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline);
+
+  /**
+   * @fn void RenderPass::bindIndexBuffer(const RenderPass *self, const SDL_GPUBufferBinding *binding, SDL_GPUIndexElementSize indexElementSize)
+   * @brief Binds an index buffer for indexed draw calls.
+   * @memberof RenderPass
+   */
   void (*bindIndexBuffer)(const RenderPass *self, const SDL_GPUBufferBinding *binding, SDL_GPUIndexElementSize indexElementSize);
+
+  /**
+   * @fn void RenderPass::bindVertexBuffers(const RenderPass *self, Uint32 firstSlot, const SDL_GPUBufferBinding *bindings, Uint32 num)
+   * @brief Binds vertex buffers for subsequent draw calls.
+   * @memberof RenderPass
+   */
   void (*bindVertexBuffers)(const RenderPass *self, Uint32 firstSlot, const SDL_GPUBufferBinding *bindings, Uint32 num);
+
+  /**
+   * @fn void RenderPass::bindVertexSamplers(const RenderPass *self, Uint32 firstSlot, const SDL_GPUTextureSamplerBinding *bindings, Uint32 num)
+   * @brief Binds texture-sampler pairs for the vertex stage.
+   * @memberof RenderPass
+   */
   void (*bindVertexSamplers)(const RenderPass *self, Uint32 firstSlot, const SDL_GPUTextureSamplerBinding *bindings, Uint32 num);
+
+  /**
+   * @fn void RenderPass::bindVertexStorageBuffers(const RenderPass *self, Uint32 firstSlot, SDL_GPUBuffer *const *buffers, Uint32 num)
+   * @brief Binds read-only storage buffers for the vertex stage.
+   * @memberof RenderPass
+   */
   void (*bindVertexStorageBuffers)(const RenderPass *self, Uint32 firstSlot, SDL_GPUBuffer *const *buffers, Uint32 num);
+
+  /**
+   * @fn void RenderPass::bindVertexStorageTextures(const RenderPass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num)
+   * @brief Binds read-only storage textures for the vertex stage.
+   * @memberof RenderPass
+   */
   void (*bindVertexStorageTextures)(const RenderPass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num);
+
+  /**
+   * @fn void RenderPass::drawIndexedPrimitives(const RenderPass *self, Uint32 numIndices, Uint32 numInstances, Uint32 firstIndex, Sint32 vertexOffset, Uint32 firstInstance)
+   * @brief Draws indexed primitives.
+   * @memberof RenderPass
+   */
   void (*drawIndexedPrimitives)(const RenderPass *self, Uint32 numIndices, Uint32 numInstances, Uint32 firstIndex, Sint32 vertexOffset, Uint32 firstInstance);
+
+  /**
+   * @fn void RenderPass::drawIndexedPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount)
+   * @brief Draws indexed primitives with parameters sourced from a GPU buffer.
+   * @memberof RenderPass
+   */
   void (*drawIndexedPrimitivesIndirect)(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount);
+
+  /**
+   * @fn void RenderPass::drawPrimitives(const RenderPass *self, Uint32 numVertices, Uint32 numInstances, Uint32 firstVertex, Uint32 firstInstance)
+   * @brief Draws non-indexed primitives.
+   * @memberof RenderPass
+   */
   void (*drawPrimitives)(const RenderPass *self, Uint32 numVertices, Uint32 numInstances, Uint32 firstVertex, Uint32 firstInstance);
+
+  /**
+   * @fn void RenderPass::drawPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount)
+   * @brief Draws non-indexed primitives with parameters sourced from a GPU buffer.
+   * @memberof RenderPass
+   */
   void (*drawPrimitivesIndirect)(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount);
+
+  /**
+   * @fn RenderPass *RenderPass::initWithPass(RenderPass *self, SDL_GPURenderPass *pass)
+   * @brief Initializes this RenderPass wrapping the given SDL render pass.
+   * @param self The RenderPass.
+   * @param pass The SDL render pass to wrap. Must not be NULL.
+   * @return The initialized RenderPass, or NULL on failure.
+   * @memberof RenderPass
+   */
   RenderPass *(*initWithPass)(RenderPass *self, SDL_GPURenderPass *pass);
+
+  /**
+   * @fn void RenderPass::setBlendConstants(const RenderPass *self, SDL_FColor blendConstants)
+   * @brief Sets the blend constants used by `SDL_GPU_BLENDFACTOR_CONSTANT_*` factors.
+   * @memberof RenderPass
+   */
   void (*setBlendConstants)(const RenderPass *self, SDL_FColor blendConstants);
+
+  /**
+   * @fn void RenderPass::setScissor(const RenderPass *self, const SDL_Rect *scissor)
+   * @brief Sets the scissor rectangle. Pass NULL to reset to the full viewport.
+   * @memberof RenderPass
+   */
   void (*setScissor)(const RenderPass *self, const SDL_Rect *scissor);
+
+  /**
+   * @fn void RenderPass::setStencilReference(const RenderPass *self, Uint8 reference)
+   * @brief Sets the stencil reference value used in stencil tests.
+   * @memberof RenderPass
+   */
   void (*setStencilReference)(const RenderPass *self, Uint8 reference);
+
+  /**
+   * @fn void RenderPass::setViewport(const RenderPass *self, const SDL_GPUViewport *viewport)
+   * @brief Sets the viewport. Pass NULL to reset to the full render target.
+   * @memberof RenderPass
+   */
   void (*setViewport)(const RenderPass *self, const SDL_GPUViewport *viewport);
 };
 
+/**
+ * @fn Class *RenderPass::_RenderPass(void)
+ * @brief The RenderPass archetype.
+ * @return The RenderPass Class.
+ * @memberof RenderPass
+ */
 OBJECTIVELYGPU_EXPORT Class *_RenderPass(void);
