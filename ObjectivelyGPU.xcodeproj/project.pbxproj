@@ -8,20 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */ = {isa = PBXBuildFile; fileRef = 77315F9BC357C97B885E883C /* RenderDevice.c */; };
-		C4EF9626FEBDC084801F3B39 /* RenderDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 9220C57BBAA3C951D8083799 /* RenderDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FA76885F6E4FCCA53C6AFE6F /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2475AF263A11F6F11DECBD3C /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		96EA6590399038D49A444BAC /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 38F069D0DBE26C7E00B5B5EE /* Types.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DDEB504EFA4FAB8A7F5DE08A /* Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 338EC7DCAE74C1B8C397D189 /* Config.h */; };
+		A09AD953AC672E0DE9D1E26D /* ObjectivelyGPU.h in Headers */ = {isa = PBXBuildFile; fileRef = C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		59897FC7BCC194032E971A9B /* RenderDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 9220C57BBAA3C951D8083799 /* RenderDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2EFBC87C8AE43A5DA2AAAFB2 /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2475AF263A11F6F11DECBD3C /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		90C29A39257729BE8D4FDDF8 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 38F069D0DBE26C7E00B5B5EE /* Types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6F351DFD232DA78A42D8B494 /* Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 338EC7DCAE74C1B8C397D189 /* Config.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ObjectivelyGPU.h"; sourceTree = "<group>"; };
 		77315F9BC357C97B885E883C /* RenderDevice.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RenderDevice.c; sourceTree = "<group>"; };
 		9220C57BBAA3C951D8083799 /* RenderDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RenderDevice.h; sourceTree = "<group>"; };
 		2475AF263A11F6F11DECBD3C /* Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		38F069D0DBE26C7E00B5B5EE /* Types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Types.h; sourceTree = "<group>"; };
 		338EC7DCAE74C1B8C397D189 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
-		D75DB081D05F4EB29F289CE8 /* Renderer.vert.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.vert.hlsl"; sourceTree = "<group>"; };
-		C416578A7DB2529C836A499C /* Renderer.frag.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.frag.hlsl"; sourceTree = "<group>"; };
+		C510361664FA37CEC93731E8 /* Renderer.vert.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.vert.hlsl"; sourceTree = "<group>"; };
+		FDEE3DD81E43E5CFE68E9519 /* Renderer.frag.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.frag.hlsl"; sourceTree = "<group>"; };
 		6251F22589273797656C269E /* ObjectivelyGPU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectivelyGPU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -55,9 +57,9 @@
 		904A6003E847F129BD1EE63E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */,
 				AFF3775B279FC0FE4D348FBA /* ObjectivelyGPU */,
 			);
-			name = Sources;
 			path = Sources;
 			sourceTree = "<group>";
 		};
@@ -77,8 +79,8 @@
 		B0DCC202FC0DE3DD6AD6B538 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				C416578A7DB2529C836A499C /* Renderer.frag.hlsl */,
-				D75DB081D05F4EB29F289CE8 /* Renderer.vert.hlsl */,
+				FDEE3DD81E43E5CFE68E9519 /* Renderer.frag.hlsl */,
+				C510361664FA37CEC93731E8 /* Renderer.vert.hlsl */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -90,10 +92,11 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DDEB504EFA4FAB8A7F5DE08A /* Config.h in Headers */,
-				FA76885F6E4FCCA53C6AFE6F /* Log.h in Headers */,
-				C4EF9626FEBDC084801F3B39 /* RenderDevice.h in Headers */,
-				96EA6590399038D49A444BAC /* Types.h in Headers */,
+				6F351DFD232DA78A42D8B494 /* Config.h in Headers */,
+				2EFBC87C8AE43A5DA2AAAFB2 /* Log.h in Headers */,
+				A09AD953AC672E0DE9D1E26D /* ObjectivelyGPU.h in Headers */,
+				59897FC7BCC194032E971A9B /* RenderDevice.h in Headers */,
+				90C29A39257729BE8D4FDDF8 /* Types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,18 +209,19 @@
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				FRAMEWORK_VERSION = A;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
 				);
+				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					/usr/local/include,
 					/opt/homebrew/include,
 				);
-				INFOPLIST_FILE = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -247,18 +251,19 @@
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				FRAMEWORK_VERSION = A;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
 				);
+				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					/usr/local/include,
 					/opt/homebrew/include,
 				);
-				INFOPLIST_FILE = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
