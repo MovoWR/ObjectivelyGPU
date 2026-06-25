@@ -7,24 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */ = {isa = PBXBuildFile; fileRef = 77315F9BC357C97B885E883C /* RenderDevice.c */; };
-		A09AD953AC672E0DE9D1E26D /* ObjectivelyGPU.h in Headers */ = {isa = PBXBuildFile; fileRef = C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2A17F0E01E5CC25A431FFBAD /* CommandBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = E71C479F7B60345FDDA44201 /* CommandBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		034285033FECAB2D6BD6AE5B /* ComputePass.h in Headers */ = {isa = PBXBuildFile; fileRef = 09B8DD26CDB7926D89445C91 /* ComputePass.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		36FBB92ACB08F2078D50C84D /* CommandBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C38B23048C269B804E75F03 /* CommandBuffer.c */; };
 		59897FC7BCC194032E971A9B /* RenderDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 9220C57BBAA3C951D8083799 /* RenderDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2EFBC87C8AE43A5DA2AAAFB2 /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2475AF263A11F6F11DECBD3C /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		90C29A39257729BE8D4FDDF8 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 38F069D0DBE26C7E00B5B5EE /* Types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		683F683E23149C267D613EA0 /* RenderPass.h in Headers */ = {isa = PBXBuildFile; fileRef = 206D63692B601BD90F377BF5 /* RenderPass.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6F351DFD232DA78A42D8B494 /* Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 338EC7DCAE74C1B8C397D189 /* Config.h */; };
+		86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */ = {isa = PBXBuildFile; fileRef = 77315F9BC357C97B885E883C /* RenderDevice.c */; };
+		90C29A39257729BE8D4FDDF8 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 38F069D0DBE26C7E00B5B5EE /* Types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A09AD953AC672E0DE9D1E26D /* ObjectivelyGPU.h in Headers */ = {isa = PBXBuildFile; fileRef = C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCCB11DB70E4A962360A2119 /* CopyPass.c in Sources */ = {isa = PBXBuildFile; fileRef = C862954A9DD435C1FF7CD31D /* CopyPass.c */; };
+		DF73824CC25298378B451056 /* CopyPass.h in Headers */ = {isa = PBXBuildFile; fileRef = 59334BDAED542AB6DE565EDD /* CopyPass.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F73340493879CD8034F99D51 /* ComputePass.c in Sources */ = {isa = PBXBuildFile; fileRef = ED8024CA4186E352C1EC4CA1 /* ComputePass.c */; };
+		FF30FF2D56F9E4EA3C492CBB /* RenderPass.c in Sources */ = {isa = PBXBuildFile; fileRef = 669BE73362E651792735CB1C /* RenderPass.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ObjectivelyGPU.h"; sourceTree = "<group>"; };
+		09B8DD26CDB7926D89445C91 /* ComputePass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ComputePass.h; sourceTree = "<group>"; };
+		206D63692B601BD90F377BF5 /* RenderPass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RenderPass.h; sourceTree = "<group>"; };
+		338EC7DCAE74C1B8C397D189 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
+		38F069D0DBE26C7E00B5B5EE /* Types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Types.h; sourceTree = "<group>"; };
+		59334BDAED542AB6DE565EDD /* CopyPass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CopyPass.h; sourceTree = "<group>"; };
+		6251F22589273797656C269E /* ObjectivelyGPU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectivelyGPU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		669BE73362E651792735CB1C /* RenderPass.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RenderPass.c; sourceTree = "<group>"; };
+		6C38B23048C269B804E75F03 /* CommandBuffer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = CommandBuffer.c; sourceTree = "<group>"; };
 		77315F9BC357C97B885E883C /* RenderDevice.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RenderDevice.c; sourceTree = "<group>"; };
 		9220C57BBAA3C951D8083799 /* RenderDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RenderDevice.h; sourceTree = "<group>"; };
-		2475AF263A11F6F11DECBD3C /* Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
-		38F069D0DBE26C7E00B5B5EE /* Types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Types.h; sourceTree = "<group>"; };
-		338EC7DCAE74C1B8C397D189 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
-		C510361664FA37CEC93731E8 /* Renderer.vert.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.vert.hlsl"; sourceTree = "<group>"; };
-		FDEE3DD81E43E5CFE68E9519 /* Renderer.frag.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.frag.hlsl"; sourceTree = "<group>"; };
-		6251F22589273797656C269E /* ObjectivelyGPU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectivelyGPU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjectivelyGPU.h; sourceTree = "<group>"; };
+		C510361664FA37CEC93731E8 /* Renderer.vert.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = Renderer.vert.hlsl; sourceTree = "<group>"; };
+		C862954A9DD435C1FF7CD31D /* CopyPass.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = CopyPass.c; sourceTree = "<group>"; };
+		CEEAAFF72FED833A00FFEBE6 /* COPYING */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
+		CEEAAFF82FED833A00FFEBE6 /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		CEEAAFFA2FED833A00FFEBE6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CEEAAFFD2FED83E400FFEBE6 /* configure.ac */ = {isa = PBXFileReference; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
+		E71C479F7B60345FDDA44201 /* CommandBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommandBuffer.h; sourceTree = "<group>"; };
+		ED8024CA4186E352C1EC4CA1 /* ComputePass.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ComputePass.c; sourceTree = "<group>"; };
+		FDEE3DD81E43E5CFE68E9519 /* Renderer.frag.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = Renderer.frag.hlsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,24 +59,20 @@
 		8C4FDD7B635240BD562EBB49 = {
 			isa = PBXGroup;
 			children = (
-				904A6003E847F129BD1EE63E /* Sources */,
 				B23D89B2D2DF3745A003AEB1 /* Products */,
+				904A6003E847F129BD1EE63E /* Sources */,
+				CEEAAFF72FED833A00FFEBE6 /* COPYING */,
+				CEEAAFF82FED833A00FFEBE6 /* Makefile.am */,
+				CEEAAFFA2FED833A00FFEBE6 /* README.md */,
+				CEEAAFFD2FED83E400FFEBE6 /* configure.ac */,
 			);
-			sourceTree = "<group>";
-		};
-		B23D89B2D2DF3745A003AEB1 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				6251F22589273797656C269E /* ObjectivelyGPU.framework */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		904A6003E847F129BD1EE63E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */,
 				AFF3775B279FC0FE4D348FBA /* ObjectivelyGPU */,
+				C16D60B0E94469E649953EC5 /* ObjectivelyGPU.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -67,9 +81,16 @@
 			isa = PBXGroup;
 			children = (
 				338EC7DCAE74C1B8C397D189 /* Config.h */,
-				2475AF263A11F6F11DECBD3C /* Log.h */,
+				6C38B23048C269B804E75F03 /* CommandBuffer.c */,
+				E71C479F7B60345FDDA44201 /* CommandBuffer.h */,
+				ED8024CA4186E352C1EC4CA1 /* ComputePass.c */,
+				09B8DD26CDB7926D89445C91 /* ComputePass.h */,
+				C862954A9DD435C1FF7CD31D /* CopyPass.c */,
+				59334BDAED542AB6DE565EDD /* CopyPass.h */,
 				77315F9BC357C97B885E883C /* RenderDevice.c */,
 				9220C57BBAA3C951D8083799 /* RenderDevice.h */,
+				669BE73362E651792735CB1C /* RenderPass.c */,
+				206D63692B601BD90F377BF5 /* RenderPass.h */,
 				B0DCC202FC0DE3DD6AD6B538 /* Shaders */,
 				38F069D0DBE26C7E00B5B5EE /* Types.h */,
 			);
@@ -85,6 +106,14 @@
 			path = Shaders;
 			sourceTree = "<group>";
 		};
+		B23D89B2D2DF3745A003AEB1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6251F22589273797656C269E /* ObjectivelyGPU.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -93,9 +122,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F351DFD232DA78A42D8B494 /* Config.h in Headers */,
-				2EFBC87C8AE43A5DA2AAAFB2 /* Log.h in Headers */,
+				2A17F0E01E5CC25A431FFBAD /* CommandBuffer.h in Headers */,
+				034285033FECAB2D6BD6AE5B /* ComputePass.h in Headers */,
+				DF73824CC25298378B451056 /* CopyPass.h in Headers */,
 				A09AD953AC672E0DE9D1E26D /* ObjectivelyGPU.h in Headers */,
 				59897FC7BCC194032E971A9B /* RenderDevice.h in Headers */,
+				683F683E23149C267D613EA0 /* RenderPass.h in Headers */,
 				90C29A39257729BE8D4FDDF8 /* Types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -158,13 +190,117 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36FBB92ACB08F2078D50C84D /* CommandBuffer.c in Sources */,
+				F73340493879CD8034F99D51 /* ComputePass.c in Sources */,
+				CCCB11DB70E4A962360A2119 /* CopyPass.c in Sources */,
 				86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */,
+				FF30FF2D56F9E4EA3C492CBB /* RenderPass.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		02E8EA186897855DF59BB780 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
+				FRAMEWORK_VERSION = A;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
+					/opt/homebrew/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lObjectively",
+					"-lSDL3",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.jdolan.ObjectivelyGPU;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		AEC4259544188C1FBB7E4C07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
+				FRAMEWORK_VERSION = A;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
+					/opt/homebrew/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lObjectively",
+					"-lSDL3",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.jdolan.ObjectivelyGPU;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		B7DC821DF56771B677CD9D20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu23;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		E9B05C51385583BE376E321C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -185,106 +321,6 @@
 				SDKROOT = macosx;
 			};
 			name = Debug;
-		};
-		B7DC821DF56771B677CD9D20 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ENABLE_MODULES = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu23;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		AEC4259544188C1FBB7E4C07 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				FRAMEWORK_VERSION = A;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Frameworks",
-				);
-				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources",
-					/usr/local/include,
-					/opt/homebrew/include,
-				);
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/usr/local/lib,
-					/opt/homebrew/lib,
-				);
-				OTHER_LDFLAGS = (
-					"-lObjectively",
-					"-lSDL3",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.jdolan.ObjectivelyGPU";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
-		};
-		02E8EA186897855DF59BB780 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				FRAMEWORK_VERSION = A;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Frameworks",
-				);
-				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources",
-					/usr/local/include,
-					/opt/homebrew/include,
-				);
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/usr/local/lib,
-					/opt/homebrew/lib,
-				);
-				OTHER_LDFLAGS = (
-					"-lObjectively",
-					"-lSDL3",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.jdolan.ObjectivelyGPU";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Release;
 		};
 /* End XCBuildConfiguration section */
 

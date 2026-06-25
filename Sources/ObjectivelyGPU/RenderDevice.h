@@ -1,6 +1,6 @@
 /*
- * ObjectivelyGPU: Object oriented MVC framework for SDL3 GPU, SDL3 and GNU C.
- * Copyright (C) 2014 Jay Dolan <jay@jaydolan.com>
+ * ObjectivelyGPU: Object oriented MVC framework for SDL3 and GNU C.
+ * Copyright (C) 2026 Jay Dolan <jay@jaydolan.com>
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -23,11 +23,14 @@
 
 #pragma once
 
+#include <stdlib.h>
+
 #include <SDL3/SDL_gpu.h>
 
 #include <Objectively/Object.h>
 #include <Objectively/Vector.h>
 
+#include <ObjectivelyGPU/CommandBuffer.h>
 #include <ObjectivelyGPU/Types.h>
 
 /**
@@ -35,6 +38,9 @@
  * @brief RenderDevice owns `SDL_gpu` infrastructure for a window and frame loop.
  */
 
+typedef struct CommandBuffer CommandBuffer;
+typedef struct CopyPass CopyPass;
+typedef struct RenderPass RenderPass;
 typedef struct RenderDevice RenderDevice;
 
 /**
@@ -66,12 +72,12 @@ struct Drawable {
   /**
    * @brief Called each frame during the render pass. Issue draw commands here.
    */
-  void (*submit)(SDL_GPUCommandBuffer *cmd, SDL_GPURenderPass *renderPass, ident data);
+  void (*submit)(CommandBuffer *cmd, RenderPass *renderPass, ident data);
 
   /**
    * @brief Called when dirty during the copy pass. Upload CPU data to GPU buffers/textures here.
    */
-  void (*transfer)(SDL_GPUCopyPass *copyPass, ident data);
+  void (*transfer)(CopyPass *copyPass, ident data);
 
   /**
    * @brief When true, the RenderDevice calls transfer() this frame.
@@ -171,8 +177,8 @@ struct RenderDeviceInterface {
    */
   ObjectInterface objectInterface;
 
-  SDL_GPUCommandBuffer *(*acquireCommandBuffer)(const RenderDevice *self);
-  bool (*acquireSwapchainTexture)(const RenderDevice *self, SDL_GPUCommandBuffer *cmd, Swapchain *swapchain);
+  CommandBuffer *(*acquireCommandBuffer)(const RenderDevice *self);
+  bool (*acquireSwapchainTexture)(const RenderDevice *self, CommandBuffer *cmd, Swapchain *swapchain);
   void (*addDrawable)(RenderDevice *self, Drawable *drawable);
 
   SDL_GPUBuffer *(*createBuffer)(const RenderDevice *self, const SDL_GPUBufferCreateInfo *info);
@@ -229,8 +235,8 @@ struct RenderDeviceInterface {
   void (*setTextureName)(const RenderDevice *self, SDL_GPUTexture *texture, const char *name);
   void (*setWindow)(RenderDevice *self, SDL_Window *window);
 
-  void (*submit)(const RenderDevice *self, SDL_GPUCommandBuffer *cmd);
-  SDL_GPUFence *(*submitAndFence)(const RenderDevice *self, SDL_GPUCommandBuffer *cmd);
+  void (*submit)(const RenderDevice *self, CommandBuffer *cmd);
+  SDL_GPUFence *(*submitAndFence)(const RenderDevice *self, CommandBuffer *cmd);
 
   bool (*textureSupportsFormat)(const RenderDevice *self, SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage);
   bool (*textureSupportsSampleCount)(const RenderDevice *self, SDL_GPUTextureFormat format, SDL_GPUSampleCount sample_count);

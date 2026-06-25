@@ -26,7 +26,8 @@
 
 #include <Objectively/Resource.h>
 
-#include "Log.h"
+#include "CommandBuffer.h"
+#include "CopyPass.h"
 #include "RenderDevice.h"
 
 #define _Class _RenderDevice
@@ -34,26 +35,31 @@
 #pragma mark - RenderDevice
 
 /**
- * @fn SDL_GPUCommandBuffer *RenderDevice::acquireCommandBuffer(const RenderDevice *self)
+ * @fn CommandBuffer *RenderDevice::acquireCommandBuffer(const RenderDevice *self)
  * @memberof RenderDevice
  */
-static SDL_GPUCommandBuffer *acquireCommandBuffer(const RenderDevice *self) {
+static CommandBuffer *acquireCommandBuffer(const RenderDevice *self) {
+
+  assert(self);
 
   SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(self->device);
   GPU_Assert(cmd, "SDL_AcquireGPUCommandBuffer");
-  return cmd;
+
+  return $(alloc(CommandBuffer), initWithCommandBuffer, cmd);
 }
 
 /**
- * @fn bool RenderDevice::acquireSwapchainTexture(const RenderDevice *self, SDL_GPUCommandBuffer *cmd, Swapchain *swapchain)
+ * @fn bool RenderDevice::acquireSwapchainTexture(const RenderDevice *self, CommandBuffer *cmd, Swapchain *swapchain)
  * @memberof RenderDevice
  */
-static bool acquireSwapchainTexture(const RenderDevice *self, SDL_GPUCommandBuffer *cmd, Swapchain *swapchain) {
+static bool acquireSwapchainTexture(const RenderDevice *self, CommandBuffer *cmd, Swapchain *swapchain) {
 
+  assert(self);
   assert(cmd);
+  assert(cmd->cmd);
   assert(swapchain);
 
-  SDL_AcquireGPUSwapchainTexture(cmd,
+  SDL_AcquireGPUSwapchainTexture(cmd->cmd,
                                  self->window,
                                  &swapchain->texture,
                                  (unsigned int *) &swapchain->size.w,
@@ -144,6 +150,7 @@ static SDL_GPUShader *createShader(const RenderDevice *self, const SDL_GPUShader
  */
 static SDL_GPUTexture *createTexture(const RenderDevice *self, const SDL_GPUTextureCreateInfo *info, const void *pixels) {
 
+  assert(self);
   assert(info);
 
   SDL_GPUTexture *texture = SDL_CreateGPUTexture(self->device, info);
@@ -166,9 +173,8 @@ static SDL_GPUTexture *createTexture(const RenderDevice *self, const SDL_GPUText
     memcpy(mapped, pixels, totalBytes);
     SDL_UnmapGPUTransferBuffer(self->device, tbuf);
 
-    SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(self->device);
-    GPU_Assert(cmd, "SDL_AcquireGPUCommandBuffer");
-    SDL_GPUCopyPass *copyPass = SDL_BeginGPUCopyPass(cmd);
+    CommandBuffer *cmd = $(self, acquireCommandBuffer);
+    CopyPass *copyPass = $(cmd, beginCopyPass);
 
     const SDL_GPUTextureTransferInfo src = {
       .transfer_buffer = tbuf,
@@ -182,10 +188,11 @@ static SDL_GPUTexture *createTexture(const RenderDevice *self, const SDL_GPUText
       .h       = info->height,
       .d       = info->layer_count_or_depth,
     };
-    SDL_UploadToGPUTexture(copyPass, &src, &dst, false);
+    $(copyPass, uploadTexture, &src, &dst, false);
 
-    SDL_EndGPUCopyPass(copyPass);
-    SDL_SubmitGPUCommandBuffer(cmd);
+    release(copyPass);
+    $(self, submit, cmd);
+    release(cmd);
     SDL_ReleaseGPUTransferBuffer(self->device, tbuf);
   }
 
@@ -506,26 +513,30 @@ static void setWindow(RenderDevice *self, SDL_Window *window) {
 }
 
 /**
- * @fn void RenderDevice::submit(const RenderDevice *self, SDL_GPUCommandBuffer *cmd)
+ * @fn void RenderDevice::submit(const RenderDevice *self, CommandBuffer *cmd)
  * @memberof RenderDevice
  */
-static void submit(const RenderDevice *self, SDL_GPUCommandBuffer *cmd) {
+static void submit(const RenderDevice *self, CommandBuffer *cmd) {
 
+  assert(self);
   assert(cmd);
+  assert(cmd->cmd);
 
-  const bool ok = SDL_SubmitGPUCommandBuffer(cmd);
+  const bool ok = SDL_SubmitGPUCommandBuffer(cmd->cmd);
   GPU_Assert(ok, "SDL_SubmitGPUCommandBuffer");
 }
 
 /**
- * @fn SDL_GPUFence *RenderDevice::submitAndFence(const RenderDevice *self, SDL_GPUCommandBuffer *cmd)
+ * @fn SDL_GPUFence *RenderDevice::submitAndFence(const RenderDevice *self, CommandBuffer *cmd)
  * @memberof RenderDevice
  */
-static SDL_GPUFence *submitAndFence(const RenderDevice *self, SDL_GPUCommandBuffer *cmd) {
+static SDL_GPUFence *submitAndFence(const RenderDevice *self, CommandBuffer *cmd) {
 
+  assert(self);
   assert(cmd);
+  assert(cmd->cmd);
 
-  SDL_GPUFence *fence = SDL_SubmitGPUCommandBufferAndAcquireFence(cmd);
+  SDL_GPUFence *fence = SDL_SubmitGPUCommandBufferAndAcquireFence(cmd->cmd);
   GPU_Assert(fence, "SDL_SubmitGPUCommandBufferAndAcquireFence");
   return fence;
 }
