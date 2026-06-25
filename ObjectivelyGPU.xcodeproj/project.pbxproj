@@ -1,0 +1,308 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */ = {isa = PBXBuildFile; fileRef = 77315F9BC357C97B885E883C /* RenderDevice.c */; };
+		C4EF9626FEBDC084801F3B39 /* RenderDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 9220C57BBAA3C951D8083799 /* RenderDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FA76885F6E4FCCA53C6AFE6F /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2475AF263A11F6F11DECBD3C /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96EA6590399038D49A444BAC /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 38F069D0DBE26C7E00B5B5EE /* Types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DDEB504EFA4FAB8A7F5DE08A /* Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 338EC7DCAE74C1B8C397D189 /* Config.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		77315F9BC357C97B885E883C /* RenderDevice.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RenderDevice.c; sourceTree = "<group>"; };
+		9220C57BBAA3C951D8083799 /* RenderDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RenderDevice.h; sourceTree = "<group>"; };
+		2475AF263A11F6F11DECBD3C /* Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
+		38F069D0DBE26C7E00B5B5EE /* Types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Types.h; sourceTree = "<group>"; };
+		338EC7DCAE74C1B8C397D189 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
+		D75DB081D05F4EB29F289CE8 /* Renderer.vert.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.vert.hlsl"; sourceTree = "<group>"; };
+		C416578A7DB2529C836A499C /* Renderer.frag.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Renderer.frag.hlsl"; sourceTree = "<group>"; };
+		6251F22589273797656C269E /* ObjectivelyGPU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectivelyGPU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DE1439ACCFCEB73E6F9981A5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8C4FDD7B635240BD562EBB49 = {
+			isa = PBXGroup;
+			children = (
+				904A6003E847F129BD1EE63E /* Sources */,
+				B23D89B2D2DF3745A003AEB1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B23D89B2D2DF3745A003AEB1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6251F22589273797656C269E /* ObjectivelyGPU.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		904A6003E847F129BD1EE63E /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				AFF3775B279FC0FE4D348FBA /* ObjectivelyGPU */,
+			);
+			name = Sources;
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		AFF3775B279FC0FE4D348FBA /* ObjectivelyGPU */ = {
+			isa = PBXGroup;
+			children = (
+				338EC7DCAE74C1B8C397D189 /* Config.h */,
+				2475AF263A11F6F11DECBD3C /* Log.h */,
+				77315F9BC357C97B885E883C /* RenderDevice.c */,
+				9220C57BBAA3C951D8083799 /* RenderDevice.h */,
+				B0DCC202FC0DE3DD6AD6B538 /* Shaders */,
+				38F069D0DBE26C7E00B5B5EE /* Types.h */,
+			);
+			path = ObjectivelyGPU;
+			sourceTree = "<group>";
+		};
+		B0DCC202FC0DE3DD6AD6B538 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				C416578A7DB2529C836A499C /* Renderer.frag.hlsl */,
+				D75DB081D05F4EB29F289CE8 /* Renderer.vert.hlsl */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FAEE1924216535BBA6F1D0CD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDEB504EFA4FAB8A7F5DE08A /* Config.h in Headers */,
+				FA76885F6E4FCCA53C6AFE6F /* Log.h in Headers */,
+				C4EF9626FEBDC084801F3B39 /* RenderDevice.h in Headers */,
+				96EA6590399038D49A444BAC /* Types.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0A6C122544D4229709A79AD /* Build configuration list for PBXNativeTarget "ObjectivelyGPU" */;
+			buildPhases = (
+				3B7DFB0747829707F437ED7F /* Sources */,
+				DE1439ACCFCEB73E6F9981A5 /* Frameworks */,
+				FAEE1924216535BBA6F1D0CD /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ObjectivelyGPU;
+			productName = ObjectivelyGPU;
+			productReference = 6251F22589273797656C269E /* ObjectivelyGPU.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2650;
+				ORGANIZATIONNAME = "https://github.com/jdolan";
+				TargetAttributes = {
+					EA25F2CECA5EE87704453CE2 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 406C6DFE431ECD1665C1EE27 /* Build configuration list for PBXProject "ObjectivelyGPU" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8C4FDD7B635240BD562EBB49;
+			productRefGroup = B23D89B2D2DF3745A003AEB1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3B7DFB0747829707F437ED7F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E9B05C51385583BE376E321C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu23;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B7DC821DF56771B677CD9D20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu23;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AEC4259544188C1FBB7E4C07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				INFOPLIST_FILE = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
+					/opt/homebrew/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lObjectively",
+					"-lSDL3",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.jdolan.ObjectivelyGPU";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		02E8EA186897855DF59BB780 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				INFOPLIST_FILE = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
+					/opt/homebrew/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lObjectively",
+					"-lSDL3",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.jdolan.ObjectivelyGPU";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		406C6DFE431ECD1665C1EE27 /* Build configuration list for PBXProject "ObjectivelyGPU" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9B05C51385583BE376E321C /* Debug */,
+				B7DC821DF56771B677CD9D20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E0A6C122544D4229709A79AD /* Build configuration list for PBXNativeTarget "ObjectivelyGPU" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AEC4259544188C1FBB7E4C07 /* Debug */,
+				02E8EA186897855DF59BB780 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}
