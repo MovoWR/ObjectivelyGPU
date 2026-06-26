@@ -22,6 +22,14 @@
 		F73340493879CD8034F99D51 /* ComputePass.c in Sources */ = {isa = PBXBuildFile; fileRef = ED8024CA4186E352C1EC4CA1 /* ComputePass.c */; };
 		FF30FF2D56F9E4EA3C492CBB /* RenderPass.c in Sources */ = {isa = PBXBuildFile; fileRef = 669BE73362E651792735CB1C /* RenderPass.c */; };
 		CEA0030000000000000000F1 /* Objectively.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEA0030000000000000000F0 /* Objectively.framework */; };
+		EE00100000000000000000B1 /* Hello.c in Sources */ = {isa = PBXBuildFile; fileRef = EE00010000000000000000B1 /* Hello.c */; };
+		EE00110000000000000000B2 /* HelloCompute.c in Sources */ = {isa = PBXBuildFile; fileRef = EE00020000000000000000B2 /* HelloCompute.c */; };
+		EE00120000000000000000B3 /* ObjectivelyGPU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6251F22589273797656C269E /* ObjectivelyGPU.framework */; };
+		EE00130000000000000000B4 /* SDL3.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000EE01 /* SDL3.xcframework */; };
+		EE00140000000000000000B5 /* Objectively.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEA0030000000000000000F0 /* Objectively.framework */; };
+		EE00150000000000000000B6 /* ObjectivelyGPU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6251F22589273797656C269E /* ObjectivelyGPU.framework */; };
+		EE00160000000000000000B7 /* SDL3.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000EE01 /* SDL3.xcframework */; };
+		EE00170000000000000000B8 /* Objectively.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEA0030000000000000000F0 /* Objectively.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,9 +55,30 @@
 		ED8024CA4186E352C1EC4CA1 /* ComputePass.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ComputePass.c; sourceTree = "<group>"; };
 		FDEE3DD81E43E5CFE68E9519 /* Renderer.frag.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = Renderer.frag.hlsl; sourceTree = "<group>"; };
 		CEA0030000000000000000F0 /* Objectively.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Objectively.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EE00010000000000000000B1 /* Hello.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Hello.c; sourceTree = "<group>"; };
+		EE00020000000000000000B2 /* HelloCompute.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HelloCompute.c; sourceTree = "<group>"; };
+		EE00030000000000000000B3 /* ObjectivelyGPU-Hello */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "ObjectivelyGPU-Hello"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EE00040000000000000000B4 /* ObjectivelyGPU-HelloCompute */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "ObjectivelyGPU-HelloCompute"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 
+
+/* Begin PBXContainerItemProxy section */
+		EE00700000000000000000B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA25F2CECA5EE87704453CE2;
+			remoteInfo = ObjectivelyGPU;
+		};
+		EE00900000000000000000B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA25F2CECA5EE87704453CE2;
+			remoteInfo = ObjectivelyGPU;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		DE1439ACCFCEB73E6F9981A5 /* Frameworks */ = {
@@ -58,6 +87,26 @@
 			files = (
 				AA000000000000000000FF01 /* SDL3.xcframework in Frameworks */,
 				CEA0030000000000000000F1 /* Objectively.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE00400000000000000000B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE00120000000000000000B3 /* ObjectivelyGPU.framework in Frameworks */,
+				EE00130000000000000000B4 /* SDL3.xcframework in Frameworks */,
+				EE00140000000000000000B5 /* Objectively.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE00600000000000000000B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE00150000000000000000B6 /* ObjectivelyGPU.framework in Frameworks */,
+				EE00160000000000000000B7 /* SDL3.xcframework in Frameworks */,
+				EE00170000000000000000B8 /* Objectively.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +119,7 @@
 				AA000000000000000000DD01 /* Frameworks */,
 				B23D89B2D2DF3745A003AEB1 /* Products */,
 				904A6003E847F129BD1EE63E /* Sources */,
+				EE00200000000000000000B1 /* Examples */,
 				CEEAAFF72FED833A00FFEBE6 /* COPYING */,
 				CEEAAFF82FED833A00FFEBE6 /* Makefile.am */,
 				CEEAAFFA2FED833A00FFEBE6 /* README.md */,
@@ -128,8 +178,19 @@
 			isa = PBXGroup;
 			children = (
 				6251F22589273797656C269E /* ObjectivelyGPU.framework */,
+				EE00030000000000000000B3 /* ObjectivelyGPU-Hello */,
+				EE00040000000000000000B4 /* ObjectivelyGPU-HelloCompute */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		EE00200000000000000000B1 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				EE00010000000000000000B1 /* Hello.c */,
+				EE00020000000000000000B2 /* HelloCompute.c */,
+			);
+			path = Examples;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -152,6 +213,19 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		EE00800000000000000000B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */;
+			targetProxy = EE00700000000000000000B1 /* PBXContainerItemProxy */;
+		};
+		EE00A00000000000000000B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */;
+			targetProxy = EE00900000000000000000B1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXNativeTarget section */
 		EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */ = {
 			isa = PBXNativeTarget;
@@ -169,6 +243,40 @@
 			productName = ObjectivelyGPU;
 			productReference = 6251F22589273797656C269E /* ObjectivelyGPU.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		EE00B00000000000000000B1 /* ObjectivelyGPU-Hello */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EE01100000000000000000B1 /* Build configuration list for PBXNativeTarget "ObjectivelyGPU-Hello" */;
+			buildPhases = (
+				EE00300000000000000000B1 /* Sources */,
+				EE00400000000000000000B1 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EE00800000000000000000B1 /* PBXTargetDependency */,
+			);
+			name = "ObjectivelyGPU-Hello";
+			productName = "ObjectivelyGPU-Hello";
+			productReference = EE00030000000000000000B3 /* ObjectivelyGPU-Hello */;
+			productType = "com.apple.product-type.tool";
+		};
+		EE00C00000000000000000B1 /* ObjectivelyGPU-HelloCompute */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EE01200000000000000000B1 /* Build configuration list for PBXNativeTarget "ObjectivelyGPU-HelloCompute" */;
+			buildPhases = (
+				EE00500000000000000000B1 /* Sources */,
+				EE00600000000000000000B1 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EE00A00000000000000000B1 /* PBXTargetDependency */,
+			);
+			name = "ObjectivelyGPU-HelloCompute";
+			productName = "ObjectivelyGPU-HelloCompute";
+			productReference = EE00040000000000000000B4 /* ObjectivelyGPU-HelloCompute */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -199,6 +307,8 @@
 			projectRoot = "";
 			targets = (
 				EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */,
+				EE00B00000000000000000B1 /* ObjectivelyGPU-Hello */,
+				EE00C00000000000000000B1 /* ObjectivelyGPU-HelloCompute */,
 			);
 		};
 /* End PBXProject section */
@@ -213,6 +323,22 @@
 				CCCB11DB70E4A962360A2119 /* CopyPass.c in Sources */,
 				86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */,
 				FF30FF2D56F9E4EA3C492CBB /* RenderPass.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE00300000000000000000B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE00100000000000000000B1 /* Hello.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE00500000000000000000B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE00110000000000000000B2 /* HelloCompute.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,6 +449,98 @@
 			};
 			name = Debug;
 		};
+		EE00D00000000000000000B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EE00E00000000000000000B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		EE00F00000000000000000B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EE01000000000000000000B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Sources",
+					/usr/local/include,
+					/opt/homebrew/include,
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -340,6 +558,24 @@
 			buildConfigurations = (
 				AEC4259544188C1FBB7E4C07 /* Debug */,
 				02E8EA186897855DF59BB780 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EE01100000000000000000B1 /* Build configuration list for PBXNativeTarget "ObjectivelyGPU-Hello" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE00D00000000000000000B1 /* Debug */,
+				EE00E00000000000000000B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EE01200000000000000000B1 /* Build configuration list for PBXNativeTarget "ObjectivelyGPU-HelloCompute" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE00F00000000000000000B1 /* Debug */,
+				EE01000000000000000000B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

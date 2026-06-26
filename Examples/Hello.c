@@ -267,7 +267,7 @@ int main(int argc, char **argv) {
 		.rasterizer_state = {
 			.fill_mode = SDL_GPU_FILLMODE_FILL,
 			.cull_mode = SDL_GPU_CULLMODE_BACK,
-			.front_face = SDL_GPU_FRONTFACE_CLOCKWISE,
+			.front_face = SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE,
 			.enable_depth_clip = true,
 		},
 		.multisample_state = {
