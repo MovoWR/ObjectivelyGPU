@@ -6,6 +6,20 @@
 	objectVersion = 56;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		EI03000000000000000000A1 /* ObjectivelyGPU-xcframework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = EI03400000000000000000A1 /* Build configuration list for PBXAggregateTarget "ObjectivelyGPU-xcframework" */;
+			buildPhases = (
+				EI03100000000000000000A1 /* Run Script */,
+			);
+			dependencies = (
+			);
+			name = "ObjectivelyGPU-xcframework";
+			productName = "ObjectivelyGPU-xcframework";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		034285033FECAB2D6BD6AE5B /* ComputePass.h in Headers */ = {isa = PBXBuildFile; fileRef = 09B8DD26CDB7926D89445C91 /* ComputePass.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2A17F0E01E5CC25A431FFBAD /* CommandBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = E71C479F7B60345FDDA44201 /* CommandBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -271,42 +285,6 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		EI03100000000000000000A1 /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "exec \"$SRCROOT/scripts/build-xcframework.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
-/* Begin PBXAggregateTarget section */
-		EI03000000000000000000A1 /* ObjectivelyGPU-xcframework */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = EI03400000000000000000A1 /* Build configuration list for PBXAggregateTarget "ObjectivelyGPU-xcframework" */;
-			buildPhases = (
-				EI03100000000000000000A1 /* Run Script */,
-			);
-			dependencies = (
-			);
-			name = "ObjectivelyGPU-xcframework";
-			productName = "ObjectivelyGPU-xcframework";
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXNativeTarget section */
 		EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */ = {
 			isa = PBXNativeTarget;
@@ -388,10 +366,10 @@
 				LastUpgradeCheck = 2650;
 				ORGANIZATIONNAME = "https://github.com/jdolan";
 				TargetAttributes = {
-				EI03000000000000000000A1 = {
-					CreatedOnToolsVersion = 16.0;
-				};
 					EA25F2CECA5EE87704453CE2 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					EI03000000000000000000A1 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
@@ -410,10 +388,10 @@
 			projectRoot = "";
 			targets = (
 				EA25F2CECA5EE87704453CE2 /* ObjectivelyGPU */,
+				EI03000000000000000000A1 /* ObjectivelyGPU-xcframework */,
 				EE00B00000000000000000B1 /* ObjectivelyGPU-Hello */,
 				EE00C00000000000000000B1 /* ObjectivelyGPU-HelloCompute */,
 				EI00F00000000000000000B1 /* ObjectivelyGPU-Hello-iOS */,
-							EI03000000000000000000A1 /* ObjectivelyGPU-xcframework */,
 			);
 		};
 /* End PBXProject section */
@@ -427,6 +405,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		EI03100000000000000000A1 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec \"$SRCROOT/scripts/build-xcframework.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3B7DFB0747829707F437ED7F /* Sources */ = {
@@ -565,6 +565,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				VALIDATE_PRODUCT = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 			};
 			name = Release;
 		};
@@ -586,6 +588,8 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 			};
 			name = Debug;
 		};
@@ -699,7 +703,6 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Examples/Hello-iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -730,7 +733,6 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Examples/Hello-iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
