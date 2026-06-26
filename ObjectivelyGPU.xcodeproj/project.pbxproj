@@ -151,9 +151,7 @@
 		AA000000000000000000DD01 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AA000000000000000000EE01 /* SDL3.xcframework */,
-				EI00050000000000000000B5 /* ObjectivelyGPU.xcframework */,
-				EI00060000000000000000B6 /* Objectively.xcframework */,
+				EI02000000000000000000B1 /* iOS xcframeworks */,
 				CEA0030000000000000000F0 /* Objectively.framework */,
 			);
 			name = Frameworks;
@@ -217,6 +215,14 @@
 				EI00030000000000000000B3 /* LaunchScreen.storyboard */,
 			);
 			path = "Hello-iOS";
+			sourceTree = "<group>";
+		};
+		EI02000000000000000000B1 /* iOS xcframeworks */ = {
+			isa = PBXGroup;
+			children = (
+				EI02000000000000000000B1 /* iOS xcframeworks */,
+			);
+			name = "iOS xcframeworks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
