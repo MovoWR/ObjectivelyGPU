@@ -497,7 +497,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
-					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64",
 				);
 				FRAMEWORK_VERSION = A;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -505,6 +504,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					"$(WORKSPACE_PREFIX)/Objectively/Sources",
+					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64/SDL3.framework/Headers",
 				);
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -530,7 +530,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
-					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64",
 				);
 				FRAMEWORK_VERSION = A;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -538,6 +537,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					"$(WORKSPACE_PREFIX)/Objectively/Sources",
+					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64/SDL3.framework/Headers",
 				);
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -599,13 +599,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
-					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64",
 					"$(BUILT_PRODUCTS_DIR)",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					"$(WORKSPACE_PREFIX)/Objectively/Sources",
+					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64/SDL3.framework/Headers",
 				);
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -622,13 +622,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
-					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64",
 					"$(BUILT_PRODUCTS_DIR)",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					"$(WORKSPACE_PREFIX)/Objectively/Sources",
+					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64/SDL3.framework/Headers",
 				);
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -645,13 +645,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
-					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64",
 					"$(BUILT_PRODUCTS_DIR)",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					"$(WORKSPACE_PREFIX)/Objectively/Sources",
+					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64/SDL3.framework/Headers",
 				);
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -668,13 +668,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Frameworks",
-					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64",
 					"$(BUILT_PRODUCTS_DIR)",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Sources",
 					"$(WORKSPACE_PREFIX)/Objectively/Sources",
+					"$(SRCROOT)/Frameworks/SDL3.xcframework/macos-arm64_x86_64/SDL3.framework/Headers",
 				);
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
