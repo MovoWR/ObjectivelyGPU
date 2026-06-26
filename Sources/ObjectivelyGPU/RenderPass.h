@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <SDL3/SDL_gpu.h>
-
 #include <Objectively/Object.h>
 
 #include <ObjectivelyGPU/Types.h>
@@ -46,7 +44,7 @@ typedef struct RenderPassInterface RenderPassInterface;
  *
  * @code
  *   RenderPass *pass = $(cmd, beginRenderPass, colorTargets, numTargets, NULL);
- *   $(pass, bindGraphicsPipeline, pipeline);
+ *   $(pass, bindPipeline, pipeline);
  *   $(pass, drawPrimitives, vertexCount, 1, 0, 0);
  *   release(pass);  // ends the pass
  * @endcode
@@ -65,6 +63,18 @@ struct RenderPass {
    * @protected
    */
   RenderPassInterface *interface;
+
+  /**
+   * @brief When true, the render pass clears to @c clear_color before drawing.
+   * @details Defaults to `true` (clear to opaque black).
+   */
+  bool clear;
+
+  /**
+   * @brief The color used to clear the swapchain texture when @c clear is true.
+   * @details Defaults to opaque black `{0, 0, 0, 1}`.
+   */
+  SDL_FColor clearColor;
 
   /**
    * @brief The underlying SDL render pass.
@@ -106,11 +116,11 @@ struct RenderPassInterface {
   void (*bindFragmentStorageTextures)(const RenderPass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num);
 
   /**
-   * @fn void RenderPass::bindGraphicsPipeline(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline)
+   * @fn void RenderPass::bindPipeline(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline)
    * @brief Binds a graphics pipeline for subsequent draw calls.
    * @memberof RenderPass
    */
-  void (*bindGraphicsPipeline)(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline);
+  void (*bindPipeline)(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline);
 
   /**
    * @fn void RenderPass::bindIndexBuffer(const RenderPass *self, const SDL_GPUBufferBinding *binding, SDL_GPUIndexElementSize indexElementSize)
@@ -176,14 +186,14 @@ struct RenderPassInterface {
   void (*drawPrimitivesIndirect)(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount);
 
   /**
-   * @fn RenderPass *RenderPass::initWithPass(RenderPass *self, SDL_GPURenderPass *pass)
+   * @fn RenderPass *RenderPass::init(RenderPass *self, SDL_GPURenderPass *pass)
    * @brief Initializes this RenderPass wrapping the given SDL render pass.
    * @param self The RenderPass.
    * @param pass The SDL render pass to wrap. Must not be NULL.
    * @return The initialized RenderPass, or NULL on failure.
    * @memberof RenderPass
    */
-  RenderPass *(*initWithPass)(RenderPass *self, SDL_GPURenderPass *pass);
+  RenderPass *(*init)(RenderPass *self, SDL_GPURenderPass *pass);
 
   /**
    * @fn void RenderPass::setBlendConstants(const RenderPass *self, SDL_FColor blendConstants)

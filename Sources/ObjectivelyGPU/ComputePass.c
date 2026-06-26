@@ -21,6 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+#include <assert.h>
 
 #include "ComputePass.h"
 
@@ -32,7 +33,6 @@
  * @see Object::dealloc(Object *)
  */
 static void dealloc(Object *self) {
-
 
   ComputePass *this = (ComputePass *) self;
   if (this->pass) {
@@ -49,8 +49,6 @@ static void dealloc(Object *self) {
  * @memberof ComputePass
  */
 static void bindPipeline(const ComputePass *self, SDL_GPUComputePipeline *pipeline) {
-
-
   SDL_BindGPUComputePipeline(self->pass, pipeline);
 }
 
@@ -75,8 +73,6 @@ static void bindStorageBuffers(const ComputePass *self, Uint32 firstSlot, SDL_GP
  * @memberof ComputePass
  */
 static void bindStorageTextures(const ComputePass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num) {
-
-
   SDL_BindGPUComputeStorageTextures(self->pass, firstSlot, textures, num);
 }
 
@@ -85,7 +81,6 @@ static void bindStorageTextures(const ComputePass *self, Uint32 firstSlot, SDL_G
  * @memberof ComputePass
  */
 static void dispatchCompute(const ComputePass *self, Uint32 groupCountX, Uint32 groupCountY, Uint32 groupCountZ) {
-
   SDL_DispatchGPUCompute(self->pass, groupCountX, groupCountY, groupCountZ);
 }
 
@@ -94,8 +89,6 @@ static void dispatchCompute(const ComputePass *self, Uint32 groupCountX, Uint32 
  * @memberof ComputePass
  */
 static void dispatchComputeIndirect(const ComputePass *self, SDL_GPUBuffer *buffer, Uint32 offset) {
-
-
   SDL_DispatchGPUComputeIndirect(self->pass, buffer, offset);
 }
 
@@ -108,6 +101,7 @@ static ComputePass *init(ComputePass *self, SDL_GPUComputePass *pass) {
   self = (ComputePass *) super(Object, self, init);
   if (self) {
     self->pass = pass;
+    assert(self->pass);
   }
 
   return self;

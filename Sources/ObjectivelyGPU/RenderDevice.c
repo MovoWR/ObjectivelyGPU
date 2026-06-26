@@ -220,8 +220,6 @@ static RenderDevice *init(RenderDevice *self) {
 
   self = (RenderDevice *) super(Object, self, init);
   if (self) {
-    self->clear = true;
-    self->clearColor = (SDL_FColor) { 0.f, 0.f, 0.f, 1.f };
 
     const SDL_GPUShaderFormat formats =
       SDL_GPU_SHADERFORMAT_MSL |

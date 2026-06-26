@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <SDL3/SDL_gpu.h>
-
 #include <Objectively/Object.h>
 
 #include <ObjectivelyGPU/Types.h>
@@ -46,7 +44,7 @@ typedef struct ComputePassInterface ComputePassInterface;
  *
  * @code
  *   ComputePass *compute = $(cmd, beginComputePass, NULL, 0, storageBuffers, 1);
- *   $(compute, bindComputePipeline, pipeline);
+ *   $(compute, bindPipeline, pipeline);
  *   $(compute, dispatchCompute, groupsX, groupsY, 1);
  *   release(compute);  // ends the pass
  * @endcode
@@ -85,11 +83,11 @@ struct ComputePassInterface {
   ObjectInterface objectInterface;
 
   /**
-   * @fn void ComputePass::bindComputePipeline(const ComputePass *self, SDL_GPUComputePipeline *pipeline)
+   * @fn void ComputePass::bindPipeline(const ComputePass *self, SDL_GPUComputePipeline *pipeline)
    * @brief Binds a compute pipeline for subsequent dispatches.
    * @memberof ComputePass
    */
-  void (*bindComputePipeline)(const ComputePass *self, SDL_GPUComputePipeline *pipeline);
+  void (*bindPipeline)(const ComputePass *self, SDL_GPUComputePipeline *pipeline);
 
   /**
    * @fn void ComputePass::bindSamplers(const ComputePass *self, Uint32 firstSlot, const SDL_GPUTextureSamplerBinding *bindings, Uint32 num)
@@ -131,14 +129,14 @@ struct ComputePassInterface {
   void (*dispatchComputeIndirect)(const ComputePass *self, SDL_GPUBuffer *buffer, Uint32 offset);
 
   /**
-   * @fn ComputePass *ComputePass::initWithPass(ComputePass *self, SDL_GPUComputePass *pass)
+   * @fn ComputePass *ComputePass::init(ComputePass *self, SDL_GPUComputePass *pass)
    * @brief Initializes this ComputePass wrapping the given SDL compute pass.
    * @param self The ComputePass.
    * @param pass The SDL compute pass to wrap. Must not be NULL.
    * @return The initialized ComputePass, or NULL on failure.
    * @memberof ComputePass
    */
-  ComputePass *(*initWithPass)(ComputePass *self, SDL_GPUComputePass *pass);
+  ComputePass *(*init)(ComputePass *self, SDL_GPUComputePass *pass);
 };
 
 /**

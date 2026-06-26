@@ -21,6 +21,8 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+#include <assert.h>
+
 #include "RenderPass.h"
 
 #define _Class _RenderPass
@@ -47,8 +49,6 @@ static void dealloc(Object *self) {
  * @memberof RenderPass
  */
 static void bindFragmentSamplers(const RenderPass *self, Uint32 firstSlot, const SDL_GPUTextureSamplerBinding *bindings, Uint32 num) {
-
-
   SDL_BindGPUFragmentSamplers(self->pass, firstSlot, bindings, num);
 }
 
@@ -57,8 +57,6 @@ static void bindFragmentSamplers(const RenderPass *self, Uint32 firstSlot, const
  * @memberof RenderPass
  */
 static void bindFragmentStorageBuffers(const RenderPass *self, Uint32 firstSlot, SDL_GPUBuffer *const *buffers, Uint32 num) {
-
-
   SDL_BindGPUFragmentStorageBuffers(self->pass, firstSlot, buffers, num);
 }
 
@@ -67,8 +65,6 @@ static void bindFragmentStorageBuffers(const RenderPass *self, Uint32 firstSlot,
  * @memberof RenderPass
  */
 static void bindFragmentStorageTextures(const RenderPass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num) {
-
-
   SDL_BindGPUFragmentStorageTextures(self->pass, firstSlot, textures, num);
 }
 
@@ -77,8 +73,6 @@ static void bindFragmentStorageTextures(const RenderPass *self, Uint32 firstSlot
  * @memberof RenderPass
  */
 static void bindIndexBuffer(const RenderPass *self, const SDL_GPUBufferBinding *binding, SDL_GPUIndexElementSize indexElementSize) {
-
-
   SDL_BindGPUIndexBuffer(self->pass, binding, indexElementSize);
 }
 
@@ -88,8 +82,6 @@ static void bindIndexBuffer(const RenderPass *self, const SDL_GPUBufferBinding *
  * @memberof RenderPass
  */
 static void bindPipeline(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline) {
-
-
   SDL_BindGPUGraphicsPipeline(self->pass, pipeline);
 }
 
@@ -98,8 +90,6 @@ static void bindPipeline(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeli
  * @memberof RenderPass
  */
 static void bindVertexBuffers(const RenderPass *self, Uint32 firstSlot, const SDL_GPUBufferBinding *bindings, Uint32 num) {
-
-
   SDL_BindGPUVertexBuffers(self->pass, firstSlot, bindings, num);
 }
 
@@ -108,8 +98,6 @@ static void bindVertexBuffers(const RenderPass *self, Uint32 firstSlot, const SD
  * @memberof RenderPass
  */
 static void bindVertexSamplers(const RenderPass *self, Uint32 firstSlot, const SDL_GPUTextureSamplerBinding *bindings, Uint32 num) {
-
-
   SDL_BindGPUVertexSamplers(self->pass, firstSlot, bindings, num);
 }
 
@@ -118,8 +106,6 @@ static void bindVertexSamplers(const RenderPass *self, Uint32 firstSlot, const S
  * @memberof RenderPass
  */
 static void bindVertexStorageBuffers(const RenderPass *self, Uint32 firstSlot, SDL_GPUBuffer *const *buffers, Uint32 num) {
-
-
   SDL_BindGPUVertexStorageBuffers(self->pass, firstSlot, buffers, num);
 }
 
@@ -128,8 +114,6 @@ static void bindVertexStorageBuffers(const RenderPass *self, Uint32 firstSlot, S
  * @memberof RenderPass
  */
 static void bindVertexStorageTextures(const RenderPass *self, Uint32 firstSlot, SDL_GPUTexture *const *textures, Uint32 num) {
-
-
   SDL_BindGPUVertexStorageTextures(self->pass, firstSlot, textures, num);
 }
 
@@ -138,7 +122,6 @@ static void bindVertexStorageTextures(const RenderPass *self, Uint32 firstSlot, 
  * @memberof RenderPass
  */
 static void drawIndexedPrimitives(const RenderPass *self, Uint32 numIndices, Uint32 numInstances, Uint32 firstIndex, Sint32 vertexOffset, Uint32 firstInstance) {
-
   SDL_DrawGPUIndexedPrimitives(self->pass, numIndices, numInstances, firstIndex, vertexOffset, firstInstance);
 }
 
@@ -147,8 +130,6 @@ static void drawIndexedPrimitives(const RenderPass *self, Uint32 numIndices, Uin
  * @memberof RenderPass
  */
 static void drawIndexedPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount) {
-
-
   SDL_DrawGPUIndexedPrimitivesIndirect(self->pass, buffer, offset, drawCount);
 }
 
@@ -157,7 +138,6 @@ static void drawIndexedPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer 
  * @memberof RenderPass
  */
 static void drawPrimitives(const RenderPass *self, Uint32 numVertices, Uint32 numInstances, Uint32 firstVertex, Uint32 firstInstance) {
-
   SDL_DrawGPUPrimitives(self->pass, numVertices, numInstances, firstVertex, firstInstance);
 }
 
@@ -166,8 +146,6 @@ static void drawPrimitives(const RenderPass *self, Uint32 numVertices, Uint32 nu
  * @memberof RenderPass
  */
 static void drawPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount) {
-
-
   SDL_DrawGPUPrimitivesIndirect(self->pass, buffer, offset, drawCount);
 }
 
@@ -180,6 +158,7 @@ static RenderPass *init(RenderPass *self, SDL_GPURenderPass *pass) {
   self = (RenderPass *) super(Object, self, init);
   if (self) {
     self->pass = pass;
+    assert(self->pass);
   }
 
   return self;
@@ -190,7 +169,6 @@ static RenderPass *init(RenderPass *self, SDL_GPURenderPass *pass) {
  * @memberof RenderPass
  */
 static void setBlendConstants(const RenderPass *self, SDL_FColor blendConstants) {
-
   SDL_SetGPUBlendConstants(self->pass, blendConstants);
 }
 
@@ -199,8 +177,6 @@ static void setBlendConstants(const RenderPass *self, SDL_FColor blendConstants)
  * @memberof RenderPass
  */
 static void setScissor(const RenderPass *self, const SDL_Rect *scissor) {
-
-
   SDL_SetGPUScissor(self->pass, scissor);
 }
 
@@ -209,7 +185,6 @@ static void setScissor(const RenderPass *self, const SDL_Rect *scissor) {
  * @memberof RenderPass
  */
 static void setStencilReference(const RenderPass *self, Uint8 reference) {
-
   SDL_SetGPUStencilReference(self->pass, reference);
 }
 
@@ -218,8 +193,6 @@ static void setStencilReference(const RenderPass *self, Uint8 reference) {
  * @memberof RenderPass
  */
 static void setViewport(const RenderPass *self, const SDL_GPUViewport *viewport) {
-
-
   SDL_SetGPUViewport(self->pass, viewport);
 }
 

@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <SDL3/SDL_gpu.h>
-
 #include <Objectively/Object.h>
 
 #include <ObjectivelyGPU/Types.h>
@@ -112,14 +110,14 @@ struct CopyPassInterface {
   void (*downloadTexture)(const CopyPass *self, const SDL_GPUTextureRegion *src, const SDL_GPUTextureTransferInfo *dst);
 
   /**
-   * @fn CopyPass *CopyPass::initWithPass(CopyPass *self, SDL_GPUCopyPass *pass)
+   * @fn CopyPass *CopyPass::init(CopyPass *self, SDL_GPUCopyPass *pass)
    * @brief Initializes this CopyPass wrapping the given SDL copy pass.
    * @param self The CopyPass.
    * @param pass The SDL copy pass to wrap. Must not be NULL.
    * @return The initialized CopyPass, or NULL on failure.
    * @memberof CopyPass
    */
-  CopyPass *(*initWithPass)(CopyPass *self, SDL_GPUCopyPass *pass);
+  CopyPass *(*init)(CopyPass *self, SDL_GPUCopyPass *pass);
 
   /**
    * @fn void CopyPass::uploadBuffer(const CopyPass *self, const SDL_GPUTransferBufferLocation *src, const SDL_GPUBufferRegion *dst, bool cycle)

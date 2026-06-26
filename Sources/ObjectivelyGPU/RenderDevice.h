@@ -52,7 +52,7 @@ struct Swapchain {
   SDL_GPUTexture *texture;
 
   /**
-   * @brief The swapchain dimensions for this frame.
+   * @brief The swapchain dimensions.
    * @private
    */
   SDL_Size size;
@@ -63,7 +63,8 @@ typedef struct Swapchain Swapchain;
 typedef struct RenderDeviceInterface RenderDeviceInterface;
 
 /**
- * @brief Owns the `SDL_GPUDevice` and window, and provides factory methods for GPU resources.
+ * @brief The RenderDevice encapsulates an `SDL_GPUDevice` and provides methods for allocating
+ * GPU resources, managing compute, copy and render passes, and .
  *
  * @extends Object
  */
@@ -81,26 +82,14 @@ struct RenderDevice {
   RenderDeviceInterface *interface;
 
   /**
-   * @brief The SDL_GPU device.
+   * @brief The `SDL_GPUDevice`.
    */
   SDL_GPUDevice *device;
 
   /**
-   * @brief The window currently being rendered.
+   * @brief The `SDL_Window` associated with @c device.
    */
   SDL_Window *window;
-
-  /**
-   * @brief When true, the render pass clears to @c clear_color before drawing.
-   * @details Defaults to `true` (clear to opaque black).
-   */
-  bool clear;
-
-  /**
-   * @brief The color used to clear the swapchain texture when @c clear is true.
-   * @details Defaults to opaque black `{0, 0, 0, 1}`.
-   */
-  SDL_FColor clearColor;
 };
 
 /**

@@ -22,6 +22,7 @@
  */
 
 #include <assert.h>
+
 #include "CommandBuffer.h"
 #include "ComputePass.h"
 #include "CopyPass.h"
@@ -36,8 +37,6 @@
  * @memberof CommandBuffer
  */
 static bool acquireSwapchainTexture(const CommandBuffer *self, SDL_Window *window, SDL_GPUTexture **texture, Uint32 *w, Uint32 *h) {
-
-
   return SDL_AcquireGPUSwapchainTexture(self->cmd, window, texture, w, h);
 }
 
@@ -46,7 +45,6 @@ static bool acquireSwapchainTexture(const CommandBuffer *self, SDL_Window *windo
  * @memberof CommandBuffer
  */
 static ComputePass *beginComputePass(const CommandBuffer *self, const SDL_GPUStorageTextureReadWriteBinding *storageTextures, Uint32 numStorageTextures, const SDL_GPUStorageBufferReadWriteBinding *storageBuffers, Uint32 numStorageBuffers) {
-
 
   SDL_GPUComputePass *pass = SDL_BeginGPUComputePass(self->cmd, storageTextures, numStorageTextures, storageBuffers, numStorageBuffers);
   GPU_Assert(pass, "SDL_BeginGPUComputePass");
@@ -60,7 +58,6 @@ static ComputePass *beginComputePass(const CommandBuffer *self, const SDL_GPUSto
  */
 static CopyPass *beginCopyPass(const CommandBuffer *self) {
 
-
   SDL_GPUCopyPass *pass = SDL_BeginGPUCopyPass(self->cmd);
   GPU_Assert(pass, "SDL_BeginGPUCopyPass");
 
@@ -73,7 +70,6 @@ static CopyPass *beginCopyPass(const CommandBuffer *self) {
  */
 static RenderPass *beginRenderPass(const CommandBuffer *self, const SDL_GPUColorTargetInfo *colorTargets, Uint32 numColorTargets, const SDL_GPUDepthStencilTargetInfo *depthStencil) {
 
-
   SDL_GPURenderPass *pass = SDL_BeginGPURenderPass(self->cmd, colorTargets, numColorTargets, depthStencil);
   GPU_Assert(pass, "SDL_BeginGPURenderPass");
 
@@ -85,8 +81,6 @@ static RenderPass *beginRenderPass(const CommandBuffer *self, const SDL_GPUColor
  * @memberof CommandBuffer
  */
 static void blitTexture(const CommandBuffer *self, const SDL_GPUBlitInfo *info) {
-
-
   SDL_BlitGPUTexture(self->cmd, info);
 }
 
@@ -95,7 +89,6 @@ static void blitTexture(const CommandBuffer *self, const SDL_GPUBlitInfo *info) 
  * @memberof CommandBuffer
  */
 static bool cancel(const CommandBuffer *self) {
-
 
   const bool ok = SDL_CancelGPUCommandBuffer(self->cmd);
   GPU_Assert(ok, "SDL_CancelGPUCommandBuffer");
@@ -119,11 +112,10 @@ static void generateMipmaps(const CommandBuffer *self, SDL_GPUTexture *texture) 
  */
 static CommandBuffer *initWithCommandBuffer(CommandBuffer *self, SDL_GPUCommandBuffer *cmd) {
 
-  assert(cmd);
-
   self = (CommandBuffer *) super(Object, self, init);
   if (self) {
     self->cmd = cmd;
+    assert(self->cmd);
   }
 
   return self;
@@ -134,8 +126,6 @@ static CommandBuffer *initWithCommandBuffer(CommandBuffer *self, SDL_GPUCommandB
  * @memberof CommandBuffer
  */
 static void insertDebugLabel(const CommandBuffer *self, const char *text) {
-
-
   SDL_InsertGPUDebugLabel(self->cmd, text);
 }
 
@@ -144,8 +134,6 @@ static void insertDebugLabel(const CommandBuffer *self, const char *text) {
  * @memberof CommandBuffer
  */
 static void popDebugGroup(const CommandBuffer *self) {
-
-
   SDL_PopGPUDebugGroup(self->cmd);
 }
 
@@ -154,8 +142,6 @@ static void popDebugGroup(const CommandBuffer *self) {
  * @memberof CommandBuffer
  */
 static void pushComputeUniformData(const CommandBuffer *self, Uint32 slot, const void *data, Uint32 length) {
-
-
   SDL_PushGPUComputeUniformData(self->cmd, slot, data, length);
 }
 
@@ -164,8 +150,6 @@ static void pushComputeUniformData(const CommandBuffer *self, Uint32 slot, const
  * @memberof CommandBuffer
  */
 static void pushDebugGroup(const CommandBuffer *self, const char *name) {
-
-
   SDL_PushGPUDebugGroup(self->cmd, name);
 }
 
@@ -174,8 +158,6 @@ static void pushDebugGroup(const CommandBuffer *self, const char *name) {
  * @memberof CommandBuffer
  */
 static void pushFragmentUniformData(const CommandBuffer *self, Uint32 slot, const void *data, Uint32 length) {
-
-
   SDL_PushGPUFragmentUniformData(self->cmd, slot, data, length);
 }
 
@@ -184,8 +166,6 @@ static void pushFragmentUniformData(const CommandBuffer *self, Uint32 slot, cons
  * @memberof CommandBuffer
  */
 static void pushVertexUniformData(const CommandBuffer *self, Uint32 slot, const void *data, Uint32 length) {
-
-
   SDL_PushGPUVertexUniformData(self->cmd, slot, data, length);
 }
 
@@ -194,7 +174,6 @@ static void pushVertexUniformData(const CommandBuffer *self, Uint32 slot, const 
  * @memberof CommandBuffer
  */
 static bool submit(const CommandBuffer *self) {
-
 
   const bool ok = SDL_SubmitGPUCommandBuffer(self->cmd);
   GPU_Assert(ok, "SDL_SubmitGPUCommandBuffer");
@@ -208,7 +187,6 @@ static bool submit(const CommandBuffer *self) {
  */
 static SDL_GPUFence *submitAndFence(const CommandBuffer *self) {
 
-
   SDL_GPUFence *fence = SDL_SubmitGPUCommandBufferAndAcquireFence(self->cmd);
   GPU_Assert(fence, "SDL_SubmitGPUCommandBufferAndAcquireFence");
 
@@ -221,22 +199,10 @@ static SDL_GPUFence *submitAndFence(const CommandBuffer *self) {
  */
 static bool waitAndAcquireSwapchainTexture(const CommandBuffer *self, SDL_Window *window, SDL_GPUTexture **texture, Uint32 *w, Uint32 *h) {
 
-
   const bool ok = SDL_WaitAndAcquireGPUSwapchainTexture(self->cmd, window, texture, w, h);
   GPU_Assert(ok, "SDL_WaitAndAcquireGPUSwapchainTexture");
 
   return ok;
-}
-
-#pragma mark - Object lifecycle
-
-/**
- * @see Object::dealloc(Object *)
- */
-static void dealloc(Object *self) {
-
-
-  super(Object, self, dealloc);
 }
 
 #pragma mark - Class lifecycle
@@ -245,8 +211,6 @@ static void dealloc(Object *self) {
  * @see Class::initialize(Class *)
  */
 static void initialize(Class *clazz) {
-
-  ((ObjectInterface *) clazz->interface)->dealloc = dealloc;
 
   ((CommandBufferInterface *) clazz->interface)->acquireSwapchainTexture = acquireSwapchainTexture;
   ((CommandBufferInterface *) clazz->interface)->beginComputePass = beginComputePass;

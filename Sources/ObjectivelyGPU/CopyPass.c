@@ -21,6 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+#include <assert.h>
 
 #include "CopyPass.h"
 
@@ -48,8 +49,6 @@ static void dealloc(Object *self) {
  * @memberof CopyPass
  */
 static void copyBufferToBuffer(const CopyPass *self, const SDL_GPUBufferLocation *src, const SDL_GPUBufferLocation *dst, Uint32 size, bool cycle) {
-
-
   SDL_CopyGPUBufferToBuffer(self->pass, src, dst, size, cycle);
 }
 
@@ -58,8 +57,6 @@ static void copyBufferToBuffer(const CopyPass *self, const SDL_GPUBufferLocation
  * @memberof CopyPass
  */
 static void copyTextureToTexture(const CopyPass *self, const SDL_GPUTextureLocation *src, const SDL_GPUTextureLocation *dst, Uint32 w, Uint32 h, Uint32 d, bool cycle) {
-
-
   SDL_CopyGPUTextureToTexture(self->pass, src, dst, w, h, d, cycle);
 }
 
@@ -68,8 +65,6 @@ static void copyTextureToTexture(const CopyPass *self, const SDL_GPUTextureLocat
  * @memberof CopyPass
  */
 static void downloadBuffer(const CopyPass *self, const SDL_GPUBufferRegion *src, const SDL_GPUTransferBufferLocation *dst) {
-
-
   SDL_DownloadFromGPUBuffer(self->pass, src, dst);
 }
 
@@ -78,8 +73,6 @@ static void downloadBuffer(const CopyPass *self, const SDL_GPUBufferRegion *src,
  * @memberof CopyPass
  */
 static void downloadTexture(const CopyPass *self, const SDL_GPUTextureRegion *src, const SDL_GPUTextureTransferInfo *dst) {
-
-
   SDL_DownloadFromGPUTexture(self->pass, src, dst);
 }
 
@@ -92,6 +85,7 @@ static CopyPass *init(CopyPass *self, SDL_GPUCopyPass *pass) {
   self = (CopyPass *) super(Object, self, init);
   if (self) {
     self->pass = pass;
+    assert(self->pass);
   }
 
   return self;
@@ -102,8 +96,6 @@ static CopyPass *init(CopyPass *self, SDL_GPUCopyPass *pass) {
  * @memberof CopyPass
  */
 static void uploadBuffer(const CopyPass *self, const SDL_GPUTransferBufferLocation *src, const SDL_GPUBufferRegion *dst, bool cycle) {
-
-
   SDL_UploadToGPUBuffer(self->pass, src, dst, cycle);
 }
 
@@ -112,8 +104,6 @@ static void uploadBuffer(const CopyPass *self, const SDL_GPUTransferBufferLocati
  * @memberof CopyPass
  */
 static void uploadTexture(const CopyPass *self, const SDL_GPUTextureTransferInfo *src, const SDL_GPUTextureRegion *dst, bool cycle) {
-
-
   SDL_UploadToGPUTexture(self->pass, src, dst, cycle);
 }
 
