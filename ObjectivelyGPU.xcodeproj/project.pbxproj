@@ -222,7 +222,7 @@
 			children = (
 				EI02000000000000000000B1 /* iOS xcframeworks */,
 			);
-			name = "iOS xcframeworks";
+			name = "xcframeworks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
