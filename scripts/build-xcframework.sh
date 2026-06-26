@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 #
-# build-xcframework.sh — builds ObjectivelyGPU.xcframework for iOS device,
-# iOS Simulator, and macOS, then assembles an xcframework.
+# build-xcframework.sh — builds SDL3.xcframework and ObjectivelyGPU.xcframework
+# for iOS device, iOS Simulator, and macOS.
 #
-# Assumes Frameworks/SDL3.xcframework and Frameworks/Objectively.xcframework
-# are already present (they ship in the repo).
+# Assumes Frameworks/Objectively.xcframework is already present.
 #
 # Usage:
 #   scripts/build-xcframework.sh
+#
+# Optional env vars:
+#   SDL3_VERSION        (default: release-3.4.10)
+#   IOS_MIN             (default: 14.0)
 #
 set -e -o pipefail
 
@@ -20,6 +23,7 @@ FRAMEWORKS_DIR="$GPU_DIR/Frameworks"
 FRAMEWORK="ObjectivelyGPU"
 OUTPUT="$FRAMEWORKS_DIR/$FRAMEWORK.xcframework"
 
+SDL3_VERSION="${SDL3_VERSION:-release-3.4.10}"
 IOS_MIN="${IOS_MIN:-14.0}"
 MACOS_MIN="${MACOS_MIN:-12.0}"
 
@@ -41,7 +45,116 @@ SOURCES=(
 mkdir -p "$BUILD_DIR" "$FRAMEWORKS_DIR"
 
 # ---------------------------------------------------------------------------
-# Helpers
+# SDL3 helpers (cmake-based xcframework build)
+# ---------------------------------------------------------------------------
+
+clone_sdl() {
+    local name="$1" repo="$2" tag="$3"
+    local dir="$BUILD_DIR/$name"
+    if [ ! -d "$dir/.git" ]; then
+        echo "==> Cloning $name $tag"
+        git clone --depth 1 --branch "$tag" "$repo" "$dir" -q
+    fi
+}
+
+build_sdl_cmake_xcframework() {
+    local name="$1" framework="$2" extra_cmake="$3"
+    local output="$FRAMEWORKS_DIR/$name.xcframework"
+
+    if [ -d "$output" ]; then
+        echo "==> $name.xcframework: cached"
+        return 0
+    fi
+
+    local srcdir="$BUILD_DIR/$name"
+    local prefix_device="$BUILD_DIR/$name-install-iphoneos"
+    local prefix_sim="$BUILD_DIR/$name-install-iphonesimulator"
+    local prefix_macos="$BUILD_DIR/$name-install-macos"
+
+    for slice in device simulator macos; do
+        local sdk arch sysroot depl_target cmake_sys min_ver_key prefix build_dir
+        if [ "$slice" = "device" ]; then
+            sdk="$IPHONEOS_SDK"; arch="arm64"; sysroot="iphoneos"
+            depl_target="$IOS_MIN"; cmake_sys="-DCMAKE_SYSTEM_NAME=iOS"
+            min_ver_key="MinimumOSVersion"; prefix="$prefix_device"
+        elif [ "$slice" = "simulator" ]; then
+            sdk="$IPHONESIMULATOR_SDK"; arch="arm64;x86_64"; sysroot="iphonesimulator"
+            depl_target="$IOS_MIN"; cmake_sys="-DCMAKE_SYSTEM_NAME=iOS"
+            min_ver_key="MinimumOSVersion"; prefix="$prefix_sim"
+        else
+            sdk="$MACOSX_SDK"; arch="arm64;x86_64"; sysroot="macos"
+            depl_target="$MACOS_MIN"; cmake_sys=""
+            min_ver_key="LSMinimumSystemVersion"; prefix="$prefix_macos"
+        fi
+        build_dir="$BUILD_DIR/$name-build-$sysroot"
+
+        [ -d "$prefix/$framework.framework" ] && continue
+
+        echo "==> $name ($sysroot): configuring"
+        mkdir -p "$build_dir"
+        cmake -S "$srcdir" -B "$build_dir" \
+            ${cmake_sys:-} \
+            -DCMAKE_OSX_ARCHITECTURES="$arch" \
+            -DCMAKE_OSX_SYSROOT="$sdk" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="$depl_target" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$prefix" \
+            -DBUILD_SHARED_LIBS=ON \
+            $extra_cmake \
+            > "$build_dir/cmake.log" 2>&1
+
+        echo "==> $name ($sysroot): building"
+        cmake --build "$build_dir" --target install -- -j"$NPROC" \
+            >> "$build_dir/cmake.log" 2>&1
+
+        echo "==> $name ($sysroot): bundling framework"
+        local dylib
+        dylib=$(find "$prefix/lib" -name "lib${framework}.dylib" ! -type l 2>/dev/null | head -1)
+        [ -z "$dylib" ] && dylib=$(find "$prefix/lib" -name "lib${framework}.*.dylib" ! -type l 2>/dev/null | head -1)
+
+        local fwdir="$prefix/$framework.framework"
+        mkdir -p "$fwdir/Headers/SDL3"
+        cp "$dylib" "$fwdir/$framework"
+        xcrun install_name_tool -id "@rpath/$framework.framework/$framework" "$fwdir/$framework"
+        [ -d "$prefix/include/SDL3" ] && cp "$prefix/include/SDL3/"*.h "$fwdir/Headers/SDL3/"
+
+        cat > "$fwdir/Info.plist" << PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key><string>$framework</string>
+    <key>CFBundleIdentifier</key><string>org.libsdl.$framework</string>
+    <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+    <key>CFBundleName</key><string>$framework</string>
+    <key>CFBundlePackageType</key><string>FMWK</string>
+    <key>CFBundleShortVersionString</key><string>1.0</string>
+    <key>CFBundleVersion</key><string>1</string>
+    <key>$min_ver_key</key><string>$depl_target</string>
+</dict>
+</plist>
+PLIST
+    done
+
+    echo "==> Creating $name.xcframework"
+    rm -rf "$output"
+    xcodebuild -create-xcframework \
+        -framework "$prefix_device/$framework.framework" \
+        -framework "$prefix_sim/$framework.framework" \
+        -framework "$prefix_macos/$framework.framework" \
+        -output "$output"
+}
+
+# ---------------------------------------------------------------------------
+# SDL3
+# ---------------------------------------------------------------------------
+
+clone_sdl SDL3 https://github.com/libsdl-org/SDL.git "$SDL3_VERSION"
+build_sdl_cmake_xcframework SDL3 SDL3 \
+    "-DSDL_TESTS=OFF -DSDL_EXAMPLES=OFF"
+
+# ---------------------------------------------------------------------------
+# ObjectivelyGPU helpers
 # ---------------------------------------------------------------------------
 
 fw_headers() {

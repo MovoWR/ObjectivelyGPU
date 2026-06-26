@@ -12,27 +12,39 @@ jobs:
     runs-on: macos-14
 
     env:
+      SDL3_VERSION: "release-3.4.10"
       IOS_MIN: "14.0"
 
     steps:
+    - name: Install dependencies
+      run: brew install cmake
+
     - name: Checkout
       uses: actions/checkout@v6
 
-    - name: Download dependency xcframeworks
+    - name: Cache xcframework build
+      uses: actions/cache@v4
+      with:
+        path: .build-xcframework
+        key: xcframework-${{ env.SDL3_VERSION }}-ios-${{ env.IOS_MIN }}-${{ hashFiles('Sources/ObjectivelyGPU/**/*.c', 'Sources/ObjectivelyGPU/**/*.h', 'scripts/build-xcframework.sh') }}
+        restore-keys: |
+          xcframework-${{ env.SDL3_VERSION }}-ios-${{ env.IOS_MIN }}-
+
+    - name: Download Objectively xcframework
       run: |
         mkdir -p Frameworks
         gh release download --repo jdolan/Objectively --pattern "Objectively.xcframework.zip" -D Frameworks/
-        gh release download --repo jdolan/ObjectivelyMVC --pattern "SDL3.xcframework.zip" -D Frameworks/
-        cd Frameworks && unzip -q Objectively.xcframework.zip && unzip -q SDL3.xcframework.zip && rm *.zip
+        cd Frameworks && unzip -q Objectively.xcframework.zip && rm Objectively.xcframework.zip
       env:
         GH_TOKEN: ${{ github.token }}
 
-    - name: Build xcframework
+    - name: Build xcframeworks
       run: bash scripts/build-xcframework.sh
 
-    - name: Zip xcframework
+    - name: Zip xcframeworks
       run: |
         cd Frameworks
+        zip -r ../SDL3.xcframework.zip SDL3.xcframework
         zip -r ../ObjectivelyGPU.xcframework.zip ObjectivelyGPU.xcframework
 
     - name: Create release
@@ -41,6 +53,7 @@ jobs:
         gh release create ${{ github.ref_name }} \
           --title "ObjectivelyGPU ${{ github.ref_name }}" \
           --generate-notes \
+          SDL3.xcframework.zip \
           ObjectivelyGPU.xcframework.zip
       env:
         GH_TOKEN: ${{ github.token }}
