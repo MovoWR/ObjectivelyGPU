@@ -193,15 +193,15 @@ struct RenderPassInterface {
   void (*drawPrimitivesIndirect)(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount);
 
   /**
-   * @fn RenderPass *RenderPass::init(RenderPass *self, SDL_GPURenderPass *pass, CommandBuffer *cmd)
+   * @fn RenderPass *RenderPass::init(RenderPass *self, CommandBuffer *cmd, SDL_GPURenderPass *pass)
    * @brief Initializes this RenderPass wrapping the given SDL render pass.
    * @param self The RenderPass.
-   * @param pass The SDL render pass to wrap. Must not be NULL.
    * @param cmd The CommandBuffer this pass was begun from.
+   * @param pass The SDL render pass to wrap. Must not be NULL.
    * @return The initialized RenderPass, or NULL on failure.
    * @memberof RenderPass
    */
-  RenderPass *(*init)(RenderPass *self, SDL_GPURenderPass *pass, CommandBuffer *cmd);
+  RenderPass *(*init)(RenderPass *self, CommandBuffer *cmd, SDL_GPURenderPass *pass);
 
   /**
    * @fn void RenderPass::setBlendConstants(const RenderPass *self, SDL_FColor blendConstants)

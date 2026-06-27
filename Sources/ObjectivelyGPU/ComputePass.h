@@ -136,15 +136,15 @@ struct ComputePassInterface {
   void (*dispatchComputeIndirect)(const ComputePass *self, SDL_GPUBuffer *buffer, Uint32 offset);
 
   /**
-   * @fn ComputePass *ComputePass::init(ComputePass *self, SDL_GPUComputePass *pass, CommandBuffer *cmd)
+   * @fn ComputePass *ComputePass::init(ComputePass *self, CommandBuffer *cmd, SDL_GPUComputePass *pass)
    * @brief Initializes this ComputePass wrapping the given SDL compute pass.
    * @param self The ComputePass.
-   * @param pass The SDL compute pass to wrap. Must not be NULL.
    * @param cmd The CommandBuffer this pass was begun from.
+   * @param pass The SDL compute pass to wrap. Must not be NULL.
    * @return The initialized ComputePass, or NULL on failure.
    * @memberof ComputePass
    */
-  ComputePass *(*init)(ComputePass *self, SDL_GPUComputePass *pass, CommandBuffer *cmd);
+  ComputePass *(*init)(ComputePass *self, CommandBuffer *cmd, SDL_GPUComputePass *pass);
 };
 
 /**

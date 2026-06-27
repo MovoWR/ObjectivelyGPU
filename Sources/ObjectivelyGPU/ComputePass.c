@@ -94,17 +94,17 @@ static void dispatchComputeIndirect(const ComputePass *self, SDL_GPUBuffer *buff
 }
 
 /**
- * @fn ComputePass *ComputePass::init(ComputePass *self, SDL_GPUComputePass *pass, CommandBuffer *cmd)
+ * @fn ComputePass *ComputePass::init(ComputePass *self, CommandBuffer *cmd, SDL_GPUComputePass *pass)
  * @memberof ComputePass
  */
-static ComputePass *init(ComputePass *self, SDL_GPUComputePass *pass, CommandBuffer *cmd) {
+static ComputePass *init(ComputePass *self, CommandBuffer *cmd, SDL_GPUComputePass *pass) {
 
   self = (ComputePass *) super(Object, self, init);
   if (self) {
-    self->pass = pass;
-    assert(self->pass);
     self->cmd = cmd;
     assert(self->cmd);
+    self->pass = pass;
+    assert(self->pass);
   }
 
   return self;

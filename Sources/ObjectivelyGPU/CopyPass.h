@@ -65,17 +65,17 @@ struct CopyPass {
   CopyPassInterface *interface;
 
   /**
+   * @brief The CommandBuffer this pass was begun from.
+   * @private
+   */
+  CommandBuffer *cmd;
+
+  /**
    * @brief The underlying SDL copy pass.
    * @details Set to NULL by `dealloc` after `SDL_EndGPUCopyPass` is called.
    * @private
    */
   SDL_GPUCopyPass *pass;
-
-  /**
-   * @brief The CommandBuffer this pass was begun from.
-   * @private
-   */
-  CommandBuffer *cmd;
 };
 
 /**
@@ -117,15 +117,15 @@ struct CopyPassInterface {
   void (*downloadTexture)(const CopyPass *self, const SDL_GPUTextureRegion *src, const SDL_GPUTextureTransferInfo *dst);
 
   /**
-   * @fn CopyPass *CopyPass::init(CopyPass *self, SDL_GPUCopyPass *pass, CommandBuffer *cmd)
+   * @fn CopyPass *CopyPass::init(CopyPass *self, CommandBuffer *cmd, SDL_GPUCopyPass *pass)
    * @brief Initializes this CopyPass wrapping the given SDL copy pass.
    * @param self The CopyPass.
+   * @param cmd The CommandBuffer that created this pass.
    * @param pass The SDL copy pass to wrap. Must not be NULL.
-   * @param cmd The CommandBuffer this pass was begun from.
    * @return The initialized CopyPass, or NULL on failure.
    * @memberof CopyPass
    */
-  CopyPass *(*init)(CopyPass *self, SDL_GPUCopyPass *pass, CommandBuffer *cmd);
+  CopyPass *(*init)(CopyPass *self, CommandBuffer *cmd, SDL_GPUCopyPass *pass);
 
   /**
    * @fn void CopyPass::uploadBuffer(const CopyPass *self, const SDL_GPUTransferBufferLocation *src, const SDL_GPUBufferRegion *dst, bool cycle)

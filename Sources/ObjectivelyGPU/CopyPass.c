@@ -80,17 +80,17 @@ static void downloadTexture(const CopyPass *self, const SDL_GPUTextureRegion *sr
 }
 
 /**
- * @fn CopyPass *CopyPass::init(CopyPass *self, SDL_GPUCopyPass *pass, CommandBuffer *cmd)
+ * @fn CopyPass *CopyPass::init(CopyPass *self, CommandBuffer *cmd, SDL_GPUCopyPass *pass)
  * @memberof CopyPass
  */
-static CopyPass *init(CopyPass *self, SDL_GPUCopyPass *pass, CommandBuffer *cmd) {
+static CopyPass *init(CopyPass *self, CommandBuffer *cmd, SDL_GPUCopyPass *pass) {
 
   self = (CopyPass *) super(Object, self, init);
   if (self) {
-    self->pass = pass;
-    assert(self->pass);
     self->cmd = cmd;
     assert(self->cmd);
+    self->pass = pass;
+    assert(self->pass);
   }
 
   return self;

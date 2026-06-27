@@ -151,17 +151,17 @@ static void drawPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer *buffer
 }
 
 /**
- * @fn RenderPass *RenderPass::init(RenderPass *self, SDL_GPURenderPass *pass, CommandBuffer *cmd)
+ * @fn RenderPass *RenderPass::init(RenderPass *self, CommandBuffer *cmd, SDL_GPURenderPass *pass)
  * @memberof RenderPass
  */
-static RenderPass *init(RenderPass *self, SDL_GPURenderPass *pass, CommandBuffer *cmd) {
+static RenderPass *init(RenderPass *self, CommandBuffer *cmd, SDL_GPURenderPass *pass) {
 
   self = (RenderPass *) super(Object, self, init);
   if (self) {
-    self->pass = pass;
-    assert(self->pass);
     self->cmd = cmd;
     assert(self->cmd);
+    self->pass = pass;
+    assert(self->pass);
   }
 
   return self;
