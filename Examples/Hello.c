@@ -31,11 +31,18 @@
 #endif
 
 typedef struct {
-	float x, y, z;
-	float r, g, b;
-} VertexData;
+  RenderDevice *renderDevice;
+  Framebuffer *framebuffer;
+  SDL_GPUGraphicsPipeline *pipeline;
+  SDL_GPUBuffer *vertexBuffer;
+} Scene;
 
-static const VertexData vertex_data[] = {
+typedef struct {
+	float3 position;
+	float3 color;
+} Vertex;
+
+static const Vertex vertexes[] = {
 	{ -0.5f,  0.5f, -0.5f,  1, 0, 0 }, {  0.5f, -0.5f, -0.5f, 0, 0, 1 }, { -0.5f, -0.5f, -0.5f, 0, 1, 0 },
 	{ -0.5f,  0.5f, -0.5f,  1, 0, 0 }, {  0.5f,  0.5f, -0.5f, 1, 1, 0 }, {  0.5f, -0.5f, -0.5f, 0, 0, 1 },
 	{ -0.5f,  0.5f,  0.5f,  1, 1, 1 }, { -0.5f, -0.5f, -0.5f, 0, 1, 0 }, { -0.5f, -0.5f,  0.5f, 0, 1, 1 },
@@ -53,23 +60,74 @@ static const VertexData vertex_data[] = {
 /**
  * @brief
  */
+static void drawScene(Scene *scene) {
+  static float2 angles;
+  static Uint64 lastTicks;
+
+  Uint64 ticks = SDL_GetTicks();
+  float dt = (float) (ticks - lastTicks) / 1000.0f;
+  lastTicks = ticks;
+
+  angles.x += dt * 30.0f;
+  angles.y += dt * 60.0f;
+
+  while (angles.x >= 360.0f) {
+    angles.x -= 360.0f;
+  }
+  while (angles.y >= 360.0f) {
+    angles.y -= 360.0f;
+  }
+
+  CommandBuffer *cmd = $(scene->renderDevice, acquireCommandBuffer);
+
+  SwapchainTexture swapchain = { 0 };
+  $(cmd, waitAndAcquireSwapchainTexture, &swapchain);
+
+  float4x4 modelView = float4x4_rotation(angles.x, float3_new(1.f, 0.f, 0.f));
+  modelView = float4x4_mul(float4x4_rotation(angles.y, float3_new(0.f, 1.f, 0.f)), modelView);
+  modelView = float4x4_mul(float4x4_translation(float3_new(0.f, 0.f, -2.5f)), modelView);
+  const float4x4 projection = float4x4_perspective(45.f, (float) swapchain.size.w / (float) swapchain.size.h, 0.01f, 100.f);
+  const float4x4 modelViewProjection = float4x4_mul(projection, modelView);
+
+  SDL_GPUColorTargetInfo colorTarget = {
+    .texture = swapchain.texture,
+    .clear_color = { 0.1f, 0.1f, 0.2f, 1.0f },
+    .load_op = SDL_GPU_LOADOP_CLEAR,
+    .store_op = SDL_GPU_STOREOP_STORE,
+  };
+
+  SDL_GPUDepthStencilTargetInfo depthTarget = $(scene->framebuffer, depthTargetInfo, SDL_GPU_LOADOP_CLEAR, SDL_GPU_STOREOP_DONT_CARE, 1.f);
+
+  RenderPass *renderPass = $(cmd, beginRenderPass, &colorTarget, 1, &depthTarget);
+  $(renderPass, bindPipeline, scene->pipeline);
+  $(renderPass, bindVertexBuffers, 0, &(SDL_GPUBufferBinding) {
+    .buffer = scene->vertexBuffer,
+    .offset = 0,
+  }, 1);
+  $(cmd, pushVertexUniformData, 0, modelViewProjection.f, sizeof(modelViewProjection));
+  $(renderPass, drawPrimitives, (Uint32) SDL_arraysize(vertexes), 1, 0, 0);
+  release(renderPass);
+
+  $(cmd, submit);
+  release(cmd);
+}
+
+/**
+ * @brief
+ */
 int main(int argc, char **argv) {
+
+  $$(Resource, addResourcePath, EXAMPLES);
 
   GPU_Assert(SDL_Init(SDL_INIT_VIDEO), "SDL_Init");
 
 	SDL_Window *window = SDL_CreateWindow("ObjectivelyGPU Hello", 800, 600, SDL_WINDOW_HIGH_PIXEL_DENSITY);
   GPU_Assert(window, "SDL_CreateWindow");
 
-  $$(Resource, addResourcePath, EXAMPLES);
-
   RenderDevice *renderDevice = $(alloc(RenderDevice), initWithWindow, window);
   GPU_Assert(renderDevice, "RenderDevice init");
 
-	SDL_GPUBuffer *vertexBuffer = $(renderDevice, createBufferWithConstMem,
-		SDL_GPU_BUFFERUSAGE_VERTEX, vertex_data, sizeof(vertex_data));
-
-	int w = 0;
-	int h = 0;
+	int w, h;
   SDL_GetWindowSizeInPixels(window, &w, &h);
 
   Framebuffer *framebuffer = $(alloc(Framebuffer), initWithDevice, renderDevice,
@@ -94,7 +152,7 @@ int main(int argc, char **argv) {
 
   SDL_GPUVertexBufferDescription vertexBufferDescription = {
 		.slot = 0,
-		.pitch = sizeof(VertexData),
+		.pitch = sizeof(Vertex),
 		.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
 		.instance_step_rate = 0,
 	};
@@ -104,13 +162,13 @@ int main(int argc, char **argv) {
 			.location = 0,
 			.buffer_slot = 0,
 			.format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-			.offset = 0,
+			.offset = offsetof(Vertex, position),
 		},
 		{
 			.location = 1,
 			.buffer_slot = 0,
 			.format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-			.offset = 12,
+			.offset = offsetof(Vertex, color),
 		},
 	};
 
@@ -149,11 +207,9 @@ int main(int argc, char **argv) {
 	$(renderDevice, releaseShader, vertexShader);
 	$(renderDevice, releaseShader, fragmentShader);
 
-	bool running = true;
-	float angleX = 0.0f;
-	float angleY = 0.0f;
-	Uint64 lastTicks = SDL_GetTicks();
+  SDL_GPUBuffer *vertexBuffer = $(renderDevice, createBufferWithConstMem, SDL_GPU_BUFFERUSAGE_VERTEX, vertexes, sizeof(vertexes));
 
+	bool running = true;
 	while (running) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -167,52 +223,12 @@ int main(int argc, char **argv) {
 			}
 		}
 
-		Uint64 ticks = SDL_GetTicks();
-		float dt = (float) (ticks - lastTicks) / 1000.0f;
-		lastTicks = ticks;
-
-		angleX += dt * 30.0f;
-		angleY += dt * 60.0f;
-
-		while (angleX >= 360.0f) {
-			angleX -= 360.0f;
-		}
-		while (angleY >= 360.0f) {
-			angleY -= 360.0f;
-		}
-
-		CommandBuffer *cmd = $(renderDevice, acquireCommandBuffer);
-
-		SwapchainTexture swapchain = { 0 };
-		$(cmd, waitAndAcquireSwapchainTexture, window, &swapchain);
-
-		float4x4 modelView = float4x4_rotation(angleX, float3_new(1.f, 0.f, 0.f));
-		modelView = float4x4_mul(float4x4_rotation(angleY, float3_new(0.f, 1.f, 0.f)), modelView);
-		modelView = float4x4_mul(float4x4_translation(float3_new(0.f, 0.f, -2.5f)), modelView);
-		const float4x4 projection = float4x4_perspective(45.f, (float) swapchain.size.w / (float) swapchain.size.h, 0.01f, 100.f);
-		const float4x4 modelViewProjection = float4x4_mul(projection, modelView);
-
-		SDL_GPUColorTargetInfo colorTarget = {
-			.texture = swapchain.texture,
-			.clear_color = { 0.1f, 0.1f, 0.2f, 1.0f },
-			.load_op = SDL_GPU_LOADOP_CLEAR,
-			.store_op = SDL_GPU_STOREOP_STORE,
-		};
-
-		SDL_GPUDepthStencilTargetInfo depthTarget = $(framebuffer, depthTargetInfo, SDL_GPU_LOADOP_CLEAR, SDL_GPU_STOREOP_DONT_CARE, 1.f);
-
-		RenderPass *renderPass = $(cmd, beginRenderPass, &colorTarget, 1, &depthTarget);
-		$(renderPass, bindPipeline, pipeline);
-		$(renderPass, bindVertexBuffers, 0, &(SDL_GPUBufferBinding) {
-			.buffer = vertexBuffer,
-			.offset = 0,
-		}, 1);
-		$(cmd, pushVertexUniformData, 0, modelViewProjection.f, sizeof(modelViewProjection));
-		$(renderPass, drawPrimitives, (Uint32) SDL_arraysize(vertex_data), 1, 0, 0);
-		release(renderPass);
-
-		$(cmd, submit);
-		release(cmd);
+    drawScene(&(Scene) {
+      .renderDevice = renderDevice,
+      .framebuffer = framebuffer,
+      .pipeline = pipeline,
+      .vertexBuffer = vertexBuffer
+    });
 	}
 
 	$(renderDevice, waitForIdle);

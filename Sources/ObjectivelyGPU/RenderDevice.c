@@ -73,9 +73,7 @@ static CommandBuffer *acquireCommandBuffer(const RenderDevice *self) {
   SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(self->device);
   GPU_Assert(cmd, "SDL_AcquireGPUCommandBuffer");
 
-  CommandBuffer *buffer = $(alloc(CommandBuffer), initWithCommandBuffer, cmd);
-  buffer->device = self->device;
-  return buffer;
+  return $(alloc(CommandBuffer), initWithCommandBuffer, self, cmd);
 }
 
 /**

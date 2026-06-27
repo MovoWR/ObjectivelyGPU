@@ -26,6 +26,7 @@
 #include "CommandBuffer.h"
 #include "ComputePass.h"
 #include "CopyPass.h"
+#include "RenderDevice.h"
 #include "RenderPass.h"
 
 #define _Class _CommandBuffer
@@ -33,15 +34,15 @@
 #pragma mark - CommandBuffer
 
 /**
- * @fn bool CommandBuffer::acquireSwapchainTexture(const CommandBuffer *self, SDL_Window *window, SwapchainTexture *swapchain)
+ * @fn bool CommandBuffer::acquireSwapchainTexture(const CommandBuffer *self, SwapchainTexture *swapchain)
  * @memberof CommandBuffer
  */
-static bool acquireSwapchainTexture(const CommandBuffer *self, SDL_Window *window, SwapchainTexture *swapchain) {
+static bool acquireSwapchainTexture(const CommandBuffer *self, SwapchainTexture *swapchain) {
 
   assert(swapchain);
 
   return SDL_AcquireGPUSwapchainTexture(self->cmd,
-                                        window,
+                                        self->device->window,
                                         &swapchain->texture,
                                         (Uint32 *) &swapchain->size.w,
                                         (Uint32 *) &swapchain->size.h);
@@ -68,7 +69,7 @@ static CopyPass *beginCopyPass(const CommandBuffer *self) {
   SDL_GPUCopyPass *pass = SDL_BeginGPUCopyPass(self->cmd);
   GPU_Assert(pass, "SDL_BeginGPUCopyPass");
 
-  return $(alloc(CopyPass), init, pass, self->device);
+  return $(alloc(CopyPass), init, pass, self->device->device);
 }
 
 /**
@@ -114,13 +115,15 @@ static void generateMipmaps(const CommandBuffer *self, SDL_GPUTexture *texture) 
 }
 
 /**
- * @fn CommandBuffer *CommandBuffer::initWithCommandBuffer(CommandBuffer *self, SDL_GPUCommandBuffer *cmd)
+ * @fn CommandBuffer *CommandBuffer::initWithCommandBuffer(CommandBuffer *self, const RenderDevice *device, SDL_GPUCommandBuffer *cmd)
  * @memberof CommandBuffer
  */
-static CommandBuffer *initWithCommandBuffer(CommandBuffer *self, SDL_GPUCommandBuffer *cmd) {
+static CommandBuffer *initWithCommandBuffer(CommandBuffer *self, const RenderDevice *device, SDL_GPUCommandBuffer *cmd) {
 
   self = (CommandBuffer *) super(Object, self, init);
   if (self) {
+    assert(device);
+    self->device = (RenderDevice *) device;
     self->cmd = cmd;
     assert(self->cmd);
   }
@@ -201,15 +204,15 @@ static SDL_GPUFence *submitAndFence(const CommandBuffer *self) {
 }
 
 /**
- * @fn bool CommandBuffer::waitAndAcquireSwapchainTexture(const CommandBuffer *self, SDL_Window *window, SwapchainTexture *swapchain)
+ * @fn bool CommandBuffer::waitAndAcquireSwapchainTexture(const CommandBuffer *self, SwapchainTexture *swapchain)
  * @memberof CommandBuffer
  */
-static bool waitAndAcquireSwapchainTexture(const CommandBuffer *self, SDL_Window *window, SwapchainTexture *swapchain) {
+static bool waitAndAcquireSwapchainTexture(const CommandBuffer *self, SwapchainTexture *swapchain) {
 
   assert(swapchain);
 
   return SDL_WaitAndAcquireGPUSwapchainTexture(self->cmd,
-                                               window,
+                                               self->device->window,
                                                &swapchain->texture,
                                                (Uint32 *) &swapchain->size.w,
                                                (Uint32 *) &swapchain->size.h);

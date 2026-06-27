@@ -69,9 +69,9 @@ static const char *fragment_shader_msl =
 typedef struct {
 	float x, y, z;
 	float r, g, b;
-} VertexData;
+} Vertex;
 
-static const VertexData vertex_data[] = {
+static const Vertex vertex_data[] = {
 	{ -0.5f,  0.5f, -0.5f,  1, 0, 0 }, {  0.5f, -0.5f, -0.5f, 0, 0, 1 }, { -0.5f, -0.5f, -0.5f, 0, 1, 0 },
 	{ -0.5f,  0.5f, -0.5f,  1, 0, 0 }, {  0.5f,  0.5f, -0.5f, 1, 1, 0 }, {  0.5f, -0.5f, -0.5f, 0, 0, 1 },
 	{ -0.5f,  0.5f,  0.5f,  1, 1, 1 }, { -0.5f, -0.5f, -0.5f, 0, 1, 0 }, { -0.5f, -0.5f,  0.5f, 0, 1, 1 },
@@ -218,7 +218,7 @@ SDL_AppResult SDL_AppInit(void **unused, int argc, char *argv[]) {
 	};
 	SDL_GPUVertexBufferDescription vbDesc = {
 		.slot = 0,
-		.pitch = sizeof(VertexData),
+		.pitch = sizeof(Vertex),
 		.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
 	};
 	SDL_GPUVertexAttribute vertexAttribs[] = {
