@@ -61,9 +61,7 @@ struct SDL_Size {
 
 /**
  * @brief Asserts that @a cond is true, logging the SDL error and exiting on failure.
- * @details Unlike assert(3), this macro is never compiled out. Use it to guard
- * SDL_gpu operations where failure is unrecoverable (bad device, OOM, wrong
- * thread, unsupported format, etc.).
+ * @details Unlike assert(3), this macro is never compiled out.
  */
 #define GPU_Assert(cond, fmt, ...) \
   if (!(cond)) { \

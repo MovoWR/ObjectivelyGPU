@@ -61,6 +61,7 @@ static const Vertex vertexes[] = {
  * @brief
  */
 static void drawScene(Scene *scene) {
+
   static float2 angles;
   static Uint64 lastTicks;
 
@@ -86,6 +87,7 @@ static void drawScene(Scene *scene) {
   float4x4 modelView = float4x4_rotation(angles.x, float3_new(1.f, 0.f, 0.f));
   modelView = float4x4_mul(float4x4_rotation(angles.y, float3_new(0.f, 1.f, 0.f)), modelView);
   modelView = float4x4_mul(float4x4_translation(float3_new(0.f, 0.f, -2.5f)), modelView);
+
   const float4x4 projection = float4x4_perspective(45.f, (float) swapchain.size.w / (float) swapchain.size.h, 0.01f, 100.f);
   const float4x4 modelViewProjection = float4x4_mul(projection, modelView);
 
@@ -121,7 +123,7 @@ int main(int argc, char **argv) {
 
   GPU_Assert(SDL_Init(SDL_INIT_VIDEO), "SDL_Init");
 
-	SDL_Window *window = SDL_CreateWindow("ObjectivelyGPU Hello", 800, 600, SDL_WINDOW_HIGH_PIXEL_DENSITY);
+	SDL_Window *window = SDL_CreateWindow("Hello ObjectivelyGPU", 1024, 720, SDL_WINDOW_HIGH_PIXEL_DENSITY);
   GPU_Assert(window, "SDL_CreateWindow");
 
   RenderDevice *renderDevice = $(alloc(RenderDevice), initWithWindow, window);
