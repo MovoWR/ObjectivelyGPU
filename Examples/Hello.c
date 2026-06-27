@@ -21,9 +21,6 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#include <assert.h>
-#include <stdlib.h>
-
 #include <SDL3/SDL.h>
 
 #include <Objectively.h>
@@ -58,23 +55,21 @@ static const VertexData vertex_data[] = {
  */
 int main(int argc, char **argv) {
 
-	int status = EXIT_FAILURE;
-
-  SDL_Init(SDL_INIT_VIDEO);
+  GPU_Assert(SDL_Init(SDL_INIT_VIDEO), "SDL_Init");
 
 	SDL_Window *window = SDL_CreateWindow("ObjectivelyGPU Hello", 800, 600, SDL_WINDOW_HIGH_PIXEL_DENSITY);
-  GPU_Assert(window, "Failed to create window");
+  GPU_Assert(window, "SDL_CreateWindow");
 
   $$(Resource, addResourcePath, EXAMPLES);
 
   RenderDevice *renderDevice = $(alloc(RenderDevice), initWithWindow, window);
-  assert(renderDevice);
+  GPU_Assert(renderDevice, "RenderDevice init");
 
-  SDL_GPUBuffer *vertexBuffer = $(renderDevice, createBufferWithConstMem,
-  	SDL_GPU_BUFFERUSAGE_VERTEX, vertex_data, sizeof(vertex_data));
+	SDL_GPUBuffer *vertexBuffer = $(renderDevice, createBufferWithConstMem,
+		SDL_GPU_BUFFERUSAGE_VERTEX, vertex_data, sizeof(vertex_data));
 
-  int w = 0;
-  int h = 0;
+	int w = 0;
+	int h = 0;
   SDL_GetWindowSizeInPixels(window, &w, &h);
 
   Framebuffer *framebuffer = $(alloc(Framebuffer), initWithDevice, renderDevice,
@@ -230,35 +225,13 @@ int main(int argc, char **argv) {
 		release(cmd);
 	}
 
-	status = EXIT_SUCCESS;
-
-cleanup:
-	if (renderDevice) {
-		$(renderDevice, waitForIdle);
-	}
-
-	if (pipeline) {
-		$(renderDevice, releaseGraphicsPipeline, pipeline);
-	}
-	if (vertexShader) {
-		$(renderDevice, releaseShader, vertexShader);
-	}
-	if (fragmentShader) {
-		$(renderDevice, releaseShader, fragmentShader);
-	}
-	if (vertexBuffer) {
-		$(renderDevice, releaseBuffer, vertexBuffer);
-	}
-	if (framebuffer) {
-		release(framebuffer);
-	}
-	if (renderDevice) {
-		release(renderDevice);
-	}
-	if (window) {
-		SDL_DestroyWindow(window);
-	}
-
+	$(renderDevice, waitForIdle);
+	$(renderDevice, releaseGraphicsPipeline, pipeline);
+	$(renderDevice, releaseBuffer, vertexBuffer);
+	release(framebuffer);
+	release(renderDevice);
+	SDL_DestroyWindow(window);
 	SDL_Quit();
-	return status;
+
+	return EXIT_SUCCESS;
 }

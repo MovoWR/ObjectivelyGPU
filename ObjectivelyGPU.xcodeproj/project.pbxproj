@@ -62,6 +62,8 @@
 		CECF83C22FEF765400CB0CCA /* HelloCompute.vert.hlsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83B02FEF712F00CB0CCA /* HelloCompute.vert.hlsl */; };
 		CECF83C32FEF765400CB0CCA /* HelloCompute.vert.msl in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83B12FEF712F00CB0CCA /* HelloCompute.vert.msl */; };
 		CECF83C42FEF765400CB0CCA /* HelloCompute.vert.spv in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83B22FEF712F00CB0CCA /* HelloCompute.vert.spv */; };
+		CECF83C72FF03A3500CB0CCA /* Framebuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = CECF83C52FF03A3500CB0CCA /* Framebuffer.h */; };
+		CECF83C82FF03A3500CB0CCA /* Framebuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = CECF83C62FF03A3500CB0CCA /* Framebuffer.c */; };
 		DF73824CC25298378B451056 /* CopyPass.h in Headers */ = {isa = PBXBuildFile; fileRef = 59334BDAED542AB6DE565EDD /* CopyPass.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EE00100000000000000000B1 /* Hello.c in Sources */ = {isa = PBXBuildFile; fileRef = EE00010000000000000000B1 /* Hello.c */; };
 		EE00110000000000000000B2 /* HelloCompute.c in Sources */ = {isa = PBXBuildFile; fileRef = EE00020000000000000000B2 /* HelloCompute.c */; };
@@ -191,6 +193,8 @@
 		CECF83B02FEF712F00CB0CCA /* HelloCompute.vert.hlsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = HelloCompute.vert.hlsl; sourceTree = "<group>"; };
 		CECF83B12FEF712F00CB0CCA /* HelloCompute.vert.msl */ = {isa = PBXFileReference; lastKnownFileType = text; path = HelloCompute.vert.msl; sourceTree = "<group>"; };
 		CECF83B22FEF712F00CB0CCA /* HelloCompute.vert.spv */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelloCompute.vert.spv; sourceTree = "<group>"; };
+		CECF83C52FF03A3500CB0CCA /* Framebuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Framebuffer.h; sourceTree = "<group>"; };
+		CECF83C62FF03A3500CB0CCA /* Framebuffer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Framebuffer.c; sourceTree = "<group>"; };
 		CEEAAFF72FED833A00FFEBE6 /* COPYING */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		CEEAAFF82FED833A00FFEBE6 /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
 		CEEAAFFA2FED833A00FFEBE6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -291,6 +295,8 @@
 				09B8DD26CDB7926D89445C91 /* ComputePass.h */,
 				C862954A9DD435C1FF7CD31D /* CopyPass.c */,
 				59334BDAED542AB6DE565EDD /* CopyPass.h */,
+				CECF83C62FF03A3500CB0CCA /* Framebuffer.c */,
+				CECF83C52FF03A3500CB0CCA /* Framebuffer.h */,
 				CECF83972FEF6A7200CB0CCA /* Mathlib.h */,
 				77315F9BC357C97B885E883C /* RenderDevice.c */,
 				9220C57BBAA3C951D8083799 /* RenderDevice.h */,
@@ -377,6 +383,7 @@
 			files = (
 				6F351DFD232DA78A42D8B494 /* Config.h in Headers */,
 				2A17F0E01E5CC25A431FFBAD /* CommandBuffer.h in Headers */,
+				CECF83C72FF03A3500CB0CCA /* Framebuffer.h in Headers */,
 				034285033FECAB2D6BD6AE5B /* ComputePass.h in Headers */,
 				DF73824CC25298378B451056 /* CopyPass.h in Headers */,
 				CECF83982FEF6A7200CB0CCA /* Mathlib.h in Headers */,
@@ -582,6 +589,7 @@
 				36FBB92ACB08F2078D50C84D /* CommandBuffer.c in Sources */,
 				F73340493879CD8034F99D51 /* ComputePass.c in Sources */,
 				CCCB11DB70E4A962360A2119 /* CopyPass.c in Sources */,
+				CECF83C82FF03A3500CB0CCA /* Framebuffer.c in Sources */,
 				86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */,
 				FF30FF2D56F9E4EA3C492CBB /* RenderPass.c in Sources */,
 			);
