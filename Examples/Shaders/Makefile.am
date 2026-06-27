@@ -29,16 +29,6 @@ SPIRV_BLOBS = \
 
 EXTRA_DIST = $(HLSL_SOURCES) $(MSL_BLOBS) $(SPIRV_BLOBS)
 
-# For out-of-tree builds, symlink the pre-built blobs into the build directory
-# so SDL Resource resolution (SDL_GetBasePath() + "Shaders") finds them.
-all-local:
-	@if [ "x$(srcdir)" != "x$(builddir)" ]; then \
-	    for f in $(MSL_BLOBS) $(SPIRV_BLOBS); do \
-	        test -e "$(builddir)/$$f" || \
-	            $(LN_S) "$(abs_srcdir)/$$f" "$(builddir)/$$f"; \
-	    done; \
-	fi
-
 # -------------------------------------------------------------------------
 # shadercross — regenerate all blobs from HLSL source.
 # Requires shadercross (from SDL_shadercross).
