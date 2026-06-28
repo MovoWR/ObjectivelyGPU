@@ -138,13 +138,11 @@ int main(int argc, char **argv) {
     SDL_GPU_TEXTUREFORMAT_D16_UNORM);
 
 	SDL_GPUShader *vertexShader = $(renderDevice, loadShader, "Hello.vert", &(SDL_GPUShaderCreateInfo) {
-		.entrypoint = "vs_main",
 		.stage = SDL_GPU_SHADERSTAGE_VERTEX,
 		.num_uniform_buffers = 1,
 	});
 
   SDL_GPUShader *fragmentShader = $(renderDevice, loadShader, "Hello.frag", &(SDL_GPUShaderCreateInfo) {
-		.entrypoint = "fs_main",
 		.stage = SDL_GPU_SHADERSTAGE_FRAGMENT,
 	});
 

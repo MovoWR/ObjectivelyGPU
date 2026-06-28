@@ -443,6 +443,10 @@ static SDL_GPUShader *loadShader(const RenderDevice *self, const char *name, con
     filled.code_size = res->data->length;
     filled.format = formats[i].format;
 
+    if (!filled.entrypoint) {
+      filled.entrypoint = (formats[i].format == SDL_GPU_SHADERFORMAT_MSL) ? "main0" : "main";
+    }
+
     SDL_GPUShader *shader = $(self, createShader, &filled);
     release(res);
     return shader;

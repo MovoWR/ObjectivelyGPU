@@ -51,6 +51,8 @@
 		CECF83B72FEF765400CB0CCA /* Hello.frag.spv in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83A62FEF712F00CB0CCA /* Hello.frag.spv */; };
 		CECF83B82FEF765400CB0CCA /* Hello.vert.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83A72FEF712F00CB0CCA /* Hello.vert.glsl */; };
 		CECF83B92FEF765400CB0CCA /* Hello.vert.msl in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83A82FEF712F00CB0CCA /* Hello.vert.msl */; };
+		EI00200000000000000000B1 /* Hello.frag.msl in Resources */ = {isa = PBXBuildFile; fileRef = CECF83A52FEF712F00CB0CCA /* Hello.frag.msl */; };
+		EI00300000000000000000B1 /* Hello.vert.msl in Resources */ = {isa = PBXBuildFile; fileRef = CECF83A82FEF712F00CB0CCA /* Hello.vert.msl */; };
 		CECF83BA2FEF765400CB0CCA /* Hello.vert.spv in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83A92FEF712F00CB0CCA /* Hello.vert.spv */; };
 		CECF83BB2FEF765400CB0CCA /* HelloCompute.c in CopyFiles */ = {isa = PBXBuildFile; fileRef = EE00020000000000000000B2 /* HelloCompute.c */; };
 		CECF83BC2FEF765400CB0CCA /* HelloCompute.comp.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83AA2FEF712F00CB0CCA /* HelloCompute.comp.glsl */; };
@@ -514,6 +516,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EI00200000000000000000B1 /* Hello.frag.msl in Resources */,
+				EI00300000000000000000B1 /* Hello.vert.msl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
