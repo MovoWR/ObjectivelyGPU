@@ -38,6 +38,7 @@ SOURCES=(
     "$GPU_DIR/Sources/ObjectivelyGPU/CommandBuffer.c"
     "$GPU_DIR/Sources/ObjectivelyGPU/ComputePass.c"
     "$GPU_DIR/Sources/ObjectivelyGPU/CopyPass.c"
+    "$GPU_DIR/Sources/ObjectivelyGPU/Framebuffer.c"
     "$GPU_DIR/Sources/ObjectivelyGPU/RenderDevice.c"
     "$GPU_DIR/Sources/ObjectivelyGPU/RenderPass.c"
 )
