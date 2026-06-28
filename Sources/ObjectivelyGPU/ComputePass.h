@@ -77,6 +77,11 @@ struct ComputePass {
    * @private
    */
   SDL_GPUComputePass *pass;
+
+  /**
+   * @brief The currently bound pipeline, or `NULL`.
+   */
+  SDL_GPUComputePipeline *pipeline;
 };
 
 /**

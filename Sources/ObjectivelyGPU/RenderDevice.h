@@ -189,52 +189,6 @@ struct RenderDeviceInterface {
   SDL_GPUSampler *(*createSampler)(const RenderDevice *self, const SDL_GPUSamplerCreateInfo *info);
 
   /**
-   * @fn SDL_GPUSampler *RenderDevice::samplerAnisotropic(const RenderDevice *self)
-   * @brief Returns a cached anisotropic sampler (16x anisotropy, linear mip, repeat address).
-   * @details The sampler is created on first call and reused thereafter. It is
-   *   released automatically in `dealloc`. Do not release it manually.
-   * @param self The RenderDevice.
-   * @return A cached `SDL_GPUSampler` suitable for high-quality world geometry.
-   * @memberof RenderDevice
-   */
-  SDL_GPUSampler *(*samplerAnisotropic)(const RenderDevice *self);
-
-  /**
-   * @fn SDL_GPUSampler *RenderDevice::samplerLinear(const RenderDevice *self)
-   * @brief Returns a cached bilinear sampler (linear mip, repeat address).
-   * @details The sampler is created on first call and reused thereafter. It is
-   *   released automatically in `dealloc`. Do not release it manually.
-   * @param self The RenderDevice.
-   * @return A cached `SDL_GPUSampler` suitable for general world textures.
-   * @memberof RenderDevice
-   */
-  SDL_GPUSampler *(*samplerLinear)(const RenderDevice *self);
-
-  /**
-   * @fn SDL_GPUSampler *RenderDevice::samplerLinearClamp(const RenderDevice *self)
-   * @brief Returns a cached bilinear sampler with clamp-to-edge addressing (no mipmaps).
-   * @details The sampler is created on first call and reused thereafter. It is
-   *   released automatically in `dealloc`. Do not release it manually.
-   *   This is the correct sampler for UI elements, sprites, and render targets —
-   *   linear magnification without edge bleeding or mip artifacts.
-   * @param self The RenderDevice.
-   * @return A cached `SDL_GPUSampler` suitable for UI and sprite rendering.
-   * @memberof RenderDevice
-   */
-  SDL_GPUSampler *(*samplerLinearClamp)(const RenderDevice *self);
-
-  /**
-   * @fn SDL_GPUSampler *RenderDevice::samplerNearest(const RenderDevice *self)
-   * @brief Returns a cached nearest-neighbor sampler (clamp-to-edge address).
-   * @details The sampler is created on first call and reused thereafter. It is
-   *   released automatically in `dealloc`. Do not release it manually.
-   * @param self The RenderDevice.
-   * @return A cached `SDL_GPUSampler` suitable for UI and pixel-art textures.
-   * @memberof RenderDevice
-   */
-  SDL_GPUSampler *(*samplerNearest)(const RenderDevice *self);
-
-  /**
    * @fn SDL_GPUShader *RenderDevice::createShader(const RenderDevice *self, const SDL_GPUShaderCreateInfo *info)
    * @brief Creates a GPU shader from a fully-filled `SDL_GPUShaderCreateInfo`.
    * @details All fields of @p info, including `code`, `code_size`, and `format`,
@@ -453,6 +407,52 @@ struct RenderDeviceInterface {
    * @memberof RenderDevice
    */
   void (*releaseTransferBuffer)(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf);
+
+  /**
+   * @fn SDL_GPUSampler *RenderDevice::samplerAnisotropic(const RenderDevice *self)
+   * @brief Returns a cached anisotropic sampler (16x anisotropy, linear mip, repeat address).
+   * @details The sampler is created on first call and reused thereafter. It is
+   *   released automatically in `dealloc`. Do not release it manually.
+   * @param self The RenderDevice.
+   * @return A cached `SDL_GPUSampler` suitable for high-quality world geometry.
+   * @memberof RenderDevice
+   */
+  SDL_GPUSampler *(*samplerAnisotropic)(const RenderDevice *self);
+
+  /**
+   * @fn SDL_GPUSampler *RenderDevice::samplerLinear(const RenderDevice *self)
+   * @brief Returns a cached bilinear sampler (linear mip, repeat address).
+   * @details The sampler is created on first call and reused thereafter. It is
+   *   released automatically in `dealloc`. Do not release it manually.
+   * @param self The RenderDevice.
+   * @return A cached `SDL_GPUSampler` suitable for general world textures.
+   * @memberof RenderDevice
+   */
+  SDL_GPUSampler *(*samplerLinear)(const RenderDevice *self);
+
+  /**
+   * @fn SDL_GPUSampler *RenderDevice::samplerLinearClamp(const RenderDevice *self)
+   * @brief Returns a cached bilinear sampler with clamp-to-edge addressing (no mipmaps).
+   * @details The sampler is created on first call and reused thereafter. It is
+   *   released automatically in `dealloc`. Do not release it manually.
+   *   This is the correct sampler for UI elements, sprites, and render targets —
+   *   linear magnification without edge bleeding or mip artifacts.
+   * @param self The RenderDevice.
+   * @return A cached `SDL_GPUSampler` suitable for UI and sprite rendering.
+   * @memberof RenderDevice
+   */
+  SDL_GPUSampler *(*samplerLinearClamp)(const RenderDevice *self);
+
+  /**
+   * @fn SDL_GPUSampler *RenderDevice::samplerNearest(const RenderDevice *self)
+   * @brief Returns a cached nearest-neighbor sampler (clamp-to-edge address).
+   * @details The sampler is created on first call and reused thereafter. It is
+   *   released automatically in `dealloc`. Do not release it manually.
+   * @param self The RenderDevice.
+   * @return A cached `SDL_GPUSampler` suitable for UI and pixel-art textures.
+   * @memberof RenderDevice
+   */
+  SDL_GPUSampler *(*samplerNearest)(const RenderDevice *self);
 
   /**
    * @fn bool RenderDevice::setAllowedFramesInFlight(const RenderDevice *self, Uint32 allowed)

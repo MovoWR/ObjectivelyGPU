@@ -89,6 +89,11 @@ struct RenderPass {
    * @private
    */
   SDL_GPURenderPass *pass;
+
+  /**
+   * @brief The currently bound pipeline, or `NULL`.
+   */
+  SDL_GPUGraphicsPipeline *pipeline;
 };
 
 /**

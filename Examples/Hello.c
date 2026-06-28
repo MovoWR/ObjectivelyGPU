@@ -85,11 +85,6 @@ SDL_AppResult SDL_AppInit(void **unused, int argc, char *argv[]) {
 	$$(Resource, addResourcePath, EXAMPLES);
 #endif
 
-	const char *basePath = SDL_GetBasePath();
-	if (basePath) {
-		$$(Resource, addResourcePath, basePath);
-	}
-
 	app.window = SDL_CreateWindow("Hello ObjectivelyGPU", HELLO_WINDOW_W, HELLO_WINDOW_H, HELLO_WINDOW_FLAGS);
 	GPU_Assert(app.window, "SDL_CreateWindow");
 
@@ -183,14 +178,14 @@ SDL_AppResult SDL_AppInit(void **unused, int argc, char *argv[]) {
 SDL_AppResult SDL_AppIterate(void *unused) {
 
 	Uint64 ticks = SDL_GetTicks();
-	float dt = (float) (ticks - app.ticks) / 1000.0f;
+	float dt = (ticks - app.ticks) / 1000.f;
 	app.ticks = ticks;
 
-	app.angles.x += dt * 30.0f;
-	app.angles.y += dt * 60.0f;
+	app.angles.x += dt * 30.f;
+	app.angles.y += dt * 60.f;
 
-	while (app.angles.x >= 360.0f) app.angles.x -= 360.0f;
-	while (app.angles.y >= 360.0f) app.angles.y -= 360.0f;
+	while (app.angles.x >= 360.f) app.angles.x -= 360.f;
+	while (app.angles.y >= 360.f) app.angles.y -= 360.f;
 
 	CommandBuffer *cmd = $(app.renderDevice, acquireCommandBuffer);
 
@@ -208,7 +203,7 @@ SDL_AppResult SDL_AppIterate(void *unused) {
 
 	SDL_GPUColorTargetInfo colorTarget = {
 		.texture = swapchain.texture,
-		.clear_color = { 0.1f, 0.1f, 0.2f, 1.0f },
+		.clear_color = { 0.1f, 0.1f, 0.2f, 1.f },
 		.load_op = SDL_GPU_LOADOP_CLEAR,
 		.store_op = SDL_GPU_STOREOP_STORE,
 	};

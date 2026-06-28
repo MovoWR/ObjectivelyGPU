@@ -83,6 +83,9 @@ static void bindIndexBuffer(const RenderPass *self, const SDL_GPUBufferBinding *
  * @memberof RenderPass
  */
 static void bindPipeline(const RenderPass *self, SDL_GPUGraphicsPipeline *pipeline) {
+
+  ((RenderPass *) self)->pipeline = pipeline;
+
   SDL_BindGPUGraphicsPipeline(self->pass, pipeline);
 }
 
@@ -123,6 +126,7 @@ static void bindVertexStorageTextures(const RenderPass *self, Uint32 firstSlot, 
  * @memberof RenderPass
  */
 static void drawIndexedPrimitives(const RenderPass *self, Uint32 numIndices, Uint32 numInstances, Uint32 firstIndex, Sint32 vertexOffset, Uint32 firstInstance) {
+  GPU_Assert(self->pipeline, "No pipeline bound");
   SDL_DrawGPUIndexedPrimitives(self->pass, numIndices, numInstances, firstIndex, vertexOffset, firstInstance);
 }
 
@@ -131,6 +135,7 @@ static void drawIndexedPrimitives(const RenderPass *self, Uint32 numIndices, Uin
  * @memberof RenderPass
  */
 static void drawIndexedPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount) {
+  GPU_Assert(self->pipeline, "No pipeline bound");
   SDL_DrawGPUIndexedPrimitivesIndirect(self->pass, buffer, offset, drawCount);
 }
 
@@ -139,6 +144,7 @@ static void drawIndexedPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer 
  * @memberof RenderPass
  */
 static void drawPrimitives(const RenderPass *self, Uint32 numVertices, Uint32 numInstances, Uint32 firstVertex, Uint32 firstInstance) {
+  GPU_Assert(self->pipeline, "No pipeline bound");
   SDL_DrawGPUPrimitives(self->pass, numVertices, numInstances, firstVertex, firstInstance);
 }
 
@@ -147,6 +153,7 @@ static void drawPrimitives(const RenderPass *self, Uint32 numVertices, Uint32 nu
  * @memberof RenderPass
  */
 static void drawPrimitivesIndirect(const RenderPass *self, SDL_GPUBuffer *buffer, Uint32 offset, Uint32 drawCount) {
+  GPU_Assert(self->pipeline, "No pipeline bound");
   SDL_DrawGPUPrimitivesIndirect(self->pass, buffer, offset, drawCount);
 }
 
@@ -160,6 +167,7 @@ static RenderPass *init(RenderPass *self, CommandBuffer *cmd, SDL_GPURenderPass 
   if (self) {
     self->cmd = cmd;
     assert(self->cmd);
+
     self->pass = pass;
     assert(self->pass);
   }

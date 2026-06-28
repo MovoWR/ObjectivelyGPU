@@ -28,7 +28,7 @@
 
 #define _Class _ComputePass
 
-#pragma mark - Object lifecycle
+#pragma mark - Object
 
 /**
  * @see Object::dealloc(Object *)
@@ -50,6 +50,9 @@ static void dealloc(Object *self) {
  * @memberof ComputePass
  */
 static void bindPipeline(const ComputePass *self, SDL_GPUComputePipeline *pipeline) {
+
+  ((ComputePass *) self)->pipeline = pipeline;
+
   SDL_BindGPUComputePipeline(self->pass, pipeline);
 }
 
@@ -82,6 +85,7 @@ static void bindStorageTextures(const ComputePass *self, Uint32 firstSlot, SDL_G
  * @memberof ComputePass
  */
 static void dispatchCompute(const ComputePass *self, Uint32 groupCountX, Uint32 groupCountY, Uint32 groupCountZ) {
+  GPU_Assert(self->pipeline, "No pipeline bound");
   SDL_DispatchGPUCompute(self->pass, groupCountX, groupCountY, groupCountZ);
 }
 
@@ -90,6 +94,7 @@ static void dispatchCompute(const ComputePass *self, Uint32 groupCountX, Uint32 
  * @memberof ComputePass
  */
 static void dispatchComputeIndirect(const ComputePass *self, SDL_GPUBuffer *buffer, Uint32 offset) {
+  GPU_Assert(self->pipeline, "No pipeline bound");
   SDL_DispatchGPUComputeIndirect(self->pass, buffer, offset);
 }
 
@@ -103,6 +108,7 @@ static ComputePass *init(ComputePass *self, CommandBuffer *cmd, SDL_GPUComputePa
   if (self) {
     self->cmd = cmd;
     assert(self->cmd);
+
     self->pass = pass;
     assert(self->pass);
   }

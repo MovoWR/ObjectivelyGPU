@@ -35,7 +35,7 @@
 
 #define _Class _RenderDevice
 
-#pragma mark - Object lifecycle
+#pragma mark - Object
 
 /**
  * @see Object::dealloc(Object *)
@@ -175,92 +175,6 @@ static SDL_GPUSampler *createSampler(const RenderDevice *self, const SDL_GPUSamp
   GPU_Assert(sampler, "SDL_CreateGPUSampler");
 
   return sampler;
-}
-
-/**
- * @fn SDL_GPUSampler *RenderDevice::samplerAnisotropic(const RenderDevice *self)
- * @memberof RenderDevice
- */
-static SDL_GPUSampler *samplerAnisotropic(const RenderDevice *self) {
-  assert(self);
-
-  RenderDevice *this = (RenderDevice *) self;
-  if (!this->_samplerAnisotropic) {
-    this->_samplerAnisotropic = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
-      .min_filter = SDL_GPU_FILTER_LINEAR,
-      .mag_filter = SDL_GPU_FILTER_LINEAR,
-      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
-      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
-      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
-      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
-      .enable_anisotropy = true,
-      .max_anisotropy = 16.f,
-    });
-  }
-  return this->_samplerAnisotropic;
-}
-
-/**
- * @fn SDL_GPUSampler *RenderDevice::samplerLinear(const RenderDevice *self)
- * @memberof RenderDevice
- */
-static SDL_GPUSampler *samplerLinear(const RenderDevice *self) {
-  assert(self);
-
-  RenderDevice *this = (RenderDevice *) self;
-  if (!this->_samplerLinear) {
-    this->_samplerLinear = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
-      .min_filter = SDL_GPU_FILTER_LINEAR,
-      .mag_filter = SDL_GPU_FILTER_LINEAR,
-      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
-      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
-      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
-      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
-    });
-  }
-  return this->_samplerLinear;
-}
-
-/**
- * @fn SDL_GPUSampler *RenderDevice::samplerLinearClamp(const RenderDevice *self)
- * @memberof RenderDevice
- */
-static SDL_GPUSampler *samplerLinearClamp(const RenderDevice *self) {
-  assert(self);
-
-  RenderDevice *this = (RenderDevice *) self;
-  if (!this->_samplerLinearClamp) {
-    this->_samplerLinearClamp = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
-      .min_filter = SDL_GPU_FILTER_LINEAR,
-      .mag_filter = SDL_GPU_FILTER_LINEAR,
-      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
-      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-    });
-  }
-  return this->_samplerLinearClamp;
-}
-
-/**
- * @fn SDL_GPUSampler *RenderDevice::samplerNearest(const RenderDevice *self)
- * @memberof RenderDevice
- */
-static SDL_GPUSampler *samplerNearest(const RenderDevice *self) {
-  assert(self);
-
-  RenderDevice *this = (RenderDevice *) self;
-  if (!this->_samplerNearest) {
-    this->_samplerNearest = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
-      .min_filter = SDL_GPU_FILTER_NEAREST,
-      .mag_filter = SDL_GPU_FILTER_NEAREST,
-      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
-      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-    });
-  }
-  return this->_samplerNearest;
 }
 
 /**
@@ -588,6 +502,92 @@ static void releaseTexture(const RenderDevice *self, SDL_GPUTexture *texture) {
  */
 static void releaseTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf) {
   SDL_ReleaseGPUTransferBuffer(self->device, tbuf);
+}
+
+/**
+ * @fn SDL_GPUSampler *RenderDevice::samplerAnisotropic(const RenderDevice *self)
+ * @memberof RenderDevice
+ */
+static SDL_GPUSampler *samplerAnisotropic(const RenderDevice *self) {
+  assert(self);
+
+  RenderDevice *this = (RenderDevice *) self;
+  if (!this->_samplerAnisotropic) {
+    this->_samplerAnisotropic = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
+      .min_filter = SDL_GPU_FILTER_LINEAR,
+      .mag_filter = SDL_GPU_FILTER_LINEAR,
+      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
+      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+      .enable_anisotropy = true,
+      .max_anisotropy = 16.f,
+    });
+  }
+  return this->_samplerAnisotropic;
+}
+
+/**
+ * @fn SDL_GPUSampler *RenderDevice::samplerLinear(const RenderDevice *self)
+ * @memberof RenderDevice
+ */
+static SDL_GPUSampler *samplerLinear(const RenderDevice *self) {
+  assert(self);
+
+  RenderDevice *this = (RenderDevice *) self;
+  if (!this->_samplerLinear) {
+    this->_samplerLinear = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
+      .min_filter = SDL_GPU_FILTER_LINEAR,
+      .mag_filter = SDL_GPU_FILTER_LINEAR,
+      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
+      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+    });
+  }
+  return this->_samplerLinear;
+}
+
+/**
+ * @fn SDL_GPUSampler *RenderDevice::samplerLinearClamp(const RenderDevice *self)
+ * @memberof RenderDevice
+ */
+static SDL_GPUSampler *samplerLinearClamp(const RenderDevice *self) {
+  assert(self);
+
+  RenderDevice *this = (RenderDevice *) self;
+  if (!this->_samplerLinearClamp) {
+    this->_samplerLinearClamp = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
+      .min_filter = SDL_GPU_FILTER_LINEAR,
+      .mag_filter = SDL_GPU_FILTER_LINEAR,
+      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
+      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+    });
+  }
+  return this->_samplerLinearClamp;
+}
+
+/**
+ * @fn SDL_GPUSampler *RenderDevice::samplerNearest(const RenderDevice *self)
+ * @memberof RenderDevice
+ */
+static SDL_GPUSampler *samplerNearest(const RenderDevice *self) {
+  assert(self);
+
+  RenderDevice *this = (RenderDevice *) self;
+  if (!this->_samplerNearest) {
+    this->_samplerNearest = $(self, createSampler, &(SDL_GPUSamplerCreateInfo) {
+      .min_filter = SDL_GPU_FILTER_NEAREST,
+      .mag_filter = SDL_GPU_FILTER_NEAREST,
+      .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
+      .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+      .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+      .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+    });
+  }
+  return this->_samplerNearest;
 }
 
 /**

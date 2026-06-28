@@ -119,7 +119,7 @@ struct CommandBufferInterface {
   bool (*acquireSwapchainTexture)(const CommandBuffer *self, SwapchainTexture *swapchain);
 
   /**
-   * @fn ComputePass *CommandBuffer::beginComputePass(const CommandBuffer *self, ...)
+   * @fn ComputePass *CommandBuffer::beginComputePass(const CommandBuffer *self, const SDL_GPUStorageTextureReadWriteBinding *storageTextures, Uint32 numStorageTextures, const SDL_GPUStorageBufferReadWriteBinding *storageBuffers, Uint32 numStorageBuffers)
    * @brief Begins a compute pass and returns a retained ComputePass.
    * @details The returned ComputePass must be released when compute work is
    *   complete. Releasing it calls `SDL_EndGPUComputePass` automatically.
@@ -145,7 +145,7 @@ struct CommandBufferInterface {
   CopyPass *(*beginCopyPass)(const CommandBuffer *self);
 
   /**
-   * @fn RenderPass *CommandBuffer::beginRenderPass(const CommandBuffer *self, ...)
+   * @fn RenderPass *CommandBuffer::beginRenderPass(const CommandBuffer *self, const SDL_GPUColorTargetInfo *colorTargets, Uint32 numColorTargets, const SDL_GPUDepthStencilTargetInfo *depthStencil)
    * @brief Begins a render pass and returns a retained RenderPass.
    * @details The returned RenderPass must be released when all draw calls are
    *   recorded. Releasing it calls `SDL_EndGPURenderPass` automatically.
