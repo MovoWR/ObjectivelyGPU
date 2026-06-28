@@ -531,7 +531,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "exec \"$SRCROOT/scripts/build-xcframework.sh\"\n";
+			shellScript = "exec \"$SRCROOT/Frameworks/build-xcframework.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		SC00100000000000000000A0 /* Compile Shaders */ = {
