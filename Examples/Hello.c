@@ -90,31 +90,33 @@ SDL_AppResult SDL_AppInit(void **unused, int argc, char *argv[]) {
 		$$(Resource, addResourcePath, basePath);
 	}
 
-	SDL_Window *window = SDL_CreateWindow("Hello ObjectivelyGPU", HELLO_WINDOW_W, HELLO_WINDOW_H, HELLO_WINDOW_FLAGS);
-	GPU_Assert(window, "SDL_CreateWindow");
+	app.window = SDL_CreateWindow("Hello ObjectivelyGPU", HELLO_WINDOW_W, HELLO_WINDOW_H, HELLO_WINDOW_FLAGS);
+	GPU_Assert(app.window, "SDL_CreateWindow");
 
-	RenderDevice *renderDevice = $(alloc(RenderDevice), initWithWindow, window);
+	app.renderDevice = $(alloc(RenderDevice), initWithWindow, app.window);
 
 	int w = 0, h = 0;
-	SDL_GetWindowSizeInPixels(window, &w, &h);
+	SDL_GetWindowSizeInPixels(app.window, &w, &h);
 
-	Framebuffer *framebuffer = $(alloc(Framebuffer), initWithDevice, renderDevice,
+  app.framebuffer = $(alloc(Framebuffer), initWithDevice, app.renderDevice,
 		&MakeSize(w, h),
 		SDL_GPU_TEXTUREFORMAT_INVALID,
 		SDL_GPU_TEXTUREFORMAT_D16_UNORM);
 
-	SDL_GPUShader *vertexShader = $(renderDevice, loadShader, "Hello.vert", &(SDL_GPUShaderCreateInfo) {
+	SDL_GPUShader *vertexShader = $(app.renderDevice, loadShader, "Hello.vert", &(SDL_GPUShaderCreateInfo) {
 		.stage = SDL_GPU_SHADERSTAGE_VERTEX,
 		.num_uniform_buffers = 1,
 	});
 
-	SDL_GPUShader *fragmentShader = $(renderDevice, loadShader, "Hello.frag", &(SDL_GPUShaderCreateInfo) {
+	SDL_GPUShader *fragmentShader = $(app.renderDevice, loadShader, "Hello.frag", &(SDL_GPUShaderCreateInfo) {
 		.stage = SDL_GPU_SHADERSTAGE_FRAGMENT,
 	});
 
 	SDL_GPUColorTargetDescription colorTargetDescription = {
-		.format = $(renderDevice, getSwapchainTextureFormat, window),
+		.format = $(app.renderDevice, getSwapchainTextureFormat, app.window),
 	};
+
+  app.vertexBuffer = $(app.renderDevice, createBufferWithConstMem, SDL_GPU_BUFFERUSAGE_VERTEX, vertexes, sizeof(vertexes));
 
 	SDL_GPUVertexBufferDescription vertexBufferDescription = {
 		.slot = 0,
@@ -137,7 +139,7 @@ SDL_AppResult SDL_AppInit(void **unused, int argc, char *argv[]) {
 		},
 	};
 
-	SDL_GPUGraphicsPipeline *pipeline = $(renderDevice, createGraphicsPipeline, &(SDL_GPUGraphicsPipelineCreateInfo) {
+	app.pipeline = $(app.renderDevice, createGraphicsPipeline, &(SDL_GPUGraphicsPipelineCreateInfo) {
 		.vertex_shader = vertexShader,
 		.fragment_shader = fragmentShader,
 		.vertex_input_state = {
@@ -169,18 +171,8 @@ SDL_AppResult SDL_AppInit(void **unused, int argc, char *argv[]) {
 		},
 	});
 
-	$(renderDevice, releaseShader, vertexShader);
-	$(renderDevice, releaseShader, fragmentShader);
-
-	SDL_GPUBuffer *vertexBuffer = $(renderDevice, createBufferWithConstMem, SDL_GPU_BUFFERUSAGE_VERTEX, vertexes, sizeof(vertexes));
-
-	app = (AppState) {
-		.window = window,
-		.renderDevice = renderDevice,
-		.framebuffer = framebuffer,
-		.vertexBuffer = vertexBuffer,
-		.pipeline = pipeline,
-	};
+	$(app.renderDevice, releaseShader, vertexShader);
+	$(app.renderDevice, releaseShader, fragmentShader);
 
 	return SDL_APP_CONTINUE;
 }
