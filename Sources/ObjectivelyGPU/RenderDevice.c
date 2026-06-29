@@ -1,6 +1,6 @@
 /*
- * ObjectivelyGPU: Object oriented MVC framework for SDL3 GPU, SDL3 and GNU C.
- * Copyright (C) 2014 Jay Dolan <jay@jaydolan.com>
+ * ObjectivelyGPU: Object oriented graphics framework for SDL3 and GNU C.
+ * Copyright (C) 2026 Jay Dolan <jay@jaydolan.com>
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages

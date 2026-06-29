@@ -1,5 +1,5 @@
 /*
- * ObjectivelyGPU: Object oriented MVC framework for SDL3 and GNU C.
+ * ObjectivelyGPU: Object oriented graphics framework for SDL3 and GNU C.
  * Copyright (C) 2026 Jay Dolan <jay@jaydolan.com>
  *
  * This software is provided 'as-is', without any express or implied
@@ -192,17 +192,17 @@ static void setBlendConstants(RenderPass *self, SDL_FColor blendConstants) {
 static void setScissor(RenderPass *self, const SDL_Rect *scissor) {
 
   if (scissor) {
-    const int x = SDL_clamp(scissor->x, 0, self->viewport.w);
-    const int y = SDL_clamp(scissor->y, 0, self->viewport.h);
-    const int r = SDL_clamp(scissor->x + scissor->w, 0, self->viewport.w);
-    const int b = SDL_clamp(scissor->y + scissor->h, 0, self->viewport.h);
-    self->scissor = (SDL_Rect) { .x = x, .y = y, .w = r - x, .h = b - y };
+    self->scissor = *scissor;
   } else {
+    // Reset to the full render target. RenderPass does not yet capture the
+    // target dimensions, so fall back to the current viewport, which the
+    // caller is expected to have set. This becomes a true target-size reset
+    // once Texture objects carry their dimensions into beginRenderPass.
     self->scissor = (SDL_Rect) {
-      self->viewport.x,
-      self->viewport.y,
-      self->viewport.w,
-      self->viewport.h
+      (int) self->viewport.x,
+      (int) self->viewport.y,
+      (int) self->viewport.w,
+      (int) self->viewport.h,
     };
   }
 

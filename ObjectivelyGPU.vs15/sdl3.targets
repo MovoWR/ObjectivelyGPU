@@ -25,7 +25,7 @@
           Condition="!Exists('$(SDL3Dir)include\SDL3\SDL.h')">
     <Message Importance="high" Text="Downloading SDL3 $(SDL3Version) development libraries..." />
     <Exec WorkingDirectory="$(MSBuildThisFileDirectory)"
-          Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$ErrorActionPreference = 'Stop'; New-Item -ItemType Directory -Force libs | Out-Null; Invoke-WebRequest -Uri 'https://github.com/libsdl-org/SDL/releases/download/release-$(SDL3Version)/SDL3-devel-$(SDL3Version)-VC.zip' -OutFile 'libs\sdl3.zip'; Expand-Archive -Force 'libs\sdl3.zip' 'libs'; Remove-Item 'libs\sdl3.zip'&quot;" />
+          Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$ErrorActionPreference = 'Stop'; $m = New-Object System.Threading.Mutex($false, 'Global\ObjectivelySDL3'); [void]$m.WaitOne(); try { if (-not (Test-Path '$(SDL3Dir)include\SDL3\SDL.h')) { New-Item -ItemType Directory -Force libs | Out-Null; Invoke-WebRequest -Uri 'https://github.com/libsdl-org/SDL/releases/download/release-$(SDL3Version)/SDL3-devel-$(SDL3Version)-VC.zip' -OutFile 'libs\sdl3.zip'; Expand-Archive -Force 'libs\sdl3.zip' 'libs'; Remove-Item 'libs\sdl3.zip' } } finally { $m.ReleaseMutex() }&quot;" />
   </Target>
 
 </Project>
