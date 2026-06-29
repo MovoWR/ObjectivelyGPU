@@ -48,43 +48,10 @@ static void dealloc(Object *self) {
 #pragma mark - Framebuffer
 
 /**
- * @brief Allocates color and depth textures for the current size and formats.
- */
-static void allocateTextures(Framebuffer *this) {
-
-  if (this->colorFormat != SDL_GPU_TEXTUREFORMAT_INVALID) {
-    this->colorTexture = $(this->device, createTexture, &(SDL_GPUTextureCreateInfo) {
-      .type = SDL_GPU_TEXTURETYPE_2D,
-      .format = this->colorFormat,
-      .usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER,
-      .width = (Uint32) this->size.w,
-      .height = (Uint32) this->size.h,
-      .layer_count_or_depth = 1,
-      .num_levels = 1,
-      .sample_count = SDL_GPU_SAMPLECOUNT_1,
-    }, NULL);
-  }
-
-  if (this->depthFormat != SDL_GPU_TEXTUREFORMAT_INVALID) {
-    this->depthTexture = $(this->device, createTexture, &(SDL_GPUTextureCreateInfo) {
-      .type = SDL_GPU_TEXTURETYPE_2D,
-      .format = this->depthFormat,
-      .usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET,
-      .width = (Uint32) this->size.w,
-      .height = (Uint32) this->size.h,
-      .layer_count_or_depth = 1,
-      .num_levels = 1,
-      .sample_count = SDL_GPU_SAMPLECOUNT_1,
-    }, NULL);
-  }
-}
-
-/**
  * @fn SDL_GPUColorTargetInfo Framebuffer::colorTargetInfo(const Framebuffer *self, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor)
  * @memberof Framebuffer
  */
-static SDL_GPUColorTargetInfo colorTargetInfo(const Framebuffer *self,
-  SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor) {
+static SDL_GPUColorTargetInfo colorTargetInfo(const Framebuffer *self, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor) {
 
   assert(self->colorTexture);
 
@@ -100,8 +67,7 @@ static SDL_GPUColorTargetInfo colorTargetInfo(const Framebuffer *self,
  * @fn SDL_GPUDepthStencilTargetInfo Framebuffer::depthTargetInfo(const Framebuffer *self, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, float clearDepth)
  * @memberof Framebuffer
  */
-static SDL_GPUDepthStencilTargetInfo depthTargetInfo(const Framebuffer *self,
-  SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, float clearDepth) {
+static SDL_GPUDepthStencilTargetInfo depthTargetInfo(const Framebuffer *self, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, float clearDepth) {
 
   assert(self->depthTexture);
 
@@ -117,23 +83,19 @@ static SDL_GPUDepthStencilTargetInfo depthTargetInfo(const Framebuffer *self,
  * @fn Framebuffer *Framebuffer::initWithDevice(Framebuffer *self, RenderDevice *device, const SDL_Size *size, SDL_GPUTextureFormat colorFormat, SDL_GPUTextureFormat depthFormat)
  * @memberof Framebuffer
  */
-static Framebuffer *initWithDevice(Framebuffer *self, RenderDevice *device,
-  const SDL_Size *size,
-  SDL_GPUTextureFormat colorFormat,
-  SDL_GPUTextureFormat depthFormat) {
+static Framebuffer *initWithDevice(Framebuffer *self, RenderDevice *device, const SDL_Size *size, SDL_GPUTextureFormat colorFormat, SDL_GPUTextureFormat depthFormat) {
 
   assert(device);
-  assert(size);
-  assert(size->w > 0 && size->h > 0);
+  assert(size && size->w > 0 && size->h > 0);
 
   self = (Framebuffer *) super(Object, self, init);
   if (self) {
     self->device = retain(device);
-    self->size = *size;
+
     self->colorFormat = colorFormat;
     self->depthFormat = depthFormat;
 
-    allocateTextures(self);
+    $(self, resize, size);
   }
 
   return self;
@@ -144,22 +106,43 @@ static Framebuffer *initWithDevice(Framebuffer *self, RenderDevice *device,
  * @memberof Framebuffer
  */
 static bool resize(Framebuffer *self, const SDL_Size *size) {
-  assert(self);
-  assert(size);
-  assert(size->w > 0 && size->h > 0);
 
-  if (self->size.w == size->w && self->size.h == size->h) {
-    return false;
-  }
+  assert(size);
 
   $(self->device, releaseTexture, self->colorTexture);
-  self->colorTexture = NULL;
-
   $(self->device, releaseTexture, self->depthTexture);
-  self->depthTexture = NULL;
 
   self->size = *size;
-  allocateTextures(self);
+
+  if (self->colorFormat != SDL_GPU_TEXTUREFORMAT_INVALID) {
+    self->colorTexture = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
+      .type = SDL_GPU_TEXTURETYPE_2D,
+      .format = self->colorFormat,
+      .usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER,
+      .width = (Uint32) self->size.w,
+      .height = (Uint32) self->size.h,
+      .layer_count_or_depth = 1,
+      .num_levels = 1,
+      .sample_count = SDL_GPU_SAMPLECOUNT_1,
+    }, NULL);
+  } else {
+    self->colorTexture = NULL;
+  }
+
+  if (self->depthFormat != SDL_GPU_TEXTUREFORMAT_INVALID) {
+    self->depthTexture = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
+      .type = SDL_GPU_TEXTURETYPE_2D,
+      .format = self->depthFormat,
+      .usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET,
+      .width = (Uint32) self->size.w,
+      .height = (Uint32) self->size.h,
+      .layer_count_or_depth = 1,
+      .num_levels = 1,
+      .sample_count = SDL_GPU_SAMPLECOUNT_1,
+    }, NULL);
+  } else {
+    self->depthTexture = NULL;
+  }
 
   return true;
 }
