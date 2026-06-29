@@ -66,6 +66,11 @@ struct RenderPass {
   RenderPassInterface *interface;
 
   /**
+   * @brief The current blend constants.
+   */
+  SDL_FColor blendConstants;
+
+  /**
    * @brief The CommandBuffer this pass was begun from.
    * @private
    */
@@ -79,9 +84,24 @@ struct RenderPass {
   SDL_GPURenderPass *pass;
 
   /**
-   * @brief The currently bound pipeline, or `NULL`.
+   * @brief The currentl pipeline, or `NULL`.
    */
   SDL_GPUGraphicsPipeline *pipeline;
+
+  /**
+   * @brief The current scissor.
+   */
+  SDL_Rect scissor;
+
+  /**
+   * @brief The current stencil reference.
+   */
+  Uint8 stencilReference;
+
+  /**
+   * @brief The current viewport.
+   */
+  SDL_GPUViewport viewport;
 };
 
 /**
@@ -197,32 +217,32 @@ struct RenderPassInterface {
   RenderPass *(*init)(RenderPass *self, CommandBuffer *commands, SDL_GPURenderPass *pass);
 
   /**
-   * @fn void RenderPass::setBlendConstants(const RenderPass *self, SDL_FColor blendConstants)
+   * @fn void RenderPass::setBlendConstants(RenderPass *self, SDL_FColor blendConstants)
    * @brief Sets the blend constants used by `SDL_GPU_BLENDFACTOR_CONSTANT_*` factors.
    * @memberof RenderPass
    */
-  void (*setBlendConstants)(const RenderPass *self, SDL_FColor blendConstants);
+  void (*setBlendConstants)(RenderPass *self, SDL_FColor blendConstants);
 
   /**
-   * @fn void RenderPass::setScissor(const RenderPass *self, const SDL_Rect *scissor)
+   * @fn void RenderPass::setScissor(RenderPass *self, const SDL_Rect *scissor)
    * @brief Sets the scissor rectangle. Pass NULL to reset to the full viewport.
    * @memberof RenderPass
    */
-  void (*setScissor)(const RenderPass *self, const SDL_Rect *scissor);
+  void (*setScissor)(RenderPass *self, const SDL_Rect *scissor);
 
   /**
-   * @fn void RenderPass::setStencilReference(const RenderPass *self, Uint8 reference)
+   * @fn void RenderPass::setStencilReference(RenderPass *self, Uint8 reference)
    * @brief Sets the stencil reference value used in stencil tests.
    * @memberof RenderPass
    */
-  void (*setStencilReference)(const RenderPass *self, Uint8 reference);
+  void (*setStencilReference)(RenderPass *self, Uint8 reference);
 
   /**
-   * @fn void RenderPass::setViewport(const RenderPass *self, const SDL_GPUViewport *viewport)
+   * @fn void RenderPass::setViewport(RenderPass *self, const SDL_GPUViewport *viewport)
    * @brief Sets the viewport. Pass NULL to reset to the full render target.
    * @memberof RenderPass
    */
-  void (*setViewport)(const RenderPass *self, const SDL_GPUViewport *viewport);
+  void (*setViewport)(RenderPass *self, const SDL_GPUViewport *viewport);
 };
 
 /**
