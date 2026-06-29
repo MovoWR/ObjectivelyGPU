@@ -175,35 +175,62 @@ static RenderPass *init(RenderPass *self, CommandBuffer *commands, SDL_GPURender
 }
 
 /**
- * @fn void RenderPass::setBlendConstants(const RenderPass *self, SDL_FColor blendConstants)
+ * @fn void RenderPass::setBlendConstants(RenderPass *self, SDL_FColor blendConstants)
  * @memberof RenderPass
  */
-static void setBlendConstants(const RenderPass *self, SDL_FColor blendConstants) {
-  SDL_SetGPUBlendConstants(self->pass, blendConstants);
+static void setBlendConstants(RenderPass *self, SDL_FColor blendConstants) {
+
+  self->blendConstants = blendConstants;
+
+  SDL_SetGPUBlendConstants(self->pass, self->blendConstants);
 }
 
 /**
  * @fn void RenderPass::setScissor(const RenderPass *self, const SDL_Rect *scissor)
  * @memberof RenderPass
  */
-static void setScissor(const RenderPass *self, const SDL_Rect *scissor) {
-  SDL_SetGPUScissor(self->pass, scissor);
+static void setScissor(RenderPass *self, const SDL_Rect *scissor) {
+
+  if (scissor) {
+    const int x = SDL_clamp(scissor->x, 0, self->viewport.w);
+    const int y = SDL_clamp(scissor->y, 0, self->viewport.h);
+    const int r = SDL_clamp(scissor->x + scissor->w, 0, self->viewport.w);
+    const int b = SDL_clamp(scissor->y + scissor->h, 0, self->viewport.h);
+    self->scissor = (SDL_Rect) { .x = x, .y = y, .w = r - x, .h = b - y };
+  } else {
+    self->scissor = (SDL_Rect) {
+      self->viewport.x,
+      self->viewport.y,
+      self->viewport.w,
+      self->viewport.h
+    };
+  }
+
+  SDL_SetGPUScissor(self->pass, &self->scissor);
 }
 
 /**
- * @fn void RenderPass::setStencilReference(const RenderPass *self, Uint8 reference)
+ * @fn void RenderPass::setStencilReference(RenderPass *self, Uint8 reference)
  * @memberof RenderPass
  */
-static void setStencilReference(const RenderPass *self, Uint8 reference) {
-  SDL_SetGPUStencilReference(self->pass, reference);
+static void setStencilReference(RenderPass *self, Uint8 reference) {
+
+  self->stencilReference = reference;
+
+  SDL_SetGPUStencilReference(self->pass, self->stencilReference);
 }
 
 /**
  * @fn void RenderPass::setViewport(const RenderPass *self, const SDL_GPUViewport *viewport)
  * @memberof RenderPass
  */
-static void setViewport(const RenderPass *self, const SDL_GPUViewport *viewport) {
-  SDL_SetGPUViewport(self->pass, viewport);
+static void setViewport(RenderPass *self, const SDL_GPUViewport *viewport) {
+
+  assert(viewport);
+
+  self->viewport = *viewport;
+
+  SDL_SetGPUViewport(self->pass, &self->viewport);
 }
 
 #pragma mark - Class lifecycle
