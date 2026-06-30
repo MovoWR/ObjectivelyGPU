@@ -7,7 +7,6 @@
 *~
 .DS_Store
 .build-xcframework/
-.build-xcframework/
 .deps/
 .dirstamp
 .libs/
@@ -15,7 +14,8 @@ Config.h
 Config.h.in
 Examples/Hello
 Examples/HelloCompute
-Frameworks/
+Frameworks/*
+!Frameworks/*.sh
 Makefile
 Makefile.in
 ObjectivelyGPU.vs15/libs/

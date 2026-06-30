@@ -7,53 +7,84 @@ on:
 permissions:
   contents: write
 
+env:
+  # Objectively is a source dependency (resolved via ObjectivelyGPU.xcworkspace).
+  # Override to point a GPU release/branch at a specific Objectively ref.
+  # SDL3 / curl versions live in fetch-sdl3.sh / build-libcurl.sh, not here.
+  OBJECTIVELY_REF: "main"
+
 jobs:
   release-xcframework:
     runs-on: macos-14
 
-    env:
-      SDL3_VERSION: "release-3.4.10"
-      IOS_MIN: "14.0"
-
     steps:
-    - name: Install dependencies
-      run: brew install cmake
-
-    - name: Checkout
+    - name: Checkout Objectively
       uses: actions/checkout@v6
-
-    - name: Cache xcframework build
-      uses: actions/cache@v4
       with:
-        path: .build-xcframework
-        key: xcframework-${{ env.SDL3_VERSION }}-ios-${{ env.IOS_MIN }}-${{ hashFiles('Sources/ObjectivelyGPU/**/*.c', 'Sources/ObjectivelyGPU/**/*.h', 'Frameworks/build-xcframework.sh') }}
-        restore-keys: |
-          xcframework-${{ env.SDL3_VERSION }}-ios-${{ env.IOS_MIN }}-
+        repository: jdolan/Objectively
+        ref: ${{ env.OBJECTIVELY_REF }}
+        path: Objectively
 
-    - name: Download Objectively xcframework
+    - name: Checkout ObjectivelyGPU
+      uses: actions/checkout@v6
+      with:
+        path: ObjectivelyGPU
+
+    # curl ships no prebuilt xcframework; build it so the iOS slices have curl
+    # headers for the Objectively source dependency. macOS uses system curl.
+    - name: Build libcurl.xcframework
+      working-directory: Objectively
+      run: ./Frameworks/build-libcurl.sh
+
+    - name: Fetch SDL3.xcframework
+      working-directory: ObjectivelyGPU
+      run: ./Frameworks/fetch-sdl3.sh
+
+    # Archive the framework target (single source of truth — no duplicated file
+    # list) per platform, then combine. iOS compiles the Objectively dep from
+    # source, so feed curl's headers with an additive -I.
+    - name: Build ObjectivelyGPU.xcframework
+      working-directory: ObjectivelyGPU
       run: |
-        mkdir -p Frameworks
-        gh release download --repo jdolan/Objectively --pattern "Objectively.xcframework.zip" -D Frameworks/
-        cd Frameworks && unzip -q Objectively.xcframework.zip && rm Objectively.xcframework.zip
-      env:
-        GH_TOKEN: ${{ github.token }}
+        set -euo pipefail
+        rm -rf build
+        curl_ios="$GITHUB_WORKSPACE/Objectively/Frameworks/libcurl.xcframework/ios-arm64/Headers"
+        curl_sim="$GITHUB_WORKSPACE/Objectively/Frameworks/libcurl.xcframework/ios-arm64_x86_64-simulator/Headers"
 
-    - name: Build xcframeworks
-      run: bash Frameworks/build-xcframework.sh
+        xcodebuild archive -workspace ObjectivelyGPU.xcworkspace -scheme ObjectivelyGPU \
+          -destination "generic/platform=macOS" -archivePath build/macOS \
+          SKIP_INSTALL=NO CODE_SIGNING_ALLOWED=NO
+
+        xcodebuild archive -workspace ObjectivelyGPU.xcworkspace -scheme ObjectivelyGPU \
+          -destination "generic/platform=iOS" -archivePath build/iOS \
+          SKIP_INSTALL=NO CODE_SIGNING_ALLOWED=NO \
+          OTHER_CFLAGS="\$(inherited) -I$curl_ios"
+
+        xcodebuild archive -workspace ObjectivelyGPU.xcworkspace -scheme ObjectivelyGPU \
+          -destination "generic/platform=iOS Simulator" -archivePath build/iOS_Simulator \
+          SKIP_INSTALL=NO CODE_SIGNING_ALLOWED=NO \
+          OTHER_CFLAGS="\$(inherited) -I$curl_sim"
+
+        xcodebuild -create-xcframework \
+          -framework build/macOS.xcarchive/Products/Library/Frameworks/ObjectivelyGPU.framework \
+          -framework build/iOS.xcarchive/Products/Library/Frameworks/ObjectivelyGPU.framework \
+          -framework build/iOS_Simulator.xcarchive/Products/Library/Frameworks/ObjectivelyGPU.framework \
+          -output Frameworks/ObjectivelyGPU.xcframework
 
     - name: Zip xcframeworks
+      working-directory: ObjectivelyGPU/Frameworks
       run: |
-        cd Frameworks
-        zip -r ../SDL3.xcframework.zip SDL3.xcframework
-        zip -r ../ObjectivelyGPU.xcframework.zip ObjectivelyGPU.xcframework
+        zip -r "$GITHUB_WORKSPACE/SDL3.xcframework.zip" SDL3.xcframework
+        zip -r "$GITHUB_WORKSPACE/ObjectivelyGPU.xcframework.zip" ObjectivelyGPU.xcframework
 
     - name: Create release
+      working-directory: ObjectivelyGPU
       run: |
         gh release delete ${{ github.ref_name }} --yes || true
         gh release create ${{ github.ref_name }} \
           --title "ObjectivelyGPU ${{ github.ref_name }}" \
           --generate-notes \
-          SDL3.xcframework.zip \
-          ObjectivelyGPU.xcframework.zip
+          "$GITHUB_WORKSPACE/SDL3.xcframework.zip" \
+          "$GITHUB_WORKSPACE/ObjectivelyGPU.xcframework.zip"
       env:
         GH_TOKEN: ${{ github.token }}
