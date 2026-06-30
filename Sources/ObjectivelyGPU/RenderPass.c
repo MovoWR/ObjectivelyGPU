@@ -41,6 +41,10 @@ static void dealloc(Object *self) {
     SDL_EndGPURenderPass(this->pass);
   }
 
+  if (this->commands) {
+    this->commands->pass = NULL;
+  }
+
   super(Object, self, dealloc);
 }
 
@@ -195,7 +199,18 @@ static void setBlendConstants(RenderPass *self, SDL_FColor blendConstants) {
 static void setScissor(RenderPass *self, const SDL_Rect *scissor) {
 
   if (scissor) {
-    self->scissor = *scissor;
+    // Clamp to the render target bounds: a scissor that extends past the edge
+    // (e.g. a view dragged partly offscreen) is invalid to SDL and would drop
+    // the whole draw. Clamp each edge against the viewport, then subtract back
+    // so w/h never exceed the space remaining from the clamped origin. A fully
+    // offscreen scissor collapses to zero w/h, scissoring out the draw.
+    // RenderPass does not yet capture the target dimensions, so the viewport
+    // (which the caller is expected to have set) stands in for them.
+    const int x = SDL_clamp(scissor->x, 0, (int) self->viewport.w);
+    const int y = SDL_clamp(scissor->y, 0, (int) self->viewport.h);
+    const int r = SDL_clamp(scissor->x + scissor->w, 0, (int) self->viewport.w);
+    const int b = SDL_clamp(scissor->y + scissor->h, 0, (int) self->viewport.h);
+    self->scissor = (SDL_Rect) { .x = x, .y = y, .w = r - x, .h = b - y };
   } else {
     // Reset to the full render target. RenderPass does not yet capture the
     // target dimensions, so fall back to the current viewport, which the
