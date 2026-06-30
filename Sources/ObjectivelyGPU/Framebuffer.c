@@ -38,8 +38,10 @@ static void dealloc(Object *self) {
 
   Framebuffer *this = (Framebuffer *) self;
 
-  release(this->colorTexture);
-  release(this->resolveTexture);
+  for (Uint32 i = 0; i < this->numColorTargets; i++) {
+    release(this->colorTextures[i]);
+    release(this->resolveTextures[i]);
+  }
   release(this->depthTexture);
 
   release(this->device);
@@ -50,27 +52,28 @@ static void dealloc(Object *self) {
 #pragma mark - Framebuffer
 
 /**
- * @fn SDL_GPUColorTargetInfo Framebuffer::colorTargetInfo(const Framebuffer *self, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor)
+ * @fn SDL_GPUColorTargetInfo Framebuffer::colorTargetInfo(const Framebuffer *self, Uint32 index, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor)
  * @memberof Framebuffer
  */
-static SDL_GPUColorTargetInfo colorTargetInfo(const Framebuffer *self, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor) {
+static SDL_GPUColorTargetInfo colorTargetInfo(const Framebuffer *self, Uint32 index, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor) {
 
-  assert(self->colorTexture);
+  assert(index < self->numColorTargets);
+  assert(self->colorTextures[index]);
 
   SDL_GPUColorTargetInfo info = {
-    .texture = self->colorTexture->texture,
+    .texture = self->colorTextures[index]->texture,
     .load_op = loadOp,
     .store_op = storeOp,
     .clear_color = clearColor ? *clearColor : (SDL_FColor) { 0.f, 0.f, 0.f, 1.f },
   };
 
   if (self->sampleCount > SDL_GPU_SAMPLECOUNT_1) {
-    assert(self->resolveTexture);
+    assert(self->resolveTextures[index]);
 
     // Resolve the multisampled color into the single-sample resolve target. STORE is
     // promoted to RESOLVE_AND_STORE so the multisampled contents survive for any later
     // load-op pass (e.g. UI drawn over a 3D scene) while keeping the resolve current.
-    info.resolve_texture = self->resolveTexture->texture;
+    info.resolve_texture = self->resolveTextures[index]->texture;
     if (storeOp == SDL_GPU_STOREOP_STORE) {
       info.store_op = SDL_GPU_STOREOP_RESOLVE_AND_STORE;
     }
@@ -104,11 +107,16 @@ static Framebuffer *initWithDevice(Framebuffer *self, RenderDevice *device, cons
   assert(device);
   assert(info && info->size.w > 0 && info->size.h > 0);
 
+  assert(info->numColorTargets <= GPU_MAX_COLOR_TARGETS);
+
   self = (Framebuffer *) super(Object, self, init);
   if (self) {
     self->device = retain(device);
 
-    self->colorFormat = info->colorFormat;
+    self->numColorTargets = info->numColorTargets;
+    for (Uint32 i = 0; i < info->numColorTargets; i++) {
+      self->colorFormats[i] = info->colorFormats[i];
+    }
     self->depthFormat = info->depthFormat;
     self->sampleCount = info->sampleCount;
 
@@ -130,25 +138,27 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
     return false;
   }
 
-  release(self->colorTexture);
-  release(self->resolveTexture);
+  for (Uint32 i = 0; i < self->numColorTargets; i++) {
+    release(self->colorTextures[i]);
+    release(self->resolveTextures[i]);
+    self->colorTextures[i] = NULL;
+    self->resolveTextures[i] = NULL;
+  }
   release(self->depthTexture);
-  self->colorTexture = NULL;
-  self->resolveTexture = NULL;
   self->depthTexture = NULL;
 
   self->size = *size;
 
   const bool multisampled = self->sampleCount > SDL_GPU_SAMPLECOUNT_1;
 
-  if (self->colorFormat != SDL_GPU_TEXTUREFORMAT_INVALID) {
+  for (Uint32 i = 0; i < self->numColorTargets; i++) {
 
     // A multisampled color target is resolved before sampling, so it needs only
     // COLOR_TARGET usage; the single-sample paths (no MSAA, or the resolve target)
     // also carry SAMPLER so they can be blit/sampled.
-    self->colorTexture = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
+    self->colorTextures[i] = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
       .type = SDL_GPU_TEXTURETYPE_2D,
-      .format = self->colorFormat,
+      .format = self->colorFormats[i],
       .usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | (multisampled ? 0 : SDL_GPU_TEXTUREUSAGE_SAMPLER),
       .width = (Uint32) self->size.w,
       .height = (Uint32) self->size.h,
@@ -158,9 +168,9 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
     }, NULL);
 
     if (multisampled) {
-      self->resolveTexture = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
+      self->resolveTextures[i] = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
         .type = SDL_GPU_TEXTURETYPE_2D,
-        .format = self->colorFormat,
+        .format = self->colorFormats[i],
         .usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER,
         .width = (Uint32) self->size.w,
         .height = (Uint32) self->size.h,
@@ -188,11 +198,12 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
 }
 
 /**
- * @fn Texture *Framebuffer::resolvedColorTexture(const Framebuffer *self)
+ * @fn Texture *Framebuffer::resolvedColorTexture(const Framebuffer *self, Uint32 index)
  * @memberof Framebuffer
  */
-static Texture *resolvedColorTexture(const Framebuffer *self) {
-  return self->resolveTexture ?: self->colorTexture;
+static Texture *resolvedColorTexture(const Framebuffer *self, Uint32 index) {
+  assert(index < self->numColorTargets);
+  return self->resolveTextures[index] ?: self->colorTextures[index];
 }
 
 #pragma mark - Class lifecycle

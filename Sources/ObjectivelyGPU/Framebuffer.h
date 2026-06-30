@@ -40,6 +40,13 @@ typedef struct FramebufferInterface FramebufferInterface;
 typedef struct Texture Texture;
 
 /**
+ * @brief The maximum number of color attachments a Framebuffer may have.
+ * @details A render pass binds N color targets plus at most one depth-stencil target;
+ *   this caps N. Four matches the minimum guaranteed across backends.
+ */
+#define GPU_MAX_COLOR_TARGETS 4
+
+/**
  * @brief Parameters for creating a Framebuffer.
  * @details The GPU-layer analogue of SDL's `*CreateInfo` structs, for a target that
  *   aggregates several `SDL_GPUTexture` attachments and so has no single SDL struct.
@@ -56,18 +63,26 @@ typedef struct GPU_FramebufferCreateInfo {
   SDL_Size size;
 
   /**
-   * @brief Color attachment format, or `SDL_GPU_TEXTUREFORMAT_INVALID` to omit.
+   * @brief The color attachment formats, one per render target (MRT).
+   * @details Indices `[0, numColorTargets)` are used. With MSAA, every color attachment
+   *   is multisampled and gets its own single-sample resolve target.
    */
-  SDL_GPUTextureFormat colorFormat;
+  SDL_GPUTextureFormat colorFormats[GPU_MAX_COLOR_TARGETS];
+
+  /**
+   * @brief The number of color attachments; `0` to omit color entirely.
+   */
+  Uint32 numColorTargets;
 
   /**
    * @brief Depth attachment format, or `SDL_GPU_TEXTUREFORMAT_INVALID` to omit.
+   * @details A render pass supports at most one depth-stencil target, so this is singular.
    */
   SDL_GPUTextureFormat depthFormat;
 
   /**
    * @brief MSAA sample count; `SDL_GPU_SAMPLECOUNT_1` for no multisampling.
-   * @details When greater, a single-sample resolve target is allocated alongside the
+   * @details When greater, a single-sample resolve target is allocated alongside each
    *   multisampled color attachment.
    */
   SDL_GPUSampleCount sampleCount;
@@ -88,12 +103,13 @@ typedef struct GPU_FramebufferCreateInfo {
  * @code
  *   Framebuffer *fb = $(renderDevice, createFramebuffer, &(GPU_FramebufferCreateInfo) {
  *     .size = { 1920, 1080 },
- *     .colorFormat = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT,
+ *     .colorFormats = { SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT },
+ *     .numColorTargets = 1,
  *     .depthFormat = SDL_GPU_TEXTUREFORMAT_D32_FLOAT,
  *     .sampleCount = SDL_GPU_SAMPLECOUNT_1,
  *   });
  *
- *   SDL_GPUColorTargetInfo color = $(fb, colorTargetInfo,
+ *   SDL_GPUColorTargetInfo color = $(fb, colorTargetInfo, 0,
  *     SDL_GPU_LOADOP_CLEAR, SDL_GPU_STOREOP_STORE,
  *     &(SDL_FColor) { 0, 0, 0, 1 });
  *
@@ -127,9 +143,37 @@ struct Framebuffer {
   SDL_Size size;
 
   /**
-   * @brief The color attachment texture format, or `SDL_GPU_TEXTUREFORMAT_INVALID` if none.
+   * @brief The MSAA sample count of all attachments.
+   * @details `SDL_GPU_SAMPLECOUNT_1` for no multisampling. When greater, every color
+   *   attachment and the depth attachment are multisampled (a render pass requires a
+   *   single sample count across all attachments); each color attachment also gets a
+   *   single-sample resolve target in `resolveTextures`.
    */
-  SDL_GPUTextureFormat colorFormat;
+  SDL_GPUSampleCount sampleCount;
+
+  /**
+   * @brief The number of color attachments; indices `[0, numColorTargets)` are valid.
+   */
+  Uint32 numColorTargets;
+
+  /**
+   * @brief The color attachment texture formats, indices `[0, numColorTargets)`.
+   */
+  SDL_GPUTextureFormat colorFormats[GPU_MAX_COLOR_TARGETS];
+
+  /**
+   * @brief The color attachment textures, indices `[0, numColorTargets)`.
+   * @details Multisampled when `sampleCount` > `SDL_GPU_SAMPLECOUNT_1`; in that case
+   *   sample/blit/present the corresponding `resolveTextures` entry, not these.
+   */
+  Texture *colorTextures[GPU_MAX_COLOR_TARGETS];
+
+  /**
+   * @brief The single-sample resolve targets, or all `NULL` unless `sampleCount` > `SDL_GPU_SAMPLECOUNT_1`.
+   * @details Render passes resolve `colorTextures[i]` into `resolveTextures[i]`; that is
+   *   the texture to sample, blit, or present. See `resolvedColorTexture`.
+   */
+  Texture *resolveTextures[GPU_MAX_COLOR_TARGETS];
 
   /**
    * @brief The depth attachment texture format, or `SDL_GPU_TEXTUREFORMAT_INVALID` if none.
@@ -137,28 +181,10 @@ struct Framebuffer {
   SDL_GPUTextureFormat depthFormat;
 
   /**
-   * @brief The MSAA sample count of the color and depth attachments.
-   * @details `SDL_GPU_SAMPLECOUNT_1` for no multisampling. When greater, `colorTexture`
-   *   is multisampled and `resolveTexture` holds the single-sample resolve.
-   */
-  SDL_GPUSampleCount sampleCount;
-
-  /**
-   * @brief The color attachment texture, or `NULL` if `colorFormat` is invalid.
-   * @details Multisampled when `sampleCount` is greater than `SDL_GPU_SAMPLECOUNT_1`;
-   *   in that case sample the single-sample `resolveTexture`, not this texture.
-   */
-  Texture *colorTexture;
-
-  /**
-   * @brief The single-sample resolve target, or `NULL` unless `sampleCount` is greater than `SDL_GPU_SAMPLECOUNT_1`.
-   * @details Render passes resolve `colorTexture` into this texture; it is the texture
-   *   to sample, blit, or present. See `resolvedColorTexture`.
-   */
-  Texture *resolveTexture;
-
-  /**
    * @brief The depth attachment texture, or `NULL` if `depthFormat` is invalid.
+   * @details Multisampled with the pass when `sampleCount` > `SDL_GPU_SAMPLECOUNT_1`. It is
+   *   not resolved: depth is used for testing and discarded. A consumer needing sampleable
+   *   resolved depth must resolve it in its own shader pass (SDL has no depth store-op resolve).
    * @private
    */
   Texture *depthTexture;
@@ -181,18 +207,20 @@ struct FramebufferInterface {
   ObjectInterface objectInterface;
 
   /**
-   * @fn SDL_GPUColorTargetInfo Framebuffer::colorTargetInfo(const Framebuffer *self, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor)
-   * @brief Returns a populated `SDL_GPUColorTargetInfo` for this framebuffer's color attachment.
-   * @details Pass the result directly to `CommandBuffer::beginRenderPass`.
-   *   `assert`s that `colorTexture` is non-NULL.
+   * @fn SDL_GPUColorTargetInfo Framebuffer::colorTargetInfo(const Framebuffer *self, Uint32 index, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor)
+   * @brief Returns a populated `SDL_GPUColorTargetInfo` for color attachment @p index.
+   * @details Assemble an array of these (one per color target) and pass it to
+   *   `CommandBuffer::beginRenderPass`. When multisampled, the resolve target and a
+   *   `RESOLVE_AND_STORE` store op are wired in automatically. `assert`s @p index is valid.
    * @param self The Framebuffer.
+   * @param index The color attachment index, in `[0, numColorTargets)`.
    * @param loadOp Load operation at the start of the pass.
    * @param storeOp Store operation at the end of the pass.
    * @param clearColor Clear color used when `loadOp` is `SDL_GPU_LOADOP_CLEAR`, or NULL for black.
    * @return A stack-allocated `SDL_GPUColorTargetInfo`.
    * @memberof Framebuffer
    */
-  SDL_GPUColorTargetInfo (*colorTargetInfo)(const Framebuffer *self,
+  SDL_GPUColorTargetInfo (*colorTargetInfo)(const Framebuffer *self, Uint32 index,
     SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp, const SDL_FColor *clearColor);
 
   /**
@@ -222,14 +250,15 @@ struct FramebufferInterface {
   Framebuffer *(*initWithDevice)(Framebuffer *self, RenderDevice *device, const GPU_FramebufferCreateInfo *info);
 
   /**
-   * @fn Texture *Framebuffer::resolvedColorTexture(const Framebuffer *self)
-   * @brief Returns the single-sample color texture to sample, blit, or present.
-   * @details Returns `resolveTexture` when multisampled, otherwise `colorTexture`.
+   * @fn Texture *Framebuffer::resolvedColorTexture(const Framebuffer *self, Uint32 index)
+   * @brief Returns the single-sample color texture for attachment @p index, to sample, blit, or present.
+   * @details Returns `resolveTextures[index]` when multisampled, otherwise `colorTextures[index]`.
    * @param self The Framebuffer.
-   * @return The resolved color texture, or `NULL` if this framebuffer has no color attachment.
+   * @param index The color attachment index, in `[0, numColorTargets)`.
+   * @return The resolved color texture, or `NULL` if @p index has no attachment.
    * @memberof Framebuffer
    */
-  Texture *(*resolvedColorTexture)(const Framebuffer *self);
+  Texture *(*resolvedColorTexture)(const Framebuffer *self, Uint32 index);
 
   /**
    * @fn bool Framebuffer::resize(Framebuffer *self, const SDL_Size *size)

@@ -127,7 +127,7 @@ static void endFrame(RenderDevice *self) {
 
   GPU_Assert(self->commandBuffer, "endFrame called without a frame in flight");
 
-  Texture *color = $(self->framebuffer, resolvedColorTexture);
+  Texture *color = $(self->framebuffer, resolvedColorTexture, 0);
   GPU_Assert(color, "framebuffer has no color attachment to present");
 
   $(self->commandBuffer, blitTexture, &(SDL_GPUBlitInfo) {
