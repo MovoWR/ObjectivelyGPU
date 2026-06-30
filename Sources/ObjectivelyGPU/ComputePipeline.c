@@ -84,7 +84,7 @@ static ComputePipeline *initWithResource(ComputePipeline *self, RenderDevice *de
     SDL_GPUShaderFormat format;
     const char *ext;
   } formats[] = {
-    { SDL_GPU_SHADERFORMAT_MSL,  ".msl"  },
+    { SDL_GPU_SHADERFORMAT_MSL,  ".metal"  },
     { SDL_GPU_SHADERFORMAT_DXIL, ".dxil" },
     { SDL_GPU_SHADERFORMAT_SPIRV,".spv"  },
   };

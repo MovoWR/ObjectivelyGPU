@@ -333,7 +333,7 @@ struct RenderDeviceInterface {
    * @details Convenience factory for `Shader::initWithResource`. Appends the
    *   platform-appropriate extension to @c name and resolves it via Objectively's
    *   ResourceProvider chain:
-   *   - Metal (macOS/iOS): `.msl`
+   *   - Metal (macOS/iOS): `.metal`
    *   - Vulkan (Linux/Android): `.spv`
    *   - D3D12 (Windows): `.dxil`
    *   The caller fills in @c stage, @c entrypoint, and binding counts in @c info.
@@ -354,7 +354,7 @@ struct RenderDeviceInterface {
   * @details Convenience factory for `ComputePipeline::initWithResource`. Parallel to
   *   `loadShader` for compute stages. Appends the platform-appropriate extension to
   *   @c name and resolves it via Objectively's ResourceProvider chain:
-  *   - Metal (macOS/iOS): `.msl`
+  *   - Metal (macOS/iOS): `.metal`
   *   - Vulkan (Linux/Android): `.spv`
   *   - D3D12 (Windows): `.dxil`
   *   The caller fills in @c entrypoint, thread counts, and binding counts in @c info.

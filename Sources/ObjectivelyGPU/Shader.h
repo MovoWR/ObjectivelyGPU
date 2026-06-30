@@ -108,7 +108,7 @@ struct ShaderInterface {
    * @brief Initializes this Shader from a compiled shader blob loaded via the Resource system.
    * @details Appends the platform-appropriate extension to @p name and resolves it via
    *   Objectively's ResourceProvider chain:
-   *   - Metal (macOS/iOS): `.msl`
+   *   - Metal (macOS/iOS): `.metal`
    *   - Vulkan (Linux/Android): `.spv`
    *   - D3D12 (Windows): `.dxil`
    *   The caller fills in @c stage and binding counts in @p info; `code`, `code_size`,

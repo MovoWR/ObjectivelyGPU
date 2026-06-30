@@ -102,7 +102,7 @@ struct ComputePipelineInterface {
    * @brief Initializes this ComputePipeline from a compiled blob loaded via the Resource system.
    * @details Appends the platform-appropriate extension to @p name and resolves it via
    *   Objectively's ResourceProvider chain:
-   *   - Metal (macOS/iOS): `.msl`
+   *   - Metal (macOS/iOS): `.metal`
    *   - Vulkan (Linux/Android): `.spv`
    *   - D3D12 (Windows): `.dxil`
    *   The caller fills in @c entrypoint, thread counts, and binding counts in @p info;

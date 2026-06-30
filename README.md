@@ -55,7 +55,7 @@ make shaders
 This runs:
 ```
 glslc -fshader-stage=<stage> Shader.glsl -o Shader.spv
-shadercross Shader.spv -s SPIRV -d MSL -t <stage> -o Shader.msl
+shadercross Shader.spv -s SPIRV -d MSL -t <stage> -o Shader.metal
 ```
 
 ### GLSL binding layout (SDL3 GPU descriptor set convention)
