@@ -1,5 +1,5 @@
 [![Build](https://github.com/jdolan/ObjectivelyGPU/actions/workflows/build.yml/badge.svg)](https://github.com/jdolan/ObjectivelyGPU/actions/workflows/build.yml)
-[![Zlib License](https://img.shields.io/badge/license-Zlib-brightgreen.svg)](https://opensource.org/licenses/Zlib)
+[![Zlib License](https://img.shields.io/badge/license-Zlib-limegreen.svg)](https://opensource.org/licenses/Zlib)
 ![Beta](https://img.shields.io/badge/maturity-beta-yellow.svg)
 
 # ObjectivelyGPU
@@ -47,8 +47,10 @@ if (commands) {
 `endFrame` resolves the multisampled `Framebuffer` and presents to the swapchain for you — no manual
 resolve targets, store-op bookkeeping, or present plumbing.
 
-Read the **[Guide](https://jdolan.github.io/ObjectivelyGPU/guide.html)** for the render device, resource
-objects, framebuffers and MSAA, the typed passes, and shaders.
+## User Guide
+
+Consult the **[User Guide](https://jdolan.github.io/ObjectivelyGPU/guide.html)** to draw your first frame — the
+render device, resource objects, framebuffers and MSAA, the typed passes, and shaders.
 
 ## API Documentation
 

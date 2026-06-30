@@ -18,19 +18,13 @@ Object oriented graphics framework for SDL3 and C.
 - **Shaders** in every format SDL3 supports (SPIR-V, MSL, DXIL), loaded by name with automatic per-backend selection
 - **Mathlib**: vector, matrix, and quaternion math for 3D graphics
 
+## User Guide
+
+Consult the @subpage guide [User Guide] to draw your first frame.
+
 ## Class Hierarchy
 
-Browse the [class hierarchy](hierarchy.html) to navigate the full API.
-
-## Getting Started
-
-```sh
-autoreconf -i
-./configure
-make && sudo make install
-```
-
-See the @subpage guide for the render device, resource objects, framebuffers and MSAA, the typed passes, and shaders.
+Browse the [Class Hierarchy](hierarchy.html) to navigate the full API.
 
 ## Examples
 

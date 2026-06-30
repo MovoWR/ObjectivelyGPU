@@ -1,5 +1,5 @@
-ObjectivelyGPU Guide {#guide}
-====================
+ObjectivelyGPU User Guide {#guide}
+=========================
 
 A tour of drawing with ObjectivelyGPU.
 
