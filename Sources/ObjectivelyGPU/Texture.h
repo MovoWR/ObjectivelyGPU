@@ -133,11 +133,13 @@ struct TextureInterface {
    * @details This is the designated initializer. When @p pixels is non-NULL, a
    *   temporary upload transfer buffer is allocated, @p pixels is copied into it,
    *   a copy pass is recorded and submitted, so the texture is GPU-resident before
-   *   returning. Only mip level 0 is uploaded.
+   *   returning. Only mip level 0 is uploaded. The upload size is computed with
+   *   `SDL_CalculateGPUTextureFormatSize`, so block-compressed formats (BCn, ASTC, …)
+   *   are handled correctly; @p pixels must be tightly packed for @p info's format.
    * @param self The Texture.
    * @param device The RenderDevice used to create and release the texture. Retained.
    * @param info Texture creation parameters (format, type, dimensions, usage, etc.).
-   * @param pixels Initial pixel data to upload, or `NULL` to leave the texture uninitialised.
+   * @param pixels Initial tightly-packed pixel data to upload, or `NULL` to leave the texture uninitialised.
    * @return The initialized Texture, or `NULL` on failure.
    * @memberof Texture
    */
@@ -147,8 +149,9 @@ struct TextureInterface {
    * @fn Texture *Texture::initWithSurface(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage)
    * @brief Initializes this Texture from an `SDL_Surface`, uploading its pixels immediately.
    * @details Converts @p surface to `SDL_PIXELFORMAT_RGBA32` if needed, derives the
-   *   dimensions from the surface, and delegates to `initWithDevice` with
-   *   `SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM`. The surface is neither modified nor freed.
+   *   dimensions from the surface, and uploads as `SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM`.
+   *   The surface's row `pitch` is respected, so padded rows (alignment, or a sub-surface
+   *   of an atlas) upload correctly. The surface is neither modified nor freed.
    * @param self The Texture.
    * @param device The RenderDevice used to create and release the texture. Retained.
    * @param surface The source surface. Must not be NULL.

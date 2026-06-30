@@ -51,6 +51,52 @@ static void dealloc(Object *self) {
 #pragma mark - Texture
 
 /**
+ * @brief Uploads @p size bytes of pixel data into mip level 0 of this texture.
+ * @details The source data is laid out at @p pixelsPerRow pixels (texels) per row, so
+ *   callers can pass strided data (e.g. an `SDL_Surface` with row padding) without first
+ *   tightening it. The texture's dimensions and layer count come from its metadata, so
+ *   this must be called after `initWithDevice` has populated them.
+ */
+static void uploadPixels(Texture *self, const void *pixels, Uint32 size, Uint32 pixelsPerRow) {
+
+  SDL_GPUDevice *device = self->device->device;
+
+  SDL_GPUTransferBuffer *tbuf = SDL_CreateGPUTransferBuffer(device, &(SDL_GPUTransferBufferCreateInfo) {
+    .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+    .size = size,
+  });
+  GPU_Assert(tbuf, "SDL_CreateGPUTransferBuffer");
+
+  void *mapped = SDL_MapGPUTransferBuffer(device, tbuf, false);
+  GPU_Assert(mapped, "SDL_MapGPUTransferBuffer");
+
+  memcpy(mapped, pixels, size);
+  SDL_UnmapGPUTransferBuffer(device, tbuf);
+
+  CommandBuffer *commands = $(self->device, acquireCommandBuffer);
+  CopyPass *copyPass = $(commands, beginCopyPass);
+
+  $(copyPass, uploadTexture,
+    &(SDL_GPUTextureTransferInfo) {
+      .transfer_buffer = tbuf,
+      .pixels_per_row = pixelsPerRow,
+      .rows_per_layer = (Uint32) self->size.h,
+    },
+    &(SDL_GPUTextureRegion) {
+      .texture = self->texture,
+      .w = (Uint32) self->size.w,
+      .h = (Uint32) self->size.h,
+      .d = self->layerCountOrDepth,
+    },
+    false);
+
+  release(copyPass);
+  $(commands, submit);
+  release(commands);
+  SDL_ReleaseGPUTransferBuffer(device, tbuf);
+}
+
+/**
  * @fn Texture *Texture::initWithDevice(Texture *self, RenderDevice *device, const SDL_GPUTextureCreateInfo *info, const void *pixels)
  * @memberof Texture
  */
@@ -76,42 +122,13 @@ static Texture *initWithDevice(Texture *self, RenderDevice *device, const SDL_GP
     self->sampleCount = info->sample_count;
 
     if (pixels) {
-      const Uint32 bytesPerTexel = SDL_GPUTextureFormatTexelBlockSize(info->format);
-      const Uint32 totalBytes = info->width * info->height * info->layer_count_or_depth * bytesPerTexel;
+      // Tightly-packed source: SDL_CalculateGPUTextureFormatSize accounts for
+      // block-compressed formats, so this is correct for BCn/ASTC/etc. as well as
+      // plain texel formats (where a naive width*height*texelSize would also work).
+      const Uint32 size = SDL_CalculateGPUTextureFormatSize(info->format,
+        info->width, info->height, info->layer_count_or_depth);
 
-      SDL_GPUTransferBuffer *tbuf = SDL_CreateGPUTransferBuffer(device->device, &(SDL_GPUTransferBufferCreateInfo) {
-        .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-        .size = totalBytes,
-      });
-      GPU_Assert(tbuf, "SDL_CreateGPUTransferBuffer");
-
-      void *mapped = SDL_MapGPUTransferBuffer(device->device, tbuf, false);
-      GPU_Assert(mapped, "SDL_MapGPUTransferBuffer");
-
-      memcpy(mapped, pixels, totalBytes);
-      SDL_UnmapGPUTransferBuffer(device->device, tbuf);
-
-      CommandBuffer *commands = $(device, acquireCommandBuffer);
-      CopyPass *copyPass = $(commands, beginCopyPass);
-
-      $(copyPass, uploadTexture,
-        &(SDL_GPUTextureTransferInfo) {
-          .transfer_buffer = tbuf,
-          .pixels_per_row = info->width,
-          .rows_per_layer = info->height,
-        },
-        &(SDL_GPUTextureRegion) {
-          .texture = self->texture,
-          .w = info->width,
-          .h = info->height,
-          .d = info->layer_count_or_depth,
-        },
-        false);
-
-      release(copyPass);
-      $(commands, submit);
-      release(commands);
-      SDL_ReleaseGPUTransferBuffer(device->device, tbuf);
+      uploadPixels(self, pixels, size, info->width);
     }
   }
 
@@ -132,6 +149,9 @@ static Texture *initWithSurface(Texture *self, RenderDevice *device, SDL_Surface
     : SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA32);
   GPU_Assert(rgba, "SDL_ConvertSurface");
 
+  // Create the texture empty, then upload respecting the surface's row pitch — an
+  // SDL_Surface's pitch is often larger than width * bytesPerPixel (alignment, or a
+  // sub-surface of an atlas), so assuming tightly-packed rows would skew the image.
   self = $(self, initWithDevice, device, &(SDL_GPUTextureCreateInfo) {
     .type = SDL_GPU_TEXTURETYPE_2D,
     .format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
@@ -141,7 +161,14 @@ static Texture *initWithSurface(Texture *self, RenderDevice *device, SDL_Surface
     .layer_count_or_depth = 1,
     .num_levels = 1,
     .sample_count = SDL_GPU_SAMPLECOUNT_1,
-  }, rgba->pixels);
+  }, NULL);
+
+  if (self) {
+    const Uint32 bytesPerPixel = SDL_BYTESPERPIXEL(rgba->format);
+    uploadPixels(self, rgba->pixels,
+      (Uint32) rgba->pitch * (Uint32) rgba->h,
+      (Uint32) rgba->pitch / bytesPerPixel);
+  }
 
   if (rgba != surface) {
     SDL_DestroySurface(rgba);
