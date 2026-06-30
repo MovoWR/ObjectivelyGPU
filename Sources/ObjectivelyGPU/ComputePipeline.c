@@ -62,6 +62,7 @@ static ComputePipeline *initWithDevice(ComputePipeline *self, RenderDevice *devi
   if (self) {
 
     self->device = retain(device);
+    assert(self->device);
 
     self->pipeline = SDL_CreateGPUComputePipeline(device->device, info);
     GPU_Assert(self->pipeline, "SDL_CreateGPUComputePipeline");
@@ -110,12 +111,13 @@ static ComputePipeline *initWithResource(ComputePipeline *self, RenderDevice *de
       continue;
     }
 
-    SDL_GPUComputePipelineCreateInfo filled = *info;
-    filled.code = res->data->bytes;
-    filled.code_size = res->data->length;
-    filled.format = formats[i].format;
+    SDL_GPUComputePipelineCreateInfo create = *info;
+    create.code = res->data->bytes;
+    create.code_size = res->data->length;
+    create.format = formats[i].format;
+    create.entrypoint = create.entrypoint ?: (formats[i].format == SDL_GPU_SHADERFORMAT_MSL) ? "main0" : "main";
 
-    self = $(self, initWithDevice, device, &filled);
+    self = $(self, initWithDevice, device, &create);
     release(res);
     return self;
   }

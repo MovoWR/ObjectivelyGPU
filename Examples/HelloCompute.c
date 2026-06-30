@@ -1,5 +1,5 @@
 /*
- * ObjectivelyGPU: Object oriented MVC framework for SDL3 and GNU C.
+ * ObjectivelyGPU: Object oriented GPU layer for SDL3 and GNU C.
  * Copyright (C) 2026 Jay Dolan <jay@jaydolan.com>
  *
  * This software is provided 'as-is', without any express or implied
@@ -21,181 +21,241 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#include <stdlib.h>
+#define SDL_MAIN_USE_CALLBACKS
 
+#include <SDL3/SDL_main.h>
 #include <SDL3/SDL.h>
 
 #include <Objectively.h>
 #include <ObjectivelyGPU.h>
 
+#ifdef SDL_PLATFORM_IOS
+# define HELLO_WINDOW_W      0
+# define HELLO_WINDOW_H      0
+# define HELLO_WINDOW_FLAGS  (SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_FULLSCREEN)
+#else
+# define HELLO_WINDOW_W      1024
+# define HELLO_WINDOW_H      720
+# define HELLO_WINDOW_FLAGS  SDL_WINDOW_HIGH_PIXEL_DENSITY
+#endif
+
+/**
+ * @brief MSAA sample count for the particle framebuffer.
+ */
+#define HELLO_MSAA SDL_GPU_SAMPLECOUNT_4
+
+/**
+ * @brief The number of particles animated by the compute shader.
+ */
 #define NUM_PARTICLES 256u
 
+/**
+ * @brief A particle position, written by the compute shader and read by the vertex shader.
+ */
 typedef struct {
-	float x, y;
+  float x, y;
 } Particle;
 
-static void log_sdl_error(const char *what) {
-	SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s: %s", what, SDL_GetError());
+/**
+ * @brief SDL application state passed via pointer to callbacks.
+ */
+typedef struct {
+
+  /**
+   * @brief The @c SDL_Window.
+   */
+  SDL_Window *window;
+
+  /**
+   * @brief The ObjectivelyGPU @c RenderDevice.
+   */
+  RenderDevice *renderDevice;
+
+  /**
+   * @brief The @c Framebuffer for particle rendering.
+   */
+  Framebuffer *framebuffer;
+
+  /**
+   * @brief The storage buffer of particle positions; written by compute, read by the vertex stage.
+   */
+  Buffer *particleBuffer;
+
+  /**
+   * @brief The compute pipeline that animates the particles.
+   */
+  ComputePipeline *computePipeline;
+
+  /**
+   * @brief The graphics pipeline that renders the particles as points.
+   */
+  GraphicsPipeline *graphicsPipeline;
+
+  /**
+   * @brief The application start time, in milliseconds.
+   */
+  Uint64 ticks;
+} AppState;
+
+static AppState application;
+
+#pragma mark - Particle system
+
+/**
+ * @brief Initializes the particle buffer and the compute and graphics pipelines.
+ */
+static void initParticles(AppState *app) {
+
+  app->particleBuffer = $(app->renderDevice, createBuffer, &(SDL_GPUBufferCreateInfo) {
+    .usage = SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE | SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ,
+    .size = NUM_PARTICLES * sizeof(Particle),
+  });
+
+  app->computePipeline = $(app->renderDevice, loadComputePipeline, "HelloCompute.comp", &(SDL_GPUComputePipelineCreateInfo) {
+    .num_readwrite_storage_buffers = 1,
+    .num_uniform_buffers = 1,
+    .threadcount_x = NUM_PARTICLES,
+    .threadcount_y = 1,
+    .threadcount_z = 1,
+  });
+
+  Shader *vertexShader = $(app->renderDevice, loadShader, "HelloCompute.vert", &(SDL_GPUShaderCreateInfo) {
+    .stage = SDL_GPU_SHADERSTAGE_VERTEX,
+    .num_storage_buffers = 1,
+  });
+
+  Shader *fragmentShader = $(app->renderDevice, loadShader, "HelloCompute.frag", &(SDL_GPUShaderCreateInfo) {
+    .stage = SDL_GPU_SHADERSTAGE_FRAGMENT,
+  });
+
+  SDL_GPUGraphicsPipelineCreateInfo pipelineInfo = GPU_GraphicsPipeline2D;
+  pipelineInfo.vertex_shader = vertexShader->shader;
+  pipelineInfo.fragment_shader = fragmentShader->shader;
+  pipelineInfo.primitive_type = SDL_GPU_PRIMITIVETYPE_POINTLIST;
+  pipelineInfo.multisample_state.sample_count = app->framebuffer->sampleCount;
+  pipelineInfo.target_info = (SDL_GPUGraphicsPipelineTargetInfo) {
+    .color_target_descriptions = &(SDL_GPUColorTargetDescription) {
+      .format = app->framebuffer->colorTexture->format,
+      .blend_state = GPU_BlendStateOpaque,
+    },
+    .num_color_targets = 1,
+  };
+
+  app->graphicsPipeline = $(app->renderDevice, createGraphicsPipeline, &pipelineInfo);
+
+  release(vertexShader);
+  release(fragmentShader);
 }
 
-int main(int argc, char **argv) {
-	(void) argc;
-	(void) argv;
+/**
+ * @brief Animates the particles via compute, then renders them as points.
+ */
+static void drawParticles(AppState *app, CommandBuffer *commands) {
 
-	int status = EXIT_FAILURE;
-	SDL_Window *window = NULL;
-	RenderDevice *renderDevice = NULL;
-	Buffer *particleBuffer = NULL;
-	Shader *vertexShader = NULL;
-	Shader *fragmentShader = NULL;
-	GraphicsPipeline *graphicsPipeline = NULL;
-	ComputePipeline *computePipeline = NULL;
+  const float time = (float) (SDL_GetTicks() - app->ticks) / 1000.f;
+  $(commands, pushComputeUniformData, 0, &time, sizeof(time));
 
-	if (!SDL_Init(SDL_INIT_VIDEO)) {
-		log_sdl_error("SDL_Init");
-		return status;
-	}
+  ComputePass *computePass = $(commands, beginComputePass, NULL, 0,
+    &(SDL_GPUStorageBufferReadWriteBinding) { .buffer = app->particleBuffer->buffer }, 1);
+  $(computePass, bindPipeline, app->computePipeline);
+  $(computePass, dispatchCompute, 1, 1, 1);
+  release(computePass);
 
-	const char *basePath = SDL_GetBasePath();
-	if (basePath) {
-		char shaderDir[512];
-		SDL_snprintf(shaderDir, sizeof(shaderDir), "%sShaders", basePath);
-		$$(Resource, addResourcePath, shaderDir);
-	}
+  const SDL_FColor clearColor = { 0.05f, 0.05f, 0.1f, 1.f };
+  const SDL_GPUColorTargetInfo color = $(app->framebuffer, colorTargetInfo, SDL_GPU_LOADOP_CLEAR, SDL_GPU_STOREOP_STORE, &clearColor);
 
-	window = SDL_CreateWindow("ObjectivelyGPU HelloCompute", 800, 600, SDL_WINDOW_HIGH_PIXEL_DENSITY);
-	if (!window) {
-		log_sdl_error("SDL_CreateWindow");
-		goto cleanup;
-	}
+  RenderPass *pass = $(commands, beginRenderPass, &color, 1, NULL);
+  $(pass, bindPipeline, app->graphicsPipeline);
+  $(pass, bindVertexStorageBuffers, 0, (SDL_GPUBuffer *[]) { app->particleBuffer->buffer }, 1);
+  $(pass, drawPrimitives, NUM_PARTICLES, 1, 0, 0);
+  release(pass);
+}
 
-	renderDevice = $(alloc(RenderDevice), initWithWindow, window);
+#pragma mark - SDL application callbacks
 
-	particleBuffer = $(renderDevice, createBuffer, &(SDL_GPUBufferCreateInfo) {
-		.usage = SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE | SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ,
-		.size = NUM_PARTICLES * sizeof(Particle),
-	});
+/**
+ * @brief SDL3 application initialization callback.
+ */
+SDL_AppResult SDL_AppInit(void **appState, int argc, char *argv[]) {
 
-	computePipeline = $(renderDevice, loadComputePipeline, "HelloCompute.comp", &(SDL_GPUComputePipelineCreateInfo) {
-		.entrypoint = "cs_main",
-		.num_readwrite_storage_buffers = 1,
-		.num_uniform_buffers = 1,
-		.threadcount_x = NUM_PARTICLES,
-		.threadcount_y = 1,
-		.threadcount_z = 1,
-	});
+  AppState *app = *appState = &application;
 
-	vertexShader = $(renderDevice, loadShader, "HelloCompute.vert", &(SDL_GPUShaderCreateInfo) {
-		.entrypoint = "vs_main",
-		.stage = SDL_GPU_SHADERSTAGE_VERTEX,
-		.num_storage_buffers = 1,
-	});
-	fragmentShader = $(renderDevice, loadShader, "HelloCompute.frag", &(SDL_GPUShaderCreateInfo) {
-		.entrypoint = "fs_main",
-		.stage = SDL_GPU_SHADERSTAGE_FRAGMENT,
-	});
+  GPU_Assert(SDL_Init(SDL_INIT_VIDEO), "SDL_Init");
 
-	SDL_GPUColorTargetDescription colorTargetDescription = {
-		.format = $(renderDevice, getSwapchainTextureFormat, window),
-	};
+#ifdef EXAMPLES
+  $$(Resource, addResourcePath, EXAMPLES);
+#endif
 
-	graphicsPipeline = $(renderDevice, createGraphicsPipeline, &(SDL_GPUGraphicsPipelineCreateInfo) {
-		.vertex_shader = vertexShader->shader,
-		.fragment_shader = fragmentShader->shader,
-		.primitive_type = SDL_GPU_PRIMITIVETYPE_POINTLIST,
-		.rasterizer_state = {
-			.fill_mode = SDL_GPU_FILLMODE_FILL,
-			.enable_depth_clip = true,
-		},
-		.multisample_state = {
-			.sample_count = SDL_GPU_SAMPLECOUNT_1,
-		},
-		.target_info = {
-			.color_target_descriptions = &colorTargetDescription,
-			.num_color_targets = 1,
-		},
-	});
+  app->window = SDL_CreateWindow("Hello Compute ObjectivelyGPU", HELLO_WINDOW_W, HELLO_WINDOW_H, HELLO_WINDOW_FLAGS);
+  GPU_Assert(app->window, "SDL_CreateWindow");
 
-	release(vertexShader);
-	vertexShader = NULL;
-	release(fragmentShader);
-	fragmentShader = NULL;
+  app->renderDevice = $(alloc(RenderDevice), initWithWindow, app->window);
 
-	bool running = true;
-	Uint64 startTicks = SDL_GetTicks();
+  int w = 0, h = 0;
+  SDL_GetWindowSizeInPixels(app->window, &w, &h);
 
-	while (running) {
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			switch (event.type) {
-				case SDL_EVENT_QUIT:
-				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-					running = false;
-					break;
-				case SDL_EVENT_KEY_DOWN:
-					if (event.key.key == SDLK_ESCAPE) {
-						running = false;
-					}
-					break;
-				default:
-					break;
-			}
-		}
+  const SDL_GPUTextureFormat colorFormat = $(app->renderDevice, getSwapchainTextureFormat, app->window);
+  app->framebuffer = $(app->renderDevice, createFramebuffer, &(GPU_FramebufferCreateInfo) {
+    .size = MakeSize(w, h),
+    .colorFormat = colorFormat,
+    .sampleCount = HELLO_MSAA,
+  });
 
-		CommandBuffer *commands = $(renderDevice, acquireCommandBuffer);
+  $(app->renderDevice, setFramebuffer, app->framebuffer);
 
-    SwapchainTexture swapchain = { 0 };
-		$(commands, waitAndAcquireSwapchainTexture, &swapchain);
+  app->ticks = SDL_GetTicks();
 
-		float time = (float) (SDL_GetTicks() - startTicks) / 1000.0f;
-		$(commands, pushComputeUniformData, 0, &time, sizeof(time));
+  initParticles(app);
 
-		SDL_GPUStorageBufferReadWriteBinding storageBuffer = {
-			.buffer = particleBuffer->buffer,
-			.cycle = false,
-		};
+  return SDL_APP_CONTINUE;
+}
 
-		ComputePass *computePass = $(commands, beginComputePass, NULL, 0, &storageBuffer, 1);
-		$(computePass, bindPipeline, computePipeline);
-		$(computePass, dispatchCompute, 1, 1, 1);
-		release(computePass);
+/**
+ * @brief SDL3 frame iteration callback.
+ */
+SDL_AppResult SDL_AppIterate(void *appState) {
 
-		SDL_GPUColorTargetInfo colorTarget = {
-			.texture = swapchain.texture,
-			.clear_color = { 0.05f, 0.05f, 0.1f, 1.0f },
-			.load_op = SDL_GPU_LOADOP_CLEAR,
-			.store_op = SDL_GPU_STOREOP_STORE,
-		};
+  AppState *app = appState;
 
-		RenderPass *renderPass = $(commands, beginRenderPass, &colorTarget, 1, NULL);
-		SDL_GPUBuffer *vertexStorageBuffers[] = { particleBuffer->buffer };
-		$(renderPass, bindPipeline, graphicsPipeline);
-		$(renderPass, bindVertexStorageBuffers, 0, vertexStorageBuffers, 1);
-		$(renderPass, drawPrimitives, NUM_PARTICLES, 1, 0, 0);
-		release(renderPass);
+  CommandBuffer *commands = $(app->renderDevice, beginFrame);
+  if (commands) {
+    drawParticles(app, commands);
+    $(app->renderDevice, endFrame);
+  }
 
-		$(commands, submit);
-		release(commands);
-	}
+  return SDL_APP_CONTINUE;
+}
 
-	status = EXIT_SUCCESS;
+/**
+ * @brief SDL3 event callback.
+ */
+SDL_AppResult SDL_AppEvent(void *appState, SDL_Event *event) {
 
-cleanup:
-	if (renderDevice) {
-		$(renderDevice, waitForIdle);
-	}
+  switch (event->type) {
+    case SDL_EVENT_QUIT:
+    case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+      return SDL_APP_SUCCESS;
+    default:
+      return SDL_APP_CONTINUE;
+  }
+}
 
-	release(graphicsPipeline);
-	release(computePipeline);
-	release(vertexShader);
-	release(fragmentShader);
-	release(particleBuffer);
-	release(renderDevice);
+/**
+ * @brief SDL3 quit callback.
+ */
+void SDL_AppQuit(void *appState, SDL_AppResult result) {
 
-	if (window) {
-		SDL_DestroyWindow(window);
-	}
+  AppState *app = appState;
 
-	SDL_Quit();
-	return status;
+  $(app->renderDevice, waitForIdle);
+
+  release(app->graphicsPipeline);
+  release(app->computePipeline);
+  release(app->particleBuffer);
+
+  release(app->framebuffer);
+  release(app->renderDevice);
+
+  SDL_DestroyWindow(app->window);
+  SDL_Quit();
 }
