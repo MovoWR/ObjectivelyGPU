@@ -71,6 +71,11 @@ struct GraphicsPipeline {
    * @private
    */
   RenderDevice *device;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

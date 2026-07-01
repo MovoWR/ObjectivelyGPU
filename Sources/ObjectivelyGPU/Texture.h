@@ -115,6 +115,11 @@ struct Texture {
    * @private
    */
   RenderDevice *device;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

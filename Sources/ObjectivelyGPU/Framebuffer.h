@@ -194,6 +194,11 @@ struct Framebuffer {
    * @private
    */
   RenderDevice *device;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

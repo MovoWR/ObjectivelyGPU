@@ -83,6 +83,11 @@ struct ComputePass {
    * @brief The currently bound pipeline, or `NULL`.
    */
   ComputePipeline *pipeline;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

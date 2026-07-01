@@ -71,6 +71,11 @@ struct ComputePipeline {
    * @private
    */
   RenderDevice *device;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

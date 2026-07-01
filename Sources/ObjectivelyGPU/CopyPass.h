@@ -76,6 +76,11 @@ struct CopyPass {
    * @private
    */
   SDL_GPUCopyPass *pass;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

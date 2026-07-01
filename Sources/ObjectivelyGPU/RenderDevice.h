@@ -101,6 +101,11 @@ struct RenderDevice {
    * @private
    */
   SwapchainTexture swapchain;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

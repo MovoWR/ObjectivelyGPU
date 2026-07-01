@@ -107,6 +107,11 @@ struct CommandBuffer {
    * @private
    */
   bool submitted;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

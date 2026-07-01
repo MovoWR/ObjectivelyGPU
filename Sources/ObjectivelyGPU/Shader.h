@@ -77,6 +77,11 @@ struct Shader {
    * @private
    */
   RenderDevice *device;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**

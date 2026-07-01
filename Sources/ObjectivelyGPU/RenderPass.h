@@ -103,6 +103,11 @@ struct RenderPass {
    * @brief The current viewport.
    */
   SDL_GPUViewport viewport;
+  
+  /**
+   * @brief User data.
+   */
+  ident data;
 };
 
 /**
