@@ -708,7 +708,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu23;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -726,7 +725,6 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu23;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -844,7 +842,6 @@
 					"$(SRCROOT)/Frameworks",
 					"$(inherited)",
 				);
-				GCC_C_LANGUAGE_STANDARD = gnu23;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/Sources",
 					"$(SRCROOT)/Frameworks/SDL3.xcframework/ios-arm64/SDL3.framework/Headers",
@@ -874,7 +871,6 @@
 					"$(SRCROOT)/Frameworks",
 					"$(inherited)",
 				);
-				GCC_C_LANGUAGE_STANDARD = gnu23;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/Sources",
 					"$(SRCROOT)/Frameworks/SDL3.xcframework/ios-arm64/SDL3.framework/Headers",
