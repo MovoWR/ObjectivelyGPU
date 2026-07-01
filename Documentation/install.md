@@ -22,6 +22,58 @@ autoreconf -i
 make && sudo make install
 ```
 
+## Shaders (SDL_shadercross)
+
+ObjectivelyGPU consumes compiled shader blobs, not GLSL source: SPIR-V for Vulkan, MSL for Metal, and DXIL for D3D12. The toolchain is:
+
+1. Author your shaders in GLSL.
+2. Compile GLSL to SPIR-V with `glslc` (from [shaderc](https://github.com/google/shaderc)).
+3. Cross-compile SPIR-V to MSL or DXIL with `shadercross` (from [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross)).
+
+`glslc` ships with Homebrew's `shaderc`. `shadercross` must be built from source.
+
+### Building shadercross
+
+Building `shadercross` requires the SDL3 development headers and libraries — the same SDL3 that ObjectivelyGPU depends on.
+
+```sh
+git clone https://github.com/libsdl-org/SDL_shadercross
+cd SDL_shadercross
+# Vendored deps. The DirectXShaderCompiler submodule vendors LLVM/Clang and is a
+# multi-gigabyte, lengthy build — it is only needed for HLSL input and DXIL output.
+git submodule update --init --recursive
+
+cmake -S . -B build \
+  -DSDLSHADERCROSS_VENDORED=ON \
+  -DSDLSHADERCROSS_SPIRVCROSS_SHARED=OFF \
+  -DSDLSHADERCROSS_CLI=ON \
+  -DSDLSHADERCROSS_DXC=ON \
+  -DSDLSHADERCROSS_INSTALL=ON \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_RPATH='@loader_path/../lib;/usr/local/lib' \
+  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+
+cmake --build build -j$(sysctl -n hw.ncpu)
+sudo cmake --install build
+```
+
+The two `CMAKE_INSTALL_RPATH` options are essential. Without them the installed `shadercross` has no `LC_RPATH` and fails at runtime with `Library not loaded: @rpath/libSDL3_shadercross.0.dylib`. Setting the install rpath to `@loader_path/../lib` (relocatable) lets the installed binary in `bin/` find `libSDL3_shadercross` in the sibling `lib/`. On Linux, use `$ORIGIN/../lib` in place of `@loader_path/../lib`.
+
+If you do not need HLSL input or DXIL output (for example, Metal and Vulkan only), pass `-DSDLSHADERCROSS_DXC=OFF` and skip the DirectXShaderCompiler submodule. This avoids the enormous LLVM build entirely and is the recommended lighter-weight path when D3D12 support is not required.
+
+The installed command-line tool is named `shadercross` (not `sdl-shadercross`).
+
+### Transpiling shaders
+
+Compile GLSL to SPIR-V, then cross-compile SPIR-V to the target language:
+
+```sh
+glslc -fshader-stage=vertex my.vert.glsl -o my.vert.spv
+shadercross my.vert.spv -s SPIRV -d MSL -t vertex --msl-version 2.1.0 -o my.vert.metal
+```
+
+Pass `--msl-version 2.1.0` for shaders that use features such as `invariant gl_Position`; older MSL versions reject them.
+
 ## Linking
 
 Compile and link against ObjectivelyGPU with `pkg-config`:
