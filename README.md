@@ -8,23 +8,33 @@ Object oriented graphics framework for SDL3 and C.
 Zlib [license](./COPYING).
 
 ## About
-ObjectivelyGPU is a cross-platform, object oriented graphics framework for the C programming language.
-Built on [Objectively](https://github.com/jdolan/Objectively) and [SDL3](https://libsdl.org)'s GPU API, it
+ObjectivelyGPU is a cross-platform object oriented graphics framework for the C programming language.
+Built on [Objectively](https://github.com/jdolan/Objectively) and [SDL_gpu](https://libsdl.org)'s GPU API, it
 provides a clean, idiomatic C API for modern GPU programming — targeting Metal, Vulkan, and Direct3D 12
 through a single interface.
 
 ## Features
- * **macOS, iOS, Windows, Linux & Android** cross-platform support via SDL3 (Metal, Direct3D 12, Vulkan)
- * **RenderDevice** owns the swapchain — drive frames with a simple `beginFrame` / `endFrame` loop
- * **Resource objects** with automatic lifecycle: Buffer, Texture, Sampler, Shader, GraphicsPipeline, ComputePipeline
- * **Typed passes**: RenderPass, ComputePass, CopyPass with command-lifecycle validation
- * **Framebuffer** with multiple render targets, depth, and MSAA with automatic resolve
- * **Shaders** in every format SDL3 supports — SPIR-V (Vulkan), MSL (Metal), DXIL (D3D12) — loaded by name with automatic per-backend selection; author them in any language and cross-compile with [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross), or bring your own blobs
- * **Mathlib**: vector, matrix, and quaternion math for 3D graphics
+ * **Cross-platform** support for Android, iOS, macOS, Linux and Windows
+ * **RenderDevice** owns the swapchain — drive frames with a simple `beginFrame` / `endFrame` loop and an unambiguous order of operations
+ * **Resource objects** with automatic lifecycle — Buffer, Texture, Sampler, Shader, GraphicsPipeline and ComputePipeline initialize and tear themselves down
+ * **Typed passes**: RenderPass, ComputePass and CopyPass with command-lifecycle validation that catches mistakes upfront
+ * **Framebuffer** abstracts multiple render targets, depth, and MSAA with automatic resolve — convenience without forfeiting the low-level API
+ * **Shaders** loaded by name, with the formats supported by your platform
+ * **Mathlib** — vector, matrix, and quaternion math for 3D graphics
 
-The verbose, error-prone handle juggling of a raw GPU API collapses into reference-counted objects and a
-handful of methods. A whole frame — acquire the swapchain, clear, draw a multisampled scene, resolve, and
-present — is just this:
+## tl;dr
+The verbose, error-prone handling of a raw GPU API collapses into reference-counted objects and a
+handful of intuitive methods. 
+
+Uploading an image to the GPU is a single call — the staging buffer and copy pass are handled for you:
+
+```c
+SDL_Surface *surface = IMG_Load("crate.png");
+Texture *texture = $(renderDevice, createTextureFromSurface, surface, SDL_GPU_TEXTUREUSAGE_SAMPLER);
+SDL_DestroySurface(surface);
+```
+
+And a whole frame — acquire the swapchain, clear, draw a multisampled scene, resolve, and present:
 
 ```c
 CommandBuffer *commands = $(renderDevice, beginFrame);
@@ -44,34 +54,23 @@ if (commands) {
 }
 ```
 
-`endFrame` resolves the multisampled `Framebuffer` and presents to the swapchain for you — no manual
-resolve targets, store-op bookkeeping, or present plumbing.
+The `endFrame` method resolves the multisampled `Framebuffer` and presents to the swapchain for you. No manual
+resolve targets, no store-op bookkeeping, no presentation plumbing.
+
+## Getting Started
+
+Check out the **[Installation](https://jdolan.github.io/ObjectivelyGPU/install.html)** page for dependencies, building, and linking instructions.
 
 ## User Guide
 
-Consult the **[User Guide](https://jdolan.github.io/ObjectivelyGPU/guide.html)** to draw your first frame — the
+Peep the **[User Guide](https://jdolan.github.io/ObjectivelyGPU/guide.html)** to draw your first frame — the
 render device, resource objects, framebuffers and MSAA, the typed passes, and shaders.
 
 ## API Documentation
 
-Browse the [API Documentation](https://jdolan.github.io/ObjectivelyGPU/) to explore the library.
+Browse the [API Documentation](https://jdolan.github.io/ObjectivelyGPU/) to explore the library further.
 
-## Getting Started
-
-### Dependencies
-
-* [Objectively](https://github.com/jdolan/Objectively) >= 2.0.0
-* [SDL3](https://github.com/libsdl-org/SDL) >= 3.2.0
-
-### Building
-
-```sh
-autoreconf -i
-./configure
-make && sudo make install
-```
-
-## Examples & projects using ObjectivelyGPU
+## Project Showcase
 
 1. [Hello](Examples/Hello.c) renders a spinning, multisampled 3D cube.
 1. [HelloCompute](Examples/HelloCompute.c) animates particles with a compute shader and draws them as points.
@@ -81,4 +80,5 @@ make && sudo make install
 <p align="center">
   <img src="Documentation/Hello.gif" width="48%" alt="Hello — a spinning, multisampled 3D cube">
   <img src="Documentation/HelloCompute.gif" width="48%" alt="HelloCompute — particles animated by a compute shader">
+  <img src="Documentation/ObjectivelyMVC-Hello.gif" width="48%" alt="Hello ObjectivelyMVC - a simple in-game menu">
 </p>
