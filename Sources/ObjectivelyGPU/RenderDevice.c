@@ -98,19 +98,19 @@ static CommandBuffer *acquireCommandBuffer(const RenderDevice *self) {
 static CommandBuffer *beginFrame(RenderDevice *self) {
 
   GPU_Assert(self->framebuffer, "no framebuffer set; call setFramebuffer first");
-  GPU_Assert(self->commandBuffer == NULL, "beginFrame called with a frame already in flight");
+  GPU_Assert(self->commands == NULL, "beginFrame called with a frame already in flight");
 
-  self->commandBuffer = $(self, acquireCommandBuffer);
+  self->commands = $(self, acquireCommandBuffer);
 
-  const bool ok = $(self->commandBuffer, waitAndAcquireSwapchainTexture, &self->swapchain);
+  const bool ok = $(self->commands, waitAndAcquireSwapchainTexture, &self->swapchain);
   if (ok) {
     $(self->framebuffer, resize, &self->swapchain.size);
   } else {
-    $(self->commandBuffer, cancel);
-    self->commandBuffer = release(self->commandBuffer);
+    $(self->commands, cancel);
+    self->commands = release(self->commands);
   }
 
-  return self->commandBuffer;
+  return self->commands;
 }
 
 /**
@@ -119,12 +119,12 @@ static CommandBuffer *beginFrame(RenderDevice *self) {
  */
 static void endFrame(RenderDevice *self) {
 
-  GPU_Assert(self->commandBuffer, "endFrame called without a frame in flight");
+  GPU_Assert(self->commands, "endFrame called without a frame in flight");
 
   Texture *color = $(self->framebuffer, resolvedColorTexture, 0);
   GPU_Assert(color, "framebuffer has no color attachment to present");
 
-  $(self->commandBuffer, blitTexture, &(SDL_GPUBlitInfo) {
+  $(self->commands, blitTexture, &(SDL_GPUBlitInfo) {
     .source = {
       .texture = color->texture,
       .w = (Uint32) self->swapchain.size.w,
@@ -139,9 +139,9 @@ static void endFrame(RenderDevice *self) {
     .filter = SDL_GPU_FILTER_NEAREST,
   });
 
-  $(self->commandBuffer, submit);
+  $(self->commands, submit);
 
-  self->commandBuffer = release(self->commandBuffer);
+  self->commands = release(self->commands);
   
   self->swapchain = (SwapchainTexture) { 0 };
 }

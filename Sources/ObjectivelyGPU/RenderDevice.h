@@ -93,7 +93,7 @@ struct RenderDevice {
    *   borrowed view of it and `endFrame` submits and releases it.
    * @private
    */
-  CommandBuffer *commandBuffer;
+  CommandBuffer *commands;
 
   /**
    * @brief The swapchain texture acquired for the current frame.
