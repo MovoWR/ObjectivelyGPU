@@ -76,19 +76,50 @@ static void uploadPixels(Texture *self, const void *pixels, Uint32 size, Uint32 
   CommandBuffer *commands = $(self->device, acquireCommandBuffer);
   CopyPass *copyPass = $(commands, beginCopyPass);
 
-  $(copyPass, uploadTexture,
-    &(SDL_GPUTextureTransferInfo) {
-      .transfer_buffer = tbuf,
-      .pixels_per_row = pixelsPerRow,
-      .rows_per_layer = (Uint32) self->size.h,
-    },
-    &(SDL_GPUTextureRegion) {
-      .texture = self->texture,
-      .w = (Uint32) self->size.w,
-      .h = (Uint32) self->size.h,
-      .d = self->layerCountOrDepth,
-    },
-    false);
+  if (self->type == SDL_GPU_TEXTURETYPE_3D) {
+
+    // A 3D texture's slices are addressed by depth (region.z / .d), not by layer,
+    // so upload the whole volume in one region.
+    $(copyPass, uploadTexture,
+      &(SDL_GPUTextureTransferInfo) {
+        .transfer_buffer = tbuf,
+        .pixels_per_row = pixelsPerRow,
+        .rows_per_layer = (Uint32) self->size.h,
+      },
+      &(SDL_GPUTextureRegion) {
+        .texture = self->texture,
+        .w = (Uint32) self->size.w,
+        .h = (Uint32) self->size.h,
+        .d = self->layerCountOrDepth,
+      },
+      false);
+  } else {
+
+    // Everything else (2D, 2D array, cube) is addressed by layer: upload one layer
+    // per call from its layer-major slice of the transfer buffer. A single region
+    // with d = layerCount only populates layer 0, so we must loop; a plain 2D
+    // texture is simply one iteration.
+    const Uint32 layers = self->layerCountOrDepth ? self->layerCountOrDepth : 1;
+    const Uint32 layerBytes = size / layers;
+
+    for (Uint32 layer = 0; layer < layers; layer++) {
+      $(copyPass, uploadTexture,
+        &(SDL_GPUTextureTransferInfo) {
+          .transfer_buffer = tbuf,
+          .offset = layer * layerBytes,
+          .pixels_per_row = pixelsPerRow,
+          .rows_per_layer = (Uint32) self->size.h,
+        },
+        &(SDL_GPUTextureRegion) {
+          .texture = self->texture,
+          .layer = layer,
+          .w = (Uint32) self->size.w,
+          .h = (Uint32) self->size.h,
+          .d = 1,
+        },
+        false);
+    }
+  }
 
   release(copyPass);
   $(commands, submit);
