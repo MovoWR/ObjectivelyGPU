@@ -186,7 +186,8 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
     // Single-sample depth carries SAMPLER so it can be read directly via
     // resolveDepthTexture (e.g. soft particles). Multisampled depth is a plain
     // depth-stencil target; sampling it requires the separate resolveDepthTexture,
-    // populated by a resolve pass (SDL has no depth store-op resolve) — TODO when MSAA lands.
+    // a single-sample sampleable target the app populates with a resolve pass
+    // (SDL has no depth store-op resolve).
     self->depthTexture = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
       .type = SDL_GPU_TEXTURETYPE_2D,
       .format = self->depthFormat,
@@ -197,6 +198,19 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
       .num_levels = 1,
       .sample_count = self->sampleCount,
     }, NULL);
+
+    if (multisampled) {
+      self->resolveDepthTexture = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
+        .type = SDL_GPU_TEXTURETYPE_2D,
+        .format = self->depthFormat,
+        .usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER,
+        .width = (Uint32) self->size.w,
+        .height = (Uint32) self->size.h,
+        .layer_count_or_depth = 1,
+        .num_levels = 1,
+        .sample_count = SDL_GPU_SAMPLECOUNT_1,
+      }, NULL);
+    }
   }
 
   return true;
