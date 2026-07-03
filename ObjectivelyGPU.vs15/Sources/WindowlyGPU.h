@@ -25,6 +25,8 @@
 
 #ifdef BUILDING_OBJECTIVELYGPU
  #define OBJECTIVELYGPU_EXPORT extern __declspec(dllexport)
+ #define OBJECTIVELYGPU_EXPORT_DATA __declspec(dllexport)
 #else
  #define OBJECTIVELYGPU_EXPORT __declspec(dllimport)
+ #define OBJECTIVELYGPU_EXPORT_DATA __declspec(dllimport)
 #endif

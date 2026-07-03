@@ -35,6 +35,10 @@
  #define OBJECTIVELYGPU_EXPORT extern
 #endif
 
+#ifndef OBJECTIVELYGPU_EXPORT_DATA
+ #define OBJECTIVELYGPU_EXPORT_DATA
+#endif
+
 typedef struct SDL_Size SDL_Size;
 
 /**

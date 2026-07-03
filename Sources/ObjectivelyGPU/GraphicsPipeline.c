@@ -30,11 +30,11 @@
 
 #pragma mark - Presets
 
-const SDL_GPUColorTargetBlendState GPU_BlendStateOpaque = {
+OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUColorTargetBlendState GPU_BlendStateOpaque = {
   .enable_blend = false,
 };
 
-const SDL_GPUColorTargetBlendState GPU_BlendStateAlpha = {
+OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUColorTargetBlendState GPU_BlendStateAlpha = {
   .enable_blend = true,
   .src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA,
   .dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
@@ -44,7 +44,7 @@ const SDL_GPUColorTargetBlendState GPU_BlendStateAlpha = {
   .alpha_blend_op = SDL_GPU_BLENDOP_ADD,
 };
 
-const SDL_GPUColorTargetBlendState GPU_BlendStatePremultipliedAlpha = {
+OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUColorTargetBlendState GPU_BlendStatePremultipliedAlpha = {
   .enable_blend = true,
   .src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE,
   .dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
@@ -54,7 +54,7 @@ const SDL_GPUColorTargetBlendState GPU_BlendStatePremultipliedAlpha = {
   .alpha_blend_op = SDL_GPU_BLENDOP_ADD,
 };
 
-const SDL_GPUColorTargetBlendState GPU_BlendStateAdditive = {
+OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUColorTargetBlendState GPU_BlendStateAdditive = {
   .enable_blend = true,
   .src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA,
   .dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE,
@@ -64,7 +64,7 @@ const SDL_GPUColorTargetBlendState GPU_BlendStateAdditive = {
   .alpha_blend_op = SDL_GPU_BLENDOP_ADD,
 };
 
-const SDL_GPUGraphicsPipelineCreateInfo GPU_GraphicsPipeline3D = {
+OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUGraphicsPipelineCreateInfo GPU_GraphicsPipeline3D = {
   .primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
   .rasterizer_state = {
     .fill_mode = SDL_GPU_FILLMODE_FILL,
@@ -82,7 +82,7 @@ const SDL_GPUGraphicsPipelineCreateInfo GPU_GraphicsPipeline3D = {
   },
 };
 
-const SDL_GPUGraphicsPipelineCreateInfo GPU_GraphicsPipeline2D = {
+OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUGraphicsPipelineCreateInfo GPU_GraphicsPipeline2D = {
   .primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
   .rasterizer_state = {
     .fill_mode = SDL_GPU_FILLMODE_FILL,
