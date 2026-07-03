@@ -171,7 +171,7 @@ struct Framebuffer {
   /**
    * @brief The single-sample resolve targets, or all `NULL` unless `sampleCount` > `SDL_GPU_SAMPLECOUNT_1`.
    * @details Render passes resolve `colorTextures[i]` into `resolveTextures[i]`; that is
-   *   the texture to sample, blit, or present. See `resolvedColorTexture`.
+   *   the texture to sample, blit, or present. See `resolveColorTexture`.
    */
   Texture *resolveTextures[GPU_MAX_COLOR_TARGETS];
 
@@ -182,12 +182,21 @@ struct Framebuffer {
 
   /**
    * @brief The depth attachment texture, or `NULL` if `depthFormat` is invalid.
-   * @details Multisampled with the pass when `sampleCount` > `SDL_GPU_SAMPLECOUNT_1`. It is
-   *   not resolved: depth is used for testing and discarded. A consumer needing sampleable
-   *   resolved depth must resolve it in its own shader pass (SDL has no depth store-op resolve).
+   * @details Single-sample depth also carries `SAMPLER` and is returned directly by
+   *   `resolveDepthTexture`. Multisampled depth is a plain depth-stencil target
+   *   (`resolveDepthTexture` returns the separate `resolveDepthTexture` instead, since
+   *   SDL has no depth store-op resolve). Sample via `resolveDepthTexture`, not this.
    * @private
    */
   Texture *depthTexture;
+
+  /**
+   * @brief The single-sample, sampleable depth resolve target, or `NULL`.
+   * @details Only allocated when multisampled (single-sample reads the depth attachment
+   *   directly). Populated by an explicit resolve pass; returned by `resolveDepthTexture`.
+   * @private
+   */
+  Texture *resolveDepthTexture;
 
   /**
    * @brief The owning RenderDevice, used for texture allocation and dealloc.
@@ -255,15 +264,27 @@ struct FramebufferInterface {
   Framebuffer *(*initWithDevice)(Framebuffer *self, RenderDevice *device, const GPU_FramebufferCreateInfo *info);
 
   /**
-   * @fn Texture *Framebuffer::resolvedColorTexture(const Framebuffer *self, Uint32 index)
-   * @brief Returns the single-sample color texture for attachment @p index, to sample, blit, or present.
+   * @fn Texture *Framebuffer::resolveColorTexture(const Framebuffer *self, Uint32 index)
+   * @brief Returns the single-sample, sampleable color texture for attachment @p index, to sample, blit, or present.
    * @details Returns `resolveTextures[index]` when multisampled, otherwise `colorTextures[index]`.
    * @param self The Framebuffer.
    * @param index The color attachment index, in `[0, numColorTargets)`.
    * @return The resolved color texture, or `NULL` if @p index has no attachment.
    * @memberof Framebuffer
    */
-  Texture *(*resolvedColorTexture)(const Framebuffer *self, Uint32 index);
+  Texture *(*resolveColorTexture)(const Framebuffer *self, Uint32 index);
+
+  /**
+   * @fn Texture *Framebuffer::resolveDepthTexture(const Framebuffer *self)
+   * @brief Returns the single-sample, sampleable depth texture, to read scene depth (e.g. soft particles).
+   * @details Single-sample: the depth attachment itself (created with `SAMPLER`). Multisampled: the
+   *   separate `resolveDepthTexture`, which must first be populated by a resolve pass (SDL has no depth
+   *   store-op resolve). Returns `NULL` if the framebuffer has no depth attachment.
+   * @param self The Framebuffer.
+   * @return The sampleable depth texture, or `NULL` if there is no depth attachment.
+   * @memberof Framebuffer
+   */
+  Texture *(*resolveDepthTexture)(const Framebuffer *self);
 
   /**
    * @fn bool Framebuffer::resize(Framebuffer *self, const SDL_Size *size)

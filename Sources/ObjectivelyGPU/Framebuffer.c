@@ -43,6 +43,7 @@ static void dealloc(Object *self) {
     release(this->resolveTextures[i]);
   }
   release(this->depthTexture);
+  release(this->resolveDepthTexture);
 
   release(this->device);
 
@@ -146,6 +147,8 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
   }
   release(self->depthTexture);
   self->depthTexture = NULL;
+  release(self->resolveDepthTexture);
+  self->resolveDepthTexture = NULL;
 
   self->size = *size;
 
@@ -153,9 +156,6 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
 
   for (Uint32 i = 0; i < self->numColorTargets; i++) {
 
-    // A multisampled color target is resolved before sampling, so it needs only
-    // COLOR_TARGET usage; the single-sample paths (no MSAA, or the resolve target)
-    // also carry SAMPLER so they can be blit/sampled.
     self->colorTextures[i] = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
       .type = SDL_GPU_TEXTURETYPE_2D,
       .format = self->colorFormats[i],
@@ -182,10 +182,15 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
   }
 
   if (self->depthFormat != SDL_GPU_TEXTUREFORMAT_INVALID) {
+
+    // Single-sample depth carries SAMPLER so it can be read directly via
+    // resolveDepthTexture (e.g. soft particles). Multisampled depth is a plain
+    // depth-stencil target; sampling it requires the separate resolveDepthTexture,
+    // populated by a resolve pass (SDL has no depth store-op resolve) — TODO when MSAA lands.
     self->depthTexture = $(self->device, createTexture, &(SDL_GPUTextureCreateInfo) {
       .type = SDL_GPU_TEXTURETYPE_2D,
       .format = self->depthFormat,
-      .usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET,
+      .usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET | (multisampled ? 0 : SDL_GPU_TEXTUREUSAGE_SAMPLER),
       .width = (Uint32) self->size.w,
       .height = (Uint32) self->size.h,
       .layer_count_or_depth = 1,
@@ -198,12 +203,20 @@ static bool resize(Framebuffer *self, const SDL_Size *size) {
 }
 
 /**
- * @fn Texture *Framebuffer::resolvedColorTexture(const Framebuffer *self, Uint32 index)
+ * @fn Texture *Framebuffer::resolveColorTexture(const Framebuffer *self, Uint32 index)
  * @memberof Framebuffer
  */
-static Texture *resolvedColorTexture(const Framebuffer *self, Uint32 index) {
+static Texture *resolveColorTexture(const Framebuffer *self, Uint32 index) {
   assert(index < self->numColorTargets);
   return self->resolveTextures[index] ?: self->colorTextures[index];
+}
+
+/**
+ * @fn Texture *Framebuffer::resolveDepthTexture(const Framebuffer *self)
+ * @memberof Framebuffer
+ */
+static Texture *resolveDepthTexture(const Framebuffer *self) {
+  return self->resolveDepthTexture ?: self->depthTexture;
 }
 
 #pragma mark - Class lifecycle
@@ -219,7 +232,8 @@ static void initialize(Class *clazz) {
   ((FramebufferInterface *) clazz->interface)->depthTargetInfo = depthTargetInfo;
   ((FramebufferInterface *) clazz->interface)->initWithDevice = initWithDevice;
   ((FramebufferInterface *) clazz->interface)->resize = resize;
-  ((FramebufferInterface *) clazz->interface)->resolvedColorTexture = resolvedColorTexture;
+  ((FramebufferInterface *) clazz->interface)->resolveColorTexture = resolveColorTexture;
+  ((FramebufferInterface *) clazz->interface)->resolveDepthTexture = resolveDepthTexture;
 }
 
 /**

@@ -290,7 +290,7 @@ struct RenderDeviceInterface {
   /**
    * @fn void RenderDevice::endFrame(RenderDevice *self)
    * @brief Ends the frame begun by `beginFrame`: presents the framebuffer and submits.
-   * @details Blits the framebuffer's resolved color (`Framebuffer::resolvedColorTexture`,
+   * @details Blits the framebuffer's resolved color (`Framebuffer::resolveColorTexture`,
    *   the resolve target when multisampled) into the acquired swapchain texture, submits
    *   the frame's command buffer, and releases it. Must be paired with a non-NULL
    *   `beginFrame` return.
