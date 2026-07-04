@@ -26,7 +26,6 @@
 
 #include <SDL3/SDL_surface.h>
 
-#include <Objectively/Data.h>
 #include <Objectively/Resource.h>
 
 #include "Buffer.h"
@@ -52,6 +51,59 @@
   #define GPU_DEBUG true
  #endif
 #endif
+
+/**
+ * @brief Metadata for a shader binary format: its SDL enum, the file extension
+ * of the transpiled blob, and the entry-point name the toolchain emits for each
+ * stage. shadercross names every MSL (and hence metallib) entry point "main0";
+ * SPIR-V and DXIL keep the GLSL/HLSL default "main".
+ * @see RenderDevice::loadShader
+ */
+typedef struct {
+  SDL_GPUShaderFormat format;
+  const char *ext;
+  const char *vertexEntrypoint;
+  const char *fragmentEntrypoint;
+  const char *computeEntrypoint;
+} GPU_ShaderFormat;
+
+/**
+ * @brief The shader formats supported by ObjectivelyGPU.
+ */
+static const GPU_ShaderFormat GPU_ShaderFormats[] = {
+  { SDL_GPU_SHADERFORMAT_METALLIB, ".metallib", "main0", "main0", "main0" },
+  { SDL_GPU_SHADERFORMAT_MSL,      ".metal",    "main0", "main0", "main0" },
+  { SDL_GPU_SHADERFORMAT_DXIL,     ".dxil",     "main",  "main",  "main"  },
+  { SDL_GPU_SHADERFORMAT_SPIRV,    ".spv",      "main",  "main",  "main"  },
+};
+
+/**
+ * @brief A helper
+ */
+static Resource *resolveShaderResource(const char *name, SDL_GPUShaderFormat supported, GPU_ShaderFormat *resolved) {
+
+  for (size_t i = 0; i < lengthof(GPU_ShaderFormats); i++) {
+    
+    const GPU_ShaderFormat *fmt = &GPU_ShaderFormats[i];
+    if (!(fmt->format & supported)) {
+      continue;
+    }
+    
+    char path[256];
+    SDL_snprintf(path, sizeof(path), "%s%s", name, fmt->ext);
+
+    Resource *res = $$(Resource, resourceWithName, path);
+    if (!res) {
+      continue;
+    }
+
+    *resolved = *fmt;
+    return res;
+  }
+
+  GPU_Assert(false, "Failed to resolve shader '%s'", name);
+  return NULL;
+}
 
 #define _Class _RenderDevice
 
@@ -266,13 +318,17 @@ static RenderDevice *init(RenderDevice *self) {
   self = (RenderDevice *) super(Object, self, init);
   if (self) {
 
-    const SDL_GPUShaderFormat formats =
+    const SDL_GPUShaderFormat requested =
+      SDL_GPU_SHADERFORMAT_METALLIB |
       SDL_GPU_SHADERFORMAT_MSL |
       SDL_GPU_SHADERFORMAT_SPIRV |
       SDL_GPU_SHADERFORMAT_DXIL;
 
-    self->device = SDL_CreateGPUDevice(formats, GPU_DEBUG, NULL);
+    self->device = SDL_CreateGPUDevice(requested, GPU_DEBUG, NULL);
     GPU_Assert(self->device, "SDL_CreateGPUDevice");
+    
+    self->shaderFormats = SDL_GetGPUShaderFormats(self->device);
+    GPU_Assert(self->shaderFormats, "SDL_GetGPUShaderFormats");
   }
 
   return self;
@@ -297,7 +353,30 @@ static RenderDevice *initWithWindow(RenderDevice *self, SDL_Window *window) {
  */
 static Shader *loadShader(RenderDevice *self, const char *name, const SDL_GPUShaderCreateInfo *info) {
 
-  return $(alloc(Shader), initWithResourceName, self, name, info);
+  GPU_ShaderFormat resolved;
+  Resource *resource = resolveShaderResource(name, self->shaderFormats, &resolved);
+  
+  SDL_GPUShaderCreateInfo create = *info;
+  
+  create.code = resource->data->bytes;
+  create.code_size = resource->data->length;
+  create.format = resolved.format;
+  
+  if (!create.entrypoint) {
+    switch (create.stage) {
+      case SDL_GPU_SHADERSTAGE_VERTEX:
+        create.entrypoint = resolved.vertexEntrypoint;
+        break;
+      case SDL_GPU_SHADERSTAGE_FRAGMENT:
+        create.entrypoint = resolved.fragmentEntrypoint;
+        break;
+    }
+  }
+
+  Shader *shader = $(alloc(Shader), initWithDevice, self, &create);
+
+  release(resource);
+  return shader;
 }
 
 /**
@@ -306,7 +385,22 @@ static Shader *loadShader(RenderDevice *self, const char *name, const SDL_GPUSha
  */
 static ComputePipeline *loadComputePipeline(RenderDevice *self, const char *name, const SDL_GPUComputePipelineCreateInfo *info) {
 
-  return $(alloc(ComputePipeline), initWithResourceName, self, name, info);
+  GPU_ShaderFormat resolved;
+  Resource *resource = resolveShaderResource(name, self->shaderFormats, &resolved);
+
+  SDL_GPUComputePipelineCreateInfo create = *info;
+  create.code = resource->data->bytes;
+  create.code_size = resource->data->length;
+  create.format = resolved.format;
+
+  if (!create.entrypoint) {
+    create.entrypoint = resolved.computeEntrypoint;
+  }
+
+  ComputePipeline *pipeline = $(alloc(ComputePipeline), initWithDevice, self, &create);
+
+  release(resource);
+  return pipeline;
 }
 
 /**

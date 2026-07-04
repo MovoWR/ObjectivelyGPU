@@ -23,8 +23,6 @@
 
 #include <assert.h>
 
-#include <Objectively/Resource.h>
-
 #include "RenderDevice.h"
 #include "Shader.h"
 
@@ -60,87 +58,16 @@ static Shader *initWithDevice(Shader *self, RenderDevice *device, const SDL_GPUS
 
   self = (Shader *) super(Object, self, init);
   if (self) {
-
     self->device = retain(device);
+
+    self->stage = info->stage;
+    self->format = info->format;
 
     self->shader = SDL_CreateGPUShader(device->device, info);
     GPU_Assert(self->shader, "SDL_CreateGPUShader");
-
-    self->stage = info->stage;
   }
 
   return self;
-}
-
-/**
- * @fn Shader *Shader::initWithResource(Shader *self, RenderDevice *device, const Resource *resource, SDL_GPUShaderFormat format, const SDL_GPUShaderCreateInfo *info)
- * @memberof Shader
- */
-static Shader *initWithResource(Shader *self, RenderDevice *device, const Resource *resource, SDL_GPUShaderFormat format, const SDL_GPUShaderCreateInfo *info) {
-
-  assert(device);
-  assert(resource && resource->data && resource->data->length);
-  assert(info);
-
-  SDL_GPUShaderCreateInfo filled = *info;
-  filled.code = resource->data->bytes;
-  filled.code_size = resource->data->length;
-  filled.format = format;
-
-  if (!filled.entrypoint) {
-    filled.entrypoint = (format == SDL_GPU_SHADERFORMAT_MSL) ? "main0" : "main";
-  }
-
-  return $(self, initWithDevice, device, &filled);
-}
-
-/**
- * @fn Shader *Shader::initWithResourceName(Shader *self, RenderDevice *device, const char *name, const SDL_GPUShaderCreateInfo *info)
- * @memberof Shader
- */
-static Shader *initWithResourceName(Shader *self, RenderDevice *device, const char *name, const SDL_GPUShaderCreateInfo *info) {
-
-  assert(device);
-  assert(name);
-  assert(info);
-
-  static const struct {
-    SDL_GPUShaderFormat format;
-    const char *ext;
-  } formats[] = {
-    { SDL_GPU_SHADERFORMAT_MSL,  ".metal"  },
-    { SDL_GPU_SHADERFORMAT_DXIL, ".dxil" },
-    { SDL_GPU_SHADERFORMAT_SPIRV,".spv"  },
-  };
-
-  const SDL_GPUShaderFormat supported = SDL_GetGPUShaderFormats(device->device);
-
-  for (size_t i = 0; i < SDL_arraysize(formats); i++) {
-
-    if (!(supported & formats[i].format)) {
-      continue;
-    }
-
-    char path[256];
-    SDL_snprintf(path, sizeof(path), "%s%s", name, formats[i].ext);
-
-    Resource *res = $$(Resource, resourceWithName, path);
-    if (!res) {
-      continue;
-    }
-
-    if (!res->data || res->data->length == 0) {
-      release(res);
-      continue;
-    }
-
-    self = $(self, initWithResource, device, res, formats[i].format, info);
-    release(res);
-    return self;
-  }
-
-  GPU_Assert(false, "no supported shader format found for '%s'", name);
-  return NULL;
 }
 
 #pragma mark - Class lifecycle
@@ -153,8 +80,6 @@ static void initialize(Class *clazz) {
   ((ObjectInterface *) clazz->interface)->dealloc = dealloc;
 
   ((ShaderInterface *) clazz->interface)->initWithDevice = initWithDevice;
-  ((ShaderInterface *) clazz->interface)->initWithResource = initWithResource;
-  ((ShaderInterface *) clazz->interface)->initWithResourceName = initWithResourceName;
 }
 
 /**

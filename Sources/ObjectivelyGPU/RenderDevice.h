@@ -79,6 +79,11 @@ struct RenderDevice {
    * @brief The `SDL_Window` associated with @c device.
    */
   SDL_Window *window;
+  
+  /**
+   * The bitmask of supported shader formats.
+   */
+  SDL_GPUShaderFormat shaderFormats;
 
   /**
    * @brief The present-target Framebuffer driven by `beginFrame`/`endFrame`, or `NULL`.
@@ -333,16 +338,16 @@ struct RenderDeviceInterface {
 
   /**
    * @fn Shader *RenderDevice::loadShader(RenderDevice *self, const char *name, const SDL_GPUShaderCreateInfo *info)
-   * @brief Loads a compiled shader blob via the Resource system and creates a Shader.
-   * @details Convenience factory for `Shader::initWithResourceName`. Appends the
-   *   platform-appropriate extension to @c name and resolves it via Objectively's
-   *   ResourceProvider chain:
-   *   - Metal (macOS/iOS): `.metal`
+   * @brief Loads a shader blob via the Resource system and creates a Shader.
+   * @details Appends each supported format's extension to @c name and resolves it via
+   *   Objectively's ResourceProvider chain:
+   *   - Metal (macOS/iOS): `.metallib`, then `.metal`
    *   - Vulkan (Linux/Android): `.spv`
    *   - D3D12 (Windows): `.dxil`
    *   The caller fills in @c stage, @c entrypoint, and binding counts in @c info.
-   *   @c code, @c code_size, and @c format are filled in for you.
-   *   Shader blobs are produced offline by @c sdl-shadercross from HLSL source.
+   *   @c code, @c code_size, @c format, and a default @c entrypoint are filled in for you,
+   *   then the completed info is passed to `Shader::initWithDevice`.
+   *   Shader blobs are produced offline by @c sdl-shadercross.
    * @param self The RenderDevice.
    * @param name Shader base name without extension, e.g. @c "shaders/Renderer.vert".
    * @param info Shader creation parameters. @c code, @c code_size, and @c format
@@ -355,15 +360,15 @@ struct RenderDeviceInterface {
   /**
   * @fn ComputePipeline *RenderDevice::loadComputePipeline(RenderDevice *self, const char *name, const SDL_GPUComputePipelineCreateInfo *info)
   * @brief Loads a compiled compute shader blob via the Resource system and creates a ComputePipeline.
-  * @details Convenience factory for `ComputePipeline::initWithResourceName`. Parallel to
-  *   `loadShader` for compute stages. Appends the platform-appropriate extension to
-  *   @c name and resolves it via Objectively's ResourceProvider chain:
-  *   - Metal (macOS/iOS): `.metal`
+  * @details Parallel to `loadShader` for compute stages. Appends each supported format's
+  *   extension to @c name and resolves it via Objectively's ResourceProvider chain:
+  *   - Metal (macOS/iOS): `.metallib`, then `.metal`
   *   - Vulkan (Linux/Android): `.spv`
   *   - D3D12 (Windows): `.dxil`
   *   The caller fills in @c entrypoint, thread counts, and binding counts in @c info.
-  *   @c code, @c code_size, and @c format are filled in for you.
-  *   Shader blobs are produced offline by @c sdl-shadercross from HLSL source.
+  *   @c code, @c code_size, @c format, and a default @c entrypoint are filled in for you,
+  *   then the completed info is passed to `ComputePipeline::initWithDevice`.
+  *   Shader blobs are produced offline by @c sdl-shadercross.
   * @param self The RenderDevice.
   * @param name Shader base name without extension, e.g. @c "HelloCompute.comp".
   * @param info Compute pipeline creation parameters. @c code, @c code_size, and
@@ -414,7 +419,7 @@ struct RenderDeviceInterface {
    * @memberof RenderDevice
    */
   void (*releaseTransferBuffer)(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf);
-
+  
   /**
    * @fn bool RenderDevice::setAllowedFramesInFlight(const RenderDevice *self, Uint32 allowed)
    * @brief Sets the maximum number of GPU frames that may be in flight concurrently.

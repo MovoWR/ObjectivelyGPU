@@ -26,7 +26,6 @@
 #include <SDL3/SDL_gpu.h>
 
 #include <Objectively/Object.h>
-#include <Objectively/Resource.h>
 
 #include <ObjectivelyGPU/Types.h>
 
@@ -91,55 +90,18 @@ struct ComputePipelineInterface {
   /**
    * @fn ComputePipeline *ComputePipeline::initWithDevice(ComputePipeline *self, RenderDevice *device, const SDL_GPUComputePipelineCreateInfo *info)
    * @brief Initializes this ComputePipeline from a fully-populated `SDL_GPUComputePipelineCreateInfo`.
-   * @details This is the designated initializer. All fields of @p info, including
-   *   `code`, `code_size`, and `format`, must be set by the caller. Prefer
-   *   `initWithResourceName` to load a compiled blob from the Resource system with
-   *   automatic format selection.
+   * @details The designated (and only) initializer: a thin wrapper over
+   *   `SDL_CreateGPUComputePipeline`. All fields of @p info, including `code`,
+   *   `code_size`, `format`, and `entrypoint`, must be set by the caller. Prefer
+   *   `RenderDevice::loadComputePipeline`, which resolves a compiled blob from the
+   *   Resource system, selects the device-appropriate format, and fills these in.
    * @param self The ComputePipeline.
    * @param device The RenderDevice used to create and release the pipeline. Retained.
-   * @param info Compute pipeline creation parameters with all fields populated.
+   * @param info The ComputePipeline creation parameters with all fields populated.
    * @return The initialized ComputePipeline, or `NULL` on failure.
    * @memberof ComputePipeline
    */
   ComputePipeline *(*initWithDevice)(ComputePipeline *self, RenderDevice *device, const SDL_GPUComputePipelineCreateInfo *info);
-
-  /**
-   * @fn ComputePipeline *ComputePipeline::initWithResource(ComputePipeline *self, RenderDevice *device, const Resource *resource, SDL_GPUShaderFormat format, const SDL_GPUComputePipelineCreateInfo *info)
-   * @brief Initializes this ComputePipeline from an already-loaded compiled blob.
-   * @details Uses @p resource's data as the pipeline `code` for the given @p format.
-   *   `entrypoint` defaults to `main0` (MSL) or `main` when not set; the `code`,
-   *   `code_size`, and `format` fields of @p info are ignored. `initWithResourceName`
-   *   resolves a name to a resource and format, then delegates here.
-   * @param self The ComputePipeline.
-   * @param device The RenderDevice used to create and release the pipeline. Retained.
-   * @param resource The loaded shader blob; must have non-empty data.
-   * @param format The shader format of @p resource's data.
-   * @param info Compute pipeline creation parameters; `code`, `code_size`, and `format` are ignored.
-   * @return The initialized ComputePipeline, or `NULL` on failure.
-   * @memberof ComputePipeline
-   */
-  ComputePipeline *(*initWithResource)(ComputePipeline *self, RenderDevice *device, const Resource *resource, SDL_GPUShaderFormat format, const SDL_GPUComputePipelineCreateInfo *info);
-
-  /**
-   * @fn ComputePipeline *ComputePipeline::initWithResourceName(ComputePipeline *self, RenderDevice *device, const char *name, const SDL_GPUComputePipelineCreateInfo *info)
-   * @brief Initializes this ComputePipeline from a compiled blob loaded via the Resource system.
-   * @details Appends the platform-appropriate extension to @p name and resolves it via
-   *   Objectively's ResourceProvider chain:
-   *   - Metal (macOS/iOS): `.metal`
-   *   - Vulkan (Linux/Android): `.spv`
-   *   - D3D12 (Windows): `.dxil`
-   *   The first supported, resolvable, non-empty blob is selected and passed to
-   *   `initWithResource` with its format. The caller fills in @c entrypoint, thread
-   *   counts, and binding counts in @p info; `code`, `code_size`, `format`, and a default
-   *   `entrypoint` are supplied. Shader blobs are produced offline by @c sdl-shadercross.
-   * @param self The ComputePipeline.
-   * @param device The RenderDevice used to create and release the pipeline. Retained.
-   * @param name Shader base name without extension, e.g. @c "HelloCompute.comp".
-   * @param info Compute pipeline creation parameters; `code`, `code_size`, and `format` are ignored.
-   * @return The initialized ComputePipeline. GPU_Asserts if no supported blob is found.
-   * @memberof ComputePipeline
-   */
-  ComputePipeline *(*initWithResourceName)(ComputePipeline *self, RenderDevice *device, const char *name, const SDL_GPUComputePipelineCreateInfo *info);
 };
 
 /**
