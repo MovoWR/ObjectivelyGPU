@@ -151,7 +151,7 @@ struct TextureInterface {
   Texture *(*initWithDevice)(Texture *self, RenderDevice *device, const SDL_GPUTextureCreateInfo *info, const void *pixels);
 
   /**
-   * @fn Texture *Texture::initWithSurface(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage)
+   * @fn Texture *Texture::initWithSurface(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage, bool mipmaps)
    * @brief Initializes this Texture from an `SDL_Surface`, uploading its pixels immediately.
    * @details Converts @p surface to `SDL_PIXELFORMAT_RGBA32` if needed, derives the
    *   dimensions from the surface, and uploads as `SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM`.
@@ -161,10 +161,14 @@ struct TextureInterface {
    * @param device The RenderDevice used to create and release the texture. Retained.
    * @param surface The source surface. Must not be NULL.
    * @param usage Texture usage flags (e.g. `SDL_GPU_TEXTUREUSAGE_SAMPLER`).
+   * @param mipmaps If true, a full mip chain is allocated (level count derived from the
+   *   surface's smaller dimension) and generated after the base level upload; this adds
+   *   `SDL_GPU_TEXTUREUSAGE_COLOR_TARGET` to @p usage, since mipmap generation is a blit.
+   *   If false, only mip level 0 exists, matching prior behavior.
    * @return The initialized Texture, or `NULL` on failure.
    * @memberof Texture
    */
-  Texture *(*initWithSurface)(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage);
+  Texture *(*initWithSurface)(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage, bool mipmaps);
 
   /**
    * @fn void Texture::setName(Texture *self, const char *name)

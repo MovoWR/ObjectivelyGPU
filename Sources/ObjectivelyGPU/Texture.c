@@ -22,6 +22,7 @@
  */
 
 #include <assert.h>
+#include <math.h>
 #include <string.h>
 
 #include "CommandBuffer.h"
@@ -170,7 +171,8 @@ static Texture *initWithDevice(Texture *self, RenderDevice *device, const SDL_GP
  * @fn Texture *Texture::initWithSurface(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage)
  * @memberof Texture
  */
-static Texture *initWithSurface(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage) {
+static Texture *initWithSurface(Texture *self, RenderDevice *device, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage,
+                                 bool mipmaps) {
 
   assert(device);
   assert(surface);
@@ -179,6 +181,11 @@ static Texture *initWithSurface(Texture *self, RenderDevice *device, SDL_Surface
     ? surface
     : SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA32);
   GPU_Assert(rgba, "SDL_ConvertSurface");
+
+  const Uint32 numLevels = mipmaps ? (Uint32) (floorf(log2f((float) SDL_min(rgba->w, rgba->h))) + 1) : 1;
+  if (mipmaps) {
+    usage |= SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+  }
 
   // Create the texture empty, then upload respecting the surface's row pitch — an
   // SDL_Surface's pitch is often larger than width * bytesPerPixel (alignment, or a
@@ -190,7 +197,7 @@ static Texture *initWithSurface(Texture *self, RenderDevice *device, SDL_Surface
     .width = (Uint32) rgba->w,
     .height = (Uint32) rgba->h,
     .layer_count_or_depth = 1,
-    .num_levels = 1,
+    .num_levels = numLevels,
     .sample_count = SDL_GPU_SAMPLECOUNT_1,
   }, NULL);
 
@@ -199,6 +206,15 @@ static Texture *initWithSurface(Texture *self, RenderDevice *device, SDL_Surface
     uploadPixels(self, rgba->pixels,
       (Uint32) rgba->pitch * (Uint32) rgba->h,
       (Uint32) rgba->pitch / bytesPerPixel);
+
+    if (mipmaps) {
+      // Mipmap generation is not a copy-pass operation and must run outside any pass,
+      // so it gets its own one-shot command buffer after the base level upload above.
+      CommandBuffer *commands = $(device, acquireCommandBuffer);
+      $(commands, generateMipmaps, self->texture);
+      $(commands, submit);
+      release(commands);
+    }
   }
 
   if (rgba != surface) {

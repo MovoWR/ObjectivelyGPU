@@ -295,9 +295,10 @@ static SDL_GPUTransferBuffer *createTransferBuffer(const RenderDevice *self, con
  * @fn Texture *RenderDevice::createTextureFromSurface(RenderDevice *self, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage)
  * @memberof RenderDevice
  */
-static Texture *createTextureFromSurface(RenderDevice *self, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage) {
+static Texture *createTextureFromSurface(RenderDevice *self, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage,
+                                          bool mipmaps) {
 
-  return $(alloc(Texture), initWithSurface, self, surface, usage);
+  return $(alloc(Texture), initWithSurface, self, surface, usage, mipmaps);
 }
 
 /**

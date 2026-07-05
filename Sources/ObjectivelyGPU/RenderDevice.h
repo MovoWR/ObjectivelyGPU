@@ -269,7 +269,7 @@ struct RenderDeviceInterface {
   Texture *(*createTexture)(RenderDevice *self, const SDL_GPUTextureCreateInfo *info, const void *pixels);
 
   /**
-   * @fn Texture *RenderDevice::createTextureFromSurface(RenderDevice *self, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage)
+   * @fn Texture *RenderDevice::createTextureFromSurface(RenderDevice *self, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage, bool mipmaps)
    * @brief Creates a Texture from an `SDL_Surface`, uploading pixel data immediately.
    * @details Convenience factory for `Texture::initWithSurface`. Converts @p surface
    *   to `SDL_PIXELFORMAT_RGBA32` if needed and uploads it as
@@ -277,10 +277,11 @@ struct RenderDeviceInterface {
    * @param self The RenderDevice.
    * @param surface The source surface. Must not be NULL.
    * @param usage Texture usage flags (e.g. `SDL_GPU_TEXTUREUSAGE_SAMPLER`).
+   * @param mipmaps If true, a full mip chain is allocated and generated; see `Texture::initWithSurface`.
    * @return A new, retained Texture. GPU_Asserts on failure. Free with `release`.
    * @memberof RenderDevice
    */
-  Texture *(*createTextureFromSurface)(RenderDevice *self, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage);
+  Texture *(*createTextureFromSurface)(RenderDevice *self, SDL_Surface *surface, SDL_GPUTextureUsageFlags usage, bool mipmaps);
 
   /**
    * @fn SDL_GPUTransferBuffer *RenderDevice::createTransferBuffer(const RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info)
