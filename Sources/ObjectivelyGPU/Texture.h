@@ -178,6 +178,20 @@ struct TextureInterface {
    * @memberof Texture
    */
   void (*setName)(Texture *self, const char *name);
+
+  /**
+   * @fn void *Texture::downloadPixels(const Texture *self)
+   * @brief Downloads mip level 0, layer 0 of this texture to a newly allocated buffer.
+   * @details Blocks until the download completes (records a copy pass, submits it with
+   *   a fence, and waits on that fence), so this is not suited to per-frame use. The
+   *   returned buffer is tightly packed in @p self's native `format` and sized per
+   *   `SDL_CalculateGPUTextureFormatSize`; the caller is responsible for interpreting
+   *   the pixel format and freeing the buffer with `free`.
+   * @param self The Texture.
+   * @return A newly allocated buffer of downloaded pixel data. GPU_Asserts on failure.
+   * @memberof Texture
+   */
+  void *(*downloadPixels)(const Texture *self);
 };
 
 /**

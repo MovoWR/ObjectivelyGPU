@@ -235,6 +235,61 @@ static void setName(Texture *self, const char *name) {
   SDL_SetGPUTextureName(self->device->device, self->texture, name);
 }
 
+/**
+ * @fn void *Texture::downloadPixels(const Texture *self)
+ * @memberof Texture
+ */
+static void *downloadPixels(const Texture *self) {
+
+  assert(self);
+
+  SDL_GPUDevice *device = self->device->device;
+
+  const Uint32 size = SDL_CalculateGPUTextureFormatSize(self->format, (Uint32) self->size.w, (Uint32) self->size.h, 1);
+
+  SDL_GPUTransferBuffer *tbuf = SDL_CreateGPUTransferBuffer(device, &(SDL_GPUTransferBufferCreateInfo) {
+    .usage = SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD,
+    .size = size,
+  });
+  GPU_Assert(tbuf, "SDL_CreateGPUTransferBuffer");
+
+  CommandBuffer *commands = $(self->device, acquireCommandBuffer);
+  CopyPass *copyPass = $(commands, beginCopyPass);
+
+  $(copyPass, downloadTexture,
+    &(SDL_GPUTextureRegion) {
+      .texture = self->texture,
+      .w = (Uint32) self->size.w,
+      .h = (Uint32) self->size.h,
+      .d = 1,
+    },
+    &(SDL_GPUTextureTransferInfo) {
+      .transfer_buffer = tbuf,
+      .pixels_per_row = (Uint32) self->size.w,
+      .rows_per_layer = (Uint32) self->size.h,
+    });
+
+  release(copyPass);
+
+  // Downloads are asynchronous: block on a fence before mapping the transfer
+  // buffer, so the caller always sees complete data. Not suited to per-frame use.
+  SDL_GPUFence *fence = $(commands, submitAndFence);
+  release(commands);
+  $(self->device, waitForFences, true, &fence, 1);
+  $(self->device, releaseFence, fence);
+
+  void *mapped = SDL_MapGPUTransferBuffer(device, tbuf, false);
+  GPU_Assert(mapped, "SDL_MapGPUTransferBuffer");
+
+  void *pixels = malloc(size);
+  memcpy(pixels, mapped, size);
+
+  SDL_UnmapGPUTransferBuffer(device, tbuf);
+  SDL_ReleaseGPUTransferBuffer(device, tbuf);
+
+  return pixels;
+}
+
 #pragma mark - Class lifecycle
 
 /**
@@ -247,6 +302,7 @@ static void initialize(Class *clazz) {
   ((TextureInterface *) clazz->interface)->initWithDevice = initWithDevice;
   ((TextureInterface *) clazz->interface)->initWithSurface = initWithSurface;
   ((TextureInterface *) clazz->interface)->setName = setName;
+  ((TextureInterface *) clazz->interface)->downloadPixels = downloadPixels;
 }
 
 /**
