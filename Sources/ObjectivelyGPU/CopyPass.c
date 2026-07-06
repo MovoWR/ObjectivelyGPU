@@ -103,11 +103,13 @@ static void downloadQueryResults(const CopyPass *self, QueryPool *pool, Uint32 f
   // write a "not occluded" sentinel for every requested result directly, rather
   // than leaving the destination uninitialized (which callers would likely
   // misread as "occluded", incorrectly culling everything).
-  Uint64 *results = $(self->commands->device, mapTransferBuffer, dst->transfer_buffer, false);
+  Uint64 *results = SDL_MapGPUTransferBuffer(self->commands->device->device, dst->transfer_buffer, false);
+  GPU_Assert(results, "SDL_MapGPUTransferBuffer");
+
   for (Uint32 i = 0; i < count; i++) {
     results[(dst->offset / sizeof(Uint64)) + i] = 1;
   }
-  $(self->commands->device, unmapTransferBuffer, dst->transfer_buffer);
+  SDL_UnmapGPUTransferBuffer(self->commands->device->device, dst->transfer_buffer);
 }
 
 /**

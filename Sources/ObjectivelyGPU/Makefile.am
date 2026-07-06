@@ -12,6 +12,7 @@ pkginclude_HEADERS = \
     ComputePass.h \
     ComputePipeline.h \
     CopyPass.h \
+    Fence.h \
     Framebuffer.h \
     GraphicsPipeline.h \
     Mathlib.h \
@@ -21,6 +22,7 @@ pkginclude_HEADERS = \
     Sampler.h \
     Shader.h \
     Texture.h \
+    TransferBuffer.h \
     Types.h
 
 lib_LTLIBRARIES = libObjectivelyGPU.la
@@ -31,6 +33,7 @@ libObjectivelyGPU_la_SOURCES = \
     ComputePass.c \
     ComputePipeline.c \
     CopyPass.c \
+    Fence.c \
     Framebuffer.c \
     GraphicsPipeline.c \
     QueryPool.c \
@@ -38,7 +41,8 @@ libObjectivelyGPU_la_SOURCES = \
     RenderPass.c \
     Sampler.c \
     Shader.c \
-    Texture.c
+    Texture.c \
+    TransferBuffer.c
 
 libObjectivelyGPU_la_CFLAGS = \
     $(OBJECTIVELY_CFLAGS) \

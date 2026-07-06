@@ -52,6 +52,7 @@ typedef struct RenderDeviceInterface RenderDeviceInterface;
 typedef struct Sampler Sampler;
 typedef struct Shader Shader;
 typedef struct Texture Texture;
+typedef struct TransferBuffer TransferBuffer;
 
 /**
  * @brief The RenderDevice encapsulates an `SDL_GPUDevice` and provides methods for allocating
@@ -374,14 +375,14 @@ struct RenderDeviceInterface {
   Texture *(*createSolidColorTexture)(RenderDevice *self, SDL_GPUTextureType type, Uint32 layerCount, Uint32 rgba);
 
   /**
-   * @fn SDL_GPUTransferBuffer *RenderDevice::createTransferBuffer(const RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info)
+   * @fn TransferBuffer *RenderDevice::createTransferBuffer(RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info)
    * @brief Creates a CPU-accessible transfer buffer for staging data to or from the GPU.
    * @param self The RenderDevice.
    * @param info Transfer buffer creation parameters (usage: upload or download, size).
-   * @return A new `SDL_GPUTransferBuffer`. GPU_Asserts on failure. Release with `releaseTransferBuffer`.
+   * @return A new, retained TransferBuffer. GPU_Asserts on failure. Free with `release`.
    * @memberof RenderDevice
    */
-  SDL_GPUTransferBuffer *(*createTransferBuffer)(const RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info);
+  TransferBuffer *(*createTransferBuffer)(RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info);
 
   /**
    * @fn void RenderDevice::endFrame(RenderDevice *self)
@@ -394,6 +395,19 @@ struct RenderDeviceInterface {
    * @memberof RenderDevice
    */
   void (*endFrame)(RenderDevice *self);
+
+  /**
+   * @fn Fence *RenderDevice::endFrameAndFence(RenderDevice *self)
+   * @brief Ends the frame begun by `beginFrame`, as `endFrame`, but returns a Fence.
+   * @details Identical to `endFrame`, except the frame's command buffer is submitted via
+   *   `CommandBuffer::submitAndFence`, so callers may track when the frame's GPU work has
+   *   completed, e.g. to safely read back data written during the frame. The returned
+   *   Fence is retained; release it when no longer needed.
+   * @param self The RenderDevice.
+   * @return A new, retained Fence, or `NULL` on error.
+   * @memberof RenderDevice
+   */
+  Fence *(*endFrameAndFence)(RenderDevice *self);
 
   /**
    * @fn SDL_GPUTextureFormat RenderDevice::getSwapchainTextureFormat(const RenderDevice *self)
@@ -495,48 +509,6 @@ struct RenderDeviceInterface {
                                              SDL_GPUGraphicsPipelineCreateInfo *info);
 
   /**
-  * @fn void *RenderDevice::mapTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf, bool cycle)
-   * @brief Maps a transfer buffer into CPU-accessible memory for reading or writing.
-   * @details Pass `cycle = true` to let the driver use a fresh buffer allocation
-   *   (avoiding a pipeline stall) when the buffer is already in use by the GPU.
-   *   Call `unmapTransferBuffer` when done; the mapping must not be used after that.
-   * @param self The RenderDevice.
-   * @param tbuf The transfer buffer to map.
-   * @param cycle If `true`, the driver may cycle to a new backing allocation.
-   * @return A CPU pointer to the mapped region. GPU_Asserts on failure.
-   * @memberof RenderDevice
-   */
-  void *(*mapTransferBuffer)(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf, bool cycle);
-
-  /**
-   * @fn bool RenderDevice::queryFence(const RenderDevice *self, SDL_GPUFence *fence)
-   * @brief Non-blocking query of whether a GPU fence has been signaled.
-   * @param self The RenderDevice.
-   * @param fence The fence to query.
-   * @return `true` if the fence is signaled (GPU work completed); `false` otherwise.
-   * @memberof RenderDevice
-   */
-  bool (*queryFence)(const RenderDevice *self, SDL_GPUFence *fence);
-
-  /**
-   * @fn void RenderDevice::releaseFence(const RenderDevice *self, SDL_GPUFence *fence)
-   * @brief Releases a fence returned by `submitAndFence`. Null-safe.
-   * @param self The RenderDevice.
-   * @param fence The fence to release, or `NULL`.
-   * @memberof RenderDevice
-   */
-  void (*releaseFence)(const RenderDevice *self, SDL_GPUFence *fence);
-
-  /**
-   * @fn void RenderDevice::releaseTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf)
-   * @brief Releases a transfer buffer created by `createTransferBuffer`. Null-safe.
-   * @param self The RenderDevice.
-   * @param tbuf The transfer buffer to release, or `NULL`.
-   * @memberof RenderDevice
-   */
-  void (*releaseTransferBuffer)(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf);
-  
-  /**
    * @fn bool RenderDevice::setAllowedFramesInFlight(const RenderDevice *self, Uint32 allowed)
    * @brief Sets the maximum number of GPU frames that may be in flight concurrently.
    * @details Lower values reduce latency; higher values improve throughput. The
@@ -627,29 +599,6 @@ struct RenderDeviceInterface {
    * @memberof RenderDevice
    */
   bool (*textureSupportsSampleCount)(const RenderDevice *self, SDL_GPUTextureFormat format, SDL_GPUSampleCount sample_count);
-
-  /**
-   * @fn void RenderDevice::unmapTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf)
-   * @brief Unmaps a transfer buffer previously mapped with `mapTransferBuffer`.
-   * @details The CPU pointer returned by `mapTransferBuffer` must not be accessed
-   *   after this call.
-   * @param self The RenderDevice.
-   * @param tbuf The transfer buffer to unmap.
-   * @memberof RenderDevice
-   */
-  void (*unmapTransferBuffer)(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf);
-
-  /**
-   * @fn bool RenderDevice::waitForFences(const RenderDevice *self, bool wait_all, SDL_GPUFence *const *fences, Uint32 num_fences)
-   * @brief Blocks the calling thread until one or all of the given fences are signaled.
-   * @param self The RenderDevice.
-   * @param wait_all If `true`, wait for all fences; if `false`, return when any one signals.
-   * @param fences Array of fences to wait on.
-   * @param num_fences Number of fences in @p fences.
-   * @return `true` on success, `false` on error.
-   * @memberof RenderDevice
-   */
-  bool (*waitForFences)(const RenderDevice *self, bool wait_all, SDL_GPUFence *const *fences, Uint32 num_fences);
 
   /**
    * @fn bool RenderDevice::waitForIdle(const RenderDevice *self)

@@ -26,6 +26,7 @@
 #include "CommandBuffer.h"
 #include "ComputePass.h"
 #include "CopyPass.h"
+#include "Fence.h"
 #include "RenderDevice.h"
 #include "RenderPass.h"
 
@@ -251,10 +252,10 @@ static bool submit(CommandBuffer *self) {
 }
 
 /**
- * @fn SDL_GPUFence *CommandBuffer::submitAndFence(CommandBuffer *self)
+ * @fn Fence *CommandBuffer::submitAndFence(CommandBuffer *self)
  * @memberof CommandBuffer
  */
-static SDL_GPUFence *submitAndFence(CommandBuffer *self) {
+static Fence *submitAndFence(CommandBuffer *self) {
 
   GPU_Assert(!self->submitted, "command buffer already submitted");
   GPU_Assert(!self->pass, "cannot submit with an open pass");
@@ -264,7 +265,7 @@ static SDL_GPUFence *submitAndFence(CommandBuffer *self) {
 
   self->submitted = true;
 
-  return fence;
+  return $(alloc(Fence), initWithDevice, self->device, fence);
 }
 
 /**

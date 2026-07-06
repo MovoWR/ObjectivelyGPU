@@ -39,6 +39,7 @@
 #include "Sampler.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "TransferBuffer.h"
 
 /**
  * @brief Whether to create the `SDL_GPUDevice` with backend validation/debug layers.
@@ -167,10 +168,10 @@ static CommandBuffer *beginFrame(RenderDevice *self) {
 }
 
 /**
- * @fn void RenderDevice::endFrame(RenderDevice *self)
+ * @fn Fence *RenderDevice::endFrameAndFence(RenderDevice *self)
  * @memberof RenderDevice
  */
-static void endFrame(RenderDevice *self) {
+static Fence *endFrameAndFence(RenderDevice *self) {
 
   GPU_Assert(self->commands, "endFrame called without a frame in flight");
 
@@ -192,11 +193,23 @@ static void endFrame(RenderDevice *self) {
     .filter = SDL_GPU_FILTER_NEAREST,
   });
 
-  $(self->commands, submit);
+  Fence *fence = $(self->commands, submitAndFence);
 
   self->commands = release(self->commands);
-  
+
   self->swapchain = (SwapchainTexture) { 0 };
+
+  return fence;
+}
+
+/**
+ * @fn void RenderDevice::endFrame(RenderDevice *self)
+ * @memberof RenderDevice
+ */
+static void endFrame(RenderDevice *self) {
+
+  Fence *fence = $(self, endFrameAndFence);
+  release(fence);
 }
 
 /**
@@ -364,15 +377,11 @@ static Texture *createTexture(RenderDevice *self, const SDL_GPUTextureCreateInfo
 }
 
 /**
- * @fn SDL_GPUTransferBuffer *RenderDevice::createTransferBuffer(const RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info)
+ * @fn TransferBuffer *RenderDevice::createTransferBuffer(RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info)
  * @memberof RenderDevice
  */
-static SDL_GPUTransferBuffer *createTransferBuffer(const RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info) {
-
-  SDL_GPUTransferBuffer *buffer = SDL_CreateGPUTransferBuffer(self->device, info);
-  GPU_Assert(buffer, "SDL_CreateGPUTransferBuffer");
-
-  return buffer;
+static TransferBuffer *createTransferBuffer(RenderDevice *self, const SDL_GPUTransferBufferCreateInfo *info) {
+  return $(alloc(TransferBuffer), initWithDevice, self, info);
 }
 
 /**
@@ -548,42 +557,6 @@ static GraphicsPipeline *loadGraphicsPipeline(RenderDevice *self,
 }
 
 /**
- * @fn void *RenderDevice::mapTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf, bool cycle)
- * @memberof RenderDevice
- */
-static void *mapTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf, bool cycle) {
-
-  void *mapped = SDL_MapGPUTransferBuffer(self->device, tbuf, cycle);
-  GPU_Assert(mapped, "SDL_MapGPUTransferBuffer");
-
-  return mapped;
-}
-
-/**
- * @fn bool RenderDevice::queryFence(const RenderDevice *self, SDL_GPUFence *fence)
- * @memberof RenderDevice
- */
-static bool queryFence(const RenderDevice *self, SDL_GPUFence *fence) {
-  return SDL_QueryGPUFence(self->device, fence);
-}
-
-/**
- * @fn void RenderDevice::releaseFence(const RenderDevice *self, SDL_GPUFence *fence)
- * @memberof RenderDevice
- */
-static void releaseFence(const RenderDevice *self, SDL_GPUFence *fence) {
-  SDL_ReleaseGPUFence(self->device, fence);
-}
-
-/**
- * @fn void RenderDevice::releaseTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf)
- * @memberof RenderDevice
- */
-static void releaseTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf) {
-  SDL_ReleaseGPUTransferBuffer(self->device, tbuf);
-}
-
-/**
  * @fn bool RenderDevice::setAllowedFramesInFlight(const RenderDevice *self, Uint32 allowed)
  * @memberof RenderDevice
  */
@@ -672,22 +645,6 @@ static bool textureSupportsSampleCount(const RenderDevice *self, SDL_GPUTextureF
 }
 
 /**
- * @fn void RenderDevice::unmapTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf)
- * @memberof RenderDevice
- */
-static void unmapTransferBuffer(const RenderDevice *self, SDL_GPUTransferBuffer *tbuf) {
-  SDL_UnmapGPUTransferBuffer(self->device, tbuf);
-}
-
-/**
- * @fn bool RenderDevice::waitForFences(const RenderDevice *self, bool wait_all, SDL_GPUFence *const *fences, Uint32 num_fences)
- * @memberof RenderDevice
- */
-static bool waitForFences(const RenderDevice *self, bool wait_all, SDL_GPUFence *const *fences, Uint32 num_fences) {
-  return SDL_WaitForGPUFences(self->device, wait_all, fences, num_fences);
-}
-
-/**
  * @fn bool RenderDevice::waitForIdle(const RenderDevice *self)
  * @memberof RenderDevice
  */
@@ -733,16 +690,13 @@ static void initialize(Class *clazz) {
   ((RenderDeviceInterface *) clazz->interface)->createSolidColorTexture = createSolidColorTexture;
   ((RenderDeviceInterface *) clazz->interface)->createTransferBuffer = createTransferBuffer;
   ((RenderDeviceInterface *) clazz->interface)->endFrame = endFrame;
+  ((RenderDeviceInterface *) clazz->interface)->endFrameAndFence = endFrameAndFence;
   ((RenderDeviceInterface *) clazz->interface)->getSwapchainTextureFormat = getSwapchainTextureFormat;
   ((RenderDeviceInterface *) clazz->interface)->init = init;
   ((RenderDeviceInterface *) clazz->interface)->initWithWindow = initWithWindow;
   ((RenderDeviceInterface *) clazz->interface)->loadShader = loadShader;
   ((RenderDeviceInterface *) clazz->interface)->loadComputePipeline = loadComputePipeline;
   ((RenderDeviceInterface *) clazz->interface)->loadGraphicsPipeline = loadGraphicsPipeline;
-  ((RenderDeviceInterface *) clazz->interface)->mapTransferBuffer = mapTransferBuffer;
-  ((RenderDeviceInterface *) clazz->interface)->queryFence = queryFence;
-  ((RenderDeviceInterface *) clazz->interface)->releaseFence = releaseFence;
-  ((RenderDeviceInterface *) clazz->interface)->releaseTransferBuffer = releaseTransferBuffer;
   ((RenderDeviceInterface *) clazz->interface)->setAllowedFramesInFlight = setAllowedFramesInFlight;
   ((RenderDeviceInterface *) clazz->interface)->setFramebuffer = setFramebuffer;
   ((RenderDeviceInterface *) clazz->interface)->setSwapchainParameters = setSwapchainParameters;
@@ -751,8 +705,6 @@ static void initialize(Class *clazz) {
   ((RenderDeviceInterface *) clazz->interface)->supportsSwapchainComposition = supportsSwapchainComposition;
   ((RenderDeviceInterface *) clazz->interface)->textureSupportsFormat = textureSupportsFormat;
   ((RenderDeviceInterface *) clazz->interface)->textureSupportsSampleCount = textureSupportsSampleCount;
-  ((RenderDeviceInterface *) clazz->interface)->unmapTransferBuffer = unmapTransferBuffer;
-  ((RenderDeviceInterface *) clazz->interface)->waitForFences = waitForFences;
   ((RenderDeviceInterface *) clazz->interface)->waitForIdle = waitForIdle;
   ((RenderDeviceInterface *) clazz->interface)->waitForSwapchain = waitForSwapchain;
 }

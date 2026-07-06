@@ -28,6 +28,7 @@
 #include <ObjectivelyGPU/ComputePass.h>
 #include <ObjectivelyGPU/ComputePipeline.h>
 #include <ObjectivelyGPU/CopyPass.h>
+#include <ObjectivelyGPU/Fence.h>
 #include <ObjectivelyGPU/Framebuffer.h>
 #include <ObjectivelyGPU/GraphicsPipeline.h>
 #include <ObjectivelyGPU/Mathlib.h>
@@ -37,3 +38,4 @@
 #include <ObjectivelyGPU/Sampler.h>
 #include <ObjectivelyGPU/Shader.h>
 #include <ObjectivelyGPU/Texture.h>
+#include <ObjectivelyGPU/TransferBuffer.h>

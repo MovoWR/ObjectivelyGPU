@@ -25,6 +25,7 @@
     <ClInclude Include="..\Sources\ObjectivelyGPU\ComputePass.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\ComputePipeline.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\CopyPass.h" />
+    <ClInclude Include="..\Sources\ObjectivelyGPU\Fence.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\Framebuffer.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\GraphicsPipeline.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\Mathlib.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="..\Sources\ObjectivelyGPU\Sampler.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\Shader.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\Texture.h" />
+    <ClInclude Include="..\Sources\ObjectivelyGPU\TransferBuffer.h" />
     <ClInclude Include="..\Sources\ObjectivelyGPU\Types.h" />
     <ClInclude Include="Sources\WindowlyGPU.h" />
   </ItemGroup>
@@ -43,6 +45,7 @@
     <ClCompile Include="..\Sources\ObjectivelyGPU\ComputePass.c" />
     <ClCompile Include="..\Sources\ObjectivelyGPU\ComputePipeline.c" />
     <ClCompile Include="..\Sources\ObjectivelyGPU\CopyPass.c" />
+    <ClCompile Include="..\Sources\ObjectivelyGPU\Fence.c" />
     <ClCompile Include="..\Sources\ObjectivelyGPU\Framebuffer.c" />
     <ClCompile Include="..\Sources\ObjectivelyGPU\GraphicsPipeline.c" />
     <ClCompile Include="..\Sources\ObjectivelyGPU\QueryPool.c" />
@@ -51,6 +54,7 @@
     <ClCompile Include="..\Sources\ObjectivelyGPU\Sampler.c" />
     <ClCompile Include="..\Sources\ObjectivelyGPU\Shader.c" />
     <ClCompile Include="..\Sources\ObjectivelyGPU\Texture.c" />
+    <ClCompile Include="..\Sources\ObjectivelyGPU\TransferBuffer.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Objectively\Objectively.vs15\Objectively.vcxproj">

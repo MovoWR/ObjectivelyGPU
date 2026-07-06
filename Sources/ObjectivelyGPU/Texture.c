@@ -27,6 +27,7 @@
 
 #include "CommandBuffer.h"
 #include "CopyPass.h"
+#include "Fence.h"
 #include "RenderDevice.h"
 #include "Texture.h"
 
@@ -267,10 +268,10 @@ static void *downloadPixels(const Texture *self) {
 
   // Downloads are asynchronous: block on a fence before mapping the transfer
   // buffer, so the caller always sees complete data. Not suited to per-frame use.
-  SDL_GPUFence *fence = $(commands, submitAndFence);
+  Fence *fence = $(commands, submitAndFence);
   release(commands);
-  $(self->device, waitForFences, true, &fence, 1);
-  $(self->device, releaseFence, fence);
+  $(fence, wait);
+  release(fence);
 
   void *mapped = SDL_MapGPUTransferBuffer(device, tbuf, false);
   GPU_Assert(mapped, "SDL_MapGPUTransferBuffer");

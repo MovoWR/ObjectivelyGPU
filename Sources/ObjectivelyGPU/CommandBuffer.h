@@ -34,6 +34,7 @@
 
 typedef struct ComputePass ComputePass;
 typedef struct CopyPass CopyPass;
+typedef struct Fence Fence;
 typedef struct RenderPass RenderPass;
 typedef struct RenderDevice RenderDevice;
 typedef struct CommandBuffer CommandBuffer;
@@ -288,15 +289,14 @@ struct CommandBufferInterface {
   bool (*submit)(CommandBuffer *self);
 
   /**
-   * @fn SDL_GPUFence *CommandBuffer::submitAndFence(CommandBuffer *self)
-   * @brief Submits this command buffer and returns a fence for GPU completion.
-   * @details The fence must be released via `RenderDevice::releaseFence` when
-   *   no longer needed.
+   * @fn Fence *CommandBuffer::submitAndFence(CommandBuffer *self)
+   * @brief Submits this command buffer and returns a Fence for GPU completion.
+   * @details The returned Fence is retained; release it when no longer needed.
    * @param self The CommandBuffer.
-   * @return A new SDL_GPUFence, or NULL on error.
+   * @return A new, retained Fence, or `NULL` on error.
    * @memberof CommandBuffer
    */
-  SDL_GPUFence *(*submitAndFence)(CommandBuffer *self);
+  Fence *(*submitAndFence)(CommandBuffer *self);
 
   /**
    * @fn bool CommandBuffer::waitAndAcquireSwapchainTexture(const CommandBuffer *self, SwapchainTexture *swapchain)

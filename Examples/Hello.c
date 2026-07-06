@@ -98,7 +98,7 @@ typedef struct {
    * @brief Occlusion query proof-of-concept: pool, readback buffer, and frame counter.
    */
   QueryPool *occlusionQueryPool;
-  SDL_GPUTransferBuffer *occlusionQueryTransfer;
+  TransferBuffer *occlusionQueryTransfer;
   Uint32 frames;
 } AppState;
 
@@ -238,19 +238,19 @@ static void logOcclusionQueryResult(AppState *app) {
 
   CopyPass *copyPass = $(commands, beginCopyPass);
   $(copyPass, downloadQueryResults, app->occlusionQueryPool, 0, 1, &(SDL_GPUTransferBufferLocation) {
-    .transfer_buffer = app->occlusionQueryTransfer,
+    .transfer_buffer = app->occlusionQueryTransfer->buffer,
   });
   release(copyPass);
 
-  SDL_GPUFence *fence = $(commands, submitAndFence);
+  Fence *fence = $(commands, submitAndFence);
   release(commands);
 
-  $(app->renderDevice, waitForFences, true, &fence, 1);
-  $(app->renderDevice, releaseFence, fence);
+  $(fence, wait);
+  release(fence);
 
-  const Uint64 *result = $(app->renderDevice, mapTransferBuffer, app->occlusionQueryTransfer, false);
+  const Uint64 *result = $(app->occlusionQueryTransfer, map, false);
   SDL_Log("Occlusion query result: %" SDL_PRIu64 " samples passed", *result);
-  $(app->renderDevice, unmapTransferBuffer, app->occlusionQueryTransfer);
+  $(app->occlusionQueryTransfer, unmap);
 }
 
 #pragma mark - SDL application callbacks
@@ -349,7 +349,7 @@ void SDL_AppQuit(void *appState, SDL_AppResult result) {
   release(app->scene.vertexBuffer);
 
   release(app->occlusionQueryPool);
-  $(app->renderDevice, releaseTransferBuffer, app->occlusionQueryTransfer);
+  release(app->occlusionQueryTransfer);
 
   release(app->framebuffer);
   release(app->renderDevice);

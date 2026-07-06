@@ -57,6 +57,10 @@
 		CECF83982FEF6A7200CB0CCA /* Mathlib.h in Headers */ = {isa = PBXBuildFile; fileRef = CECF83972FEF6A7200CB0CCA /* Mathlib.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		496C55EEAC4C86E3B7C6550E /* QueryPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 989E64805790578A941CB5B9 /* QueryPool.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		45AD38AB8109398E51564CFD /* QueryPool.c in Sources */ = {isa = PBXBuildFile; fileRef = 872CC6C6CBA08F1A36626F57 /* QueryPool.c */; };
+		3402D3208D6A4CF886402DD3 /* Fence.h in Headers */ = {isa = PBXBuildFile; fileRef = B89C52ADCD12486D934D4F78 /* Fence.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7138396FE1A4AF0B311EBD6 /* Fence.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F7C26CE48FB43D393B963EA /* Fence.c */; };
+		8D678937240347D29F529D34 /* TransferBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = F20F19F296684FA89413FFC0 /* TransferBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		17034614E26D4BBCA2806D4B /* TransferBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = DCDE588CEB8C4ED0A63C96C7 /* TransferBuffer.c */; };
 		CECF83B62FEF765400CB0CCA /* Hello.frag.metal in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83A52FEF712F00CB0CCA /* Hello.frag.metal */; };
 		CECF83B72FEF765400CB0CCA /* Hello.frag.spv in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83A62FEF712F00CB0CCA /* Hello.frag.spv */; };
 		CECF83B92FEF765400CB0CCA /* Hello.vert.metal in CopyFiles */ = {isa = PBXBuildFile; fileRef = CECF83A82FEF712F00CB0CCA /* Hello.vert.metal */; };
@@ -186,6 +190,10 @@
 		CECF83972FEF6A7200CB0CCA /* Mathlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mathlib.h; sourceTree = "<group>"; };
 		989E64805790578A941CB5B9 /* QueryPool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QueryPool.h; sourceTree = "<group>"; };
 		872CC6C6CBA08F1A36626F57 /* QueryPool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = QueryPool.c; sourceTree = "<group>"; };
+		B89C52ADCD12486D934D4F78 /* Fence.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Fence.h; sourceTree = "<group>"; };
+		0F7C26CE48FB43D393B963EA /* Fence.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Fence.c; sourceTree = "<group>"; };
+		F20F19F296684FA89413FFC0 /* TransferBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TransferBuffer.h; sourceTree = "<group>"; };
+		DCDE588CEB8C4ED0A63C96C7 /* TransferBuffer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = TransferBuffer.c; sourceTree = "<group>"; };
 		CECF83A32FEF6F5B00CB0CCA /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
 		CECF83A42FEF712F00CB0CCA /* Hello.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = Hello.frag.glsl; sourceTree = "<group>"; };
 		CECF83A52FEF712F00CB0CCA /* Hello.frag.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Hello.frag.metal; sourceTree = "<group>"; };
@@ -305,6 +313,8 @@
 				338EC7DCAE74C1B8C397D189 /* Config.h */,
 				59334BDAED542AB6DE565EDD /* CopyPass.h */,
 				C862954A9DD435C1FF7CD31D /* CopyPass.c */,
+				B89C52ADCD12486D934D4F78 /* Fence.h */,
+				0F7C26CE48FB43D393B963EA /* Fence.c */,
 				CECF83C52FF03A3500CB0CCA /* Framebuffer.h */,
 				CECF83C62FF03A3500CB0CCA /* Framebuffer.c */,
 				CEBA3F652FF3211F00758CA6 /* GraphicsPipeline.h */,
@@ -322,6 +332,8 @@
 				CEBA3F6A2FF3211F00758CA6 /* Shader.c */,
 				CEBA3F5E2FF30F1E00758CA6 /* Texture.h */,
 				CEBA3F5F2FF30F1E00758CA6 /* Texture.c */,
+				F20F19F296684FA89413FFC0 /* TransferBuffer.h */,
+				DCDE588CEB8C4ED0A63C96C7 /* TransferBuffer.c */,
 				38F069D0DBE26C7E00B5B5EE /* Types.h */,
 				CECF83942FEF65EB00CB0CCA /* Makefile.am */,
 			);
@@ -400,6 +412,7 @@
 				CEBA3F6D2FF3211F00758CA6 /* ComputePipeline.h in Headers */,
 				6F351DFD232DA78A42D8B494 /* Config.h in Headers */,
 				DF73824CC25298378B451056 /* CopyPass.h in Headers */,
+				3402D3208D6A4CF886402DD3 /* Fence.h in Headers */,
 				CECF83C72FF03A3500CB0CCA /* Framebuffer.h in Headers */,
 				CEBA3F6B2FF3211F00758CA6 /* GraphicsPipeline.h in Headers */,
 				CECF83982FEF6A7200CB0CCA /* Mathlib.h in Headers */,
@@ -410,6 +423,7 @@
 				CEBA3F6C2FF3211F00758CA6 /* Sampler.h in Headers */,
 				CEBA3F6E2FF3211F00758CA6 /* Shader.h in Headers */,
 				CEBA3F602FF30F1E00758CA6 /* Texture.h in Headers */,
+				8D678937240347D29F529D34 /* TransferBuffer.h in Headers */,
 				90C29A39257729BE8D4FDDF8 /* Types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -584,6 +598,7 @@
 				F73340493879CD8034F99D51 /* ComputePass.c in Sources */,
 				CEBA3F752FF330A700758CA6 /* ComputePipeline.c in Sources */,
 				CCCB11DB70E4A962360A2119 /* CopyPass.c in Sources */,
+				E7138396FE1A4AF0B311EBD6 /* Fence.c in Sources */,
 				CECF83C82FF03A3500CB0CCA /* Framebuffer.c in Sources */,
 				CEBA3F702FF3211F00758CA6 /* GraphicsPipeline.c in Sources */,
 				45AD38AB8109398E51564CFD /* QueryPool.c in Sources */,
@@ -592,6 +607,7 @@
 				86E5132F5DCCB6B674151343 /* RenderDevice.c in Sources */,
 				FF30FF2D56F9E4EA3C492CBB /* RenderPass.c in Sources */,
 				CEBA3F612FF30F1E00758CA6 /* Texture.c in Sources */,
+				17034614E26D4BBCA2806D4B /* TransferBuffer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
