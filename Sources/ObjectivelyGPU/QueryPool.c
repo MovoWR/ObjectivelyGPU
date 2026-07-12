@@ -38,7 +38,7 @@ static void dealloc(Object *self) {
   QueryPool *this = (QueryPool *) self;
 
   if (this->device) {
-#ifdef SDL_GPU_OCCLUSION_QUERY
+#ifdef SDL_GPU_QUERY_API
     if (this->pool) {
       SDL_ReleaseGPUQueryPool(this->device->device, this->pool);
     }
@@ -67,7 +67,7 @@ static QueryPool *initWithDevice(QueryPool *self, RenderDevice *device, const SD
     self->type = info->type;
     self->queryCount = info->query_count;
 
-#ifdef SDL_GPU_OCCLUSION_QUERY
+#ifdef SDL_GPU_QUERY_API
     self->pool = SDL_CreateGPUQueryPool(device->device, (SDL_GPUQueryPoolCreateInfo *) info);
     GPU_Assert(self->pool, "SDL_CreateGPUQueryPool");
 #else

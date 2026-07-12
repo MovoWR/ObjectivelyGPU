@@ -93,7 +93,7 @@ static void downloadQueryResults(const CopyPass *self, QueryPool *pool, Uint32 f
 
   assert(pool);
 
-#ifdef SDL_GPU_OCCLUSION_QUERY
+#ifdef SDL_GPU_QUERY_API
   if (pool->pool) {
     SDL_DownloadGPUQueryResults(self->pass, pool->pool, firstQuery, count, (SDL_GPUTransferBufferLocation *) dst);
     return;

@@ -134,7 +134,7 @@ static void bindVertexStorageTextures(const RenderPass *self, Uint32 firstSlot, 
  */
 static void beginQuery(const RenderPass *self, QueryPool *pool, Uint32 index) {
   assert(pool);
-#ifdef SDL_GPU_OCCLUSION_QUERY
+#ifdef SDL_GPU_QUERY_API
   if (pool->pool) {
     SDL_BeginGPUQuery(self->commands->commands, pool->pool, index);
   }
@@ -147,7 +147,7 @@ static void beginQuery(const RenderPass *self, QueryPool *pool, Uint32 index) {
  */
 static void endQuery(const RenderPass *self, QueryPool *pool, Uint32 index) {
   assert(pool);
-#ifdef SDL_GPU_OCCLUSION_QUERY
+#ifdef SDL_GPU_QUERY_API
   if (pool->pool) {
     SDL_EndGPUQuery(self->commands->commands, pool->pool, index);
   }

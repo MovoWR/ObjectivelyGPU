@@ -32,18 +32,9 @@
 /**
  * @file
  * @brief QueryPool wraps an `SDL_GPUQueryPool`, owning its handle and metadata.
- * @details The occlusion/timestamp query API is a prototype not yet part of
- *   upstream SDL. The types and methods here are always available, but when
- *   linked against an SDL3 build that does not define `SDL_GPU_OCCLUSION_QUERY`,
- *   this class and the related `RenderPass`/`CopyPass` query methods are inert
- *   no-ops: `initWithDevice` still succeeds (so callers never need to special-case
- *   its absence), but `beginQuery`/`endQuery` do nothing and
- *   `downloadQueryResults` always reports "not occluded". This lets client code
- *   (e.g. Quetoo) unconditionally use occlusion queries as an optimization that
- *   silently disables itself where unsupported.
  */
 
-#ifndef SDL_GPU_OCCLUSION_QUERY
+#ifndef SDL_GPU_QUERY_API
 
 /**
  * @brief Polyfills for the query types this prototype API depends on, so
@@ -64,8 +55,7 @@ typedef struct SDL_GPUQueryPoolCreateInfo {
   SDL_PropertiesID props;
 } SDL_GPUQueryPoolCreateInfo;
 
-#endif // !SDL_GPU_OCCLUSION_QUERY
-
+#endif
 typedef struct RenderDevice RenderDevice;
 typedef struct QueryPool QueryPool;
 typedef struct QueryPoolInterface QueryPoolInterface;
