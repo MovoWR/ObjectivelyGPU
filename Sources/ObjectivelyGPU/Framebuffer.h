@@ -87,6 +87,23 @@ typedef struct GPU_FramebufferCreateInfo {
    */
   SDL_GPUSampleCount sampleCount;
 
+  /**
+   * @brief The clear color for each color attachment, indices `[0, numColorTargets)`.
+   * @details Stashed on the Framebuffer and used as the default `clearColor` by
+   *   `colorTargetInfo` (when passed `NULL`) and by
+   *   `CommandBuffer::beginRenderPassWithFramebuffer`. Omitted entries default to
+   *   opaque black.
+   */
+  SDL_FColor clearColors[GPU_MAX_COLOR_TARGETS];
+
+  /**
+   * @brief The clear depth value for the depth attachment, if any.
+   * @details Stashed on the Framebuffer and used by
+   *   `CommandBuffer::beginRenderPassWithFramebuffer`. Typically `1.f` (the far plane);
+   *   omitted defaults to `0.f`.
+   */
+  float clearDepth;
+
 } GPU_FramebufferCreateInfo;
 
 /**
@@ -105,18 +122,15 @@ typedef struct GPU_FramebufferCreateInfo {
  *     .size = { 1920, 1080 },
  *     .colorFormats = { SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT },
  *     .numColorTargets = 1,
+ *     .clearColors = { { 0.f, 0.f, 0.f, 1.f } },
  *     .depthFormat = SDL_GPU_TEXTUREFORMAT_D32_FLOAT,
+ *     .clearDepth = 1.f,
  *     .sampleCount = SDL_GPU_SAMPLECOUNT_1,
  *   });
  *
- *   SDL_GPUColorTargetInfo color = $(fb, colorTargetInfo, 0,
- *     SDL_GPU_LOADOP_CLEAR, SDL_GPU_STOREOP_STORE,
- *     &(SDL_FColor) { 0, 0, 0, 1 });
- *
- *   SDL_GPUDepthStencilTargetInfo depth = $(fb, depthTargetInfo,
- *     SDL_GPU_LOADOP_CLEAR, SDL_GPU_STOREOP_DONT_CARE, 1.f);
- *
- *   RenderPass *pass = $(commands, beginRenderPass, &color, 1, &depth);
+ *   // Renders into all of fb's targets, clearing to its own clearColors/clearDepth.
+ *   RenderPass *pass = $(commands, beginRenderPassWithFramebuffer, fb,
+ *     SDL_GPU_LOADOP_CLEAR, SDL_GPU_STOREOP_STORE);
  *   // ...
  *   release(pass);
  *   release(fb);
@@ -181,6 +195,19 @@ struct Framebuffer {
   SDL_GPUTextureFormat depthFormat;
 
   /**
+   * @brief The clear color for each color attachment, indices `[0, numColorTargets)`.
+   * @details Used as the default `clearColor` by `colorTargetInfo` (when passed `NULL`)
+   *   and by `CommandBuffer::beginRenderPassWithFramebuffer`.
+   */
+  SDL_FColor clearColors[GPU_MAX_COLOR_TARGETS];
+
+  /**
+   * @brief The clear depth value for the depth attachment, if any.
+   * @details Used by `CommandBuffer::beginRenderPassWithFramebuffer`.
+   */
+  float clearDepth;
+
+  /**
    * @brief The depth attachment texture, or `NULL` if `depthFormat` is invalid.
    * @details Single-sample depth also carries `SAMPLER` and is returned directly by
    *   `resolveDepthTexture`. Multisampled depth is a plain depth-stencil target
@@ -230,7 +257,7 @@ struct FramebufferInterface {
    * @param index The color attachment index, in `[0, numColorTargets)`.
    * @param loadOp Load operation at the start of the pass.
    * @param storeOp Store operation at the end of the pass.
-   * @param clearColor Clear color used when `loadOp` is `SDL_GPU_LOADOP_CLEAR`, or NULL for black.
+   * @param clearColor Clear color used when `loadOp` is `SDL_GPU_LOADOP_CLEAR`, or NULL to use the framebuffer's own `clearColors[index]`.
    * @return A stack-allocated `SDL_GPUColorTargetInfo`.
    * @memberof Framebuffer
    */

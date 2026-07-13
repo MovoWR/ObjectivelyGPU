@@ -27,6 +27,7 @@
 #include "ComputePass.h"
 #include "CopyPass.h"
 #include "Fence.h"
+#include "Framebuffer.h"
 #include "RenderDevice.h"
 #include "RenderPass.h"
 
@@ -123,6 +124,29 @@ static RenderPass *beginRenderPass(CommandBuffer *self, const SDL_GPUColorTarget
   self->pass = (Object *) renderPass;
 
   return renderPass;
+}
+
+/**
+ * @fn RenderPass *CommandBuffer::beginRenderPassWithFramebuffer(CommandBuffer *self, const Framebuffer *framebuffer, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp)
+ * @memberof CommandBuffer
+ */
+static RenderPass *beginRenderPassWithFramebuffer(CommandBuffer *self, const Framebuffer *framebuffer, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp) {
+
+  assert(framebuffer);
+
+  SDL_GPUColorTargetInfo color[GPU_MAX_COLOR_TARGETS];
+  for (Uint32 i = 0; i < framebuffer->numColorTargets; i++) {
+    color[i] = $(framebuffer, colorTargetInfo, i, loadOp, storeOp, NULL);
+  }
+
+  SDL_GPUDepthStencilTargetInfo depth;
+  const SDL_GPUDepthStencilTargetInfo *depthStencil = NULL;
+  if (framebuffer->depthFormat != SDL_GPU_TEXTUREFORMAT_INVALID) {
+    depth = $(framebuffer, depthTargetInfo, loadOp, storeOp, framebuffer->clearDepth);
+    depthStencil = &depth;
+  }
+
+  return beginRenderPass(self, framebuffer->numColorTargets ? color : NULL, framebuffer->numColorTargets, depthStencil);
 }
 
 /**
@@ -302,6 +326,7 @@ static void initialize(Class *clazz) {
   ((CommandBufferInterface *) clazz->interface)->beginComputePass = beginComputePass;
   ((CommandBufferInterface *) clazz->interface)->beginCopyPass = beginCopyPass;
   ((CommandBufferInterface *) clazz->interface)->beginRenderPass = beginRenderPass;
+  ((CommandBufferInterface *) clazz->interface)->beginRenderPassWithFramebuffer = beginRenderPassWithFramebuffer;
   ((CommandBufferInterface *) clazz->interface)->blitTexture = blitTexture;
   ((CommandBufferInterface *) clazz->interface)->cancel = cancel;
   ((CommandBufferInterface *) clazz->interface)->generateMipmaps = generateMipmaps;

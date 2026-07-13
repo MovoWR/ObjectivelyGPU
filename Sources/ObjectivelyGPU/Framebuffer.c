@@ -65,7 +65,7 @@ static SDL_GPUColorTargetInfo colorTargetInfo(const Framebuffer *self, Uint32 in
     .texture = self->colorTextures[index]->texture,
     .load_op = loadOp,
     .store_op = storeOp,
-    .clear_color = clearColor ? *clearColor : (SDL_FColor) { 0.f, 0.f, 0.f, 1.f },
+    .clear_color = clearColor ? *clearColor : self->clearColors[index],
   };
 
   if (self->sampleCount > SDL_GPU_SAMPLECOUNT_1) {
@@ -117,8 +117,10 @@ static Framebuffer *initWithDevice(Framebuffer *self, RenderDevice *device, cons
     self->numColorTargets = info->numColorTargets;
     for (Uint32 i = 0; i < info->numColorTargets; i++) {
       self->colorFormats[i] = info->colorFormats[i];
+      self->clearColors[i] = info->clearColors[i];
     }
     self->depthFormat = info->depthFormat;
+    self->clearDepth = info->clearDepth;
     self->sampleCount = info->sampleCount;
 
     $(self, resize, &info->size);

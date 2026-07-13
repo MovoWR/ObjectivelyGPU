@@ -35,6 +35,7 @@
 typedef struct ComputePass ComputePass;
 typedef struct CopyPass CopyPass;
 typedef struct Fence Fence;
+typedef struct Framebuffer Framebuffer;
 typedef struct RenderPass RenderPass;
 typedef struct RenderDevice RenderDevice;
 typedef struct CommandBuffer CommandBuffer;
@@ -182,6 +183,25 @@ struct CommandBufferInterface {
    * @memberof CommandBuffer
    */
   RenderPass *(*beginRenderPass)(CommandBuffer *self, const SDL_GPUColorTargetInfo *colorTargets, Uint32 numColorTargets, const SDL_GPUDepthStencilTargetInfo *depthStencil);
+
+  /**
+   * @fn RenderPass *CommandBuffer::beginRenderPassWithFramebuffer(CommandBuffer *self, const Framebuffer *framebuffer, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp)
+   * @brief Begins a render pass over all of @p framebuffer's color targets and its
+   *  depth target (if any), using its own clear color(s) and clear depth when @p loadOp
+   *  is `SDL_GPU_LOADOP_CLEAR`.
+   * @details Convenience for the common case of "render into this framebuffer" with a
+   *  single load/store op shared by every target. For a mix of load ops across targets,
+   *  per-target clear overrides, a query pool, or a subset of a framebuffer's targets
+   *  (e.g. a depth-only pass), build the target infos yourself via
+   *  `Framebuffer::colorTargetInfo`/`depthTargetInfo` and call `beginRenderPass` directly.
+   * @param self The CommandBuffer.
+   * @param framebuffer The Framebuffer to render into.
+   * @param loadOp Load operation applied uniformly to every target.
+   * @param storeOp Store operation applied uniformly to every target.
+   * @return A new RenderPass, retained. Must be released by the caller.
+   * @memberof CommandBuffer
+   */
+  RenderPass *(*beginRenderPassWithFramebuffer)(CommandBuffer *self, const Framebuffer *framebuffer, SDL_GPULoadOp loadOp, SDL_GPUStoreOp storeOp);
 
   /**
    * @fn void CommandBuffer::blitTexture(const CommandBuffer *self, const SDL_GPUBlitInfo *info)
