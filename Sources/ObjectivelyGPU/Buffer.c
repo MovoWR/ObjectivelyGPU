@@ -28,7 +28,6 @@
 #include "CommandBuffer.h"
 #include "CopyPass.h"
 #include "RenderDevice.h"
-#include "TransferBuffer.h"
 
 #define _Class _Buffer
 
@@ -127,22 +126,29 @@ static void setName(Buffer *self, const char *name) {
 static void upload(Buffer *self, const void *data, Uint32 size, Uint32 offset, bool cycle) {
 
   assert(self);
-  assert(data);
-  assert(size);
-
-  const TransferBuffer *tbuf = $(self->device, stageData, data, size);
 
   CommandBuffer *commands = $(self->device, acquireCommandBuffer);
   CopyPass *copyPass = $(commands, beginCopyPass);
 
-  $(copyPass, uploadBuffer,
-    &(SDL_GPUTransferBufferLocation) { .transfer_buffer = tbuf->buffer },
-    &(SDL_GPUBufferRegion) { .buffer = self->buffer, .offset = offset, .size = size },
-    cycle);
+  $(self, uploadWithPass, copyPass, data, size, offset, cycle);
 
   release(copyPass);
   $(commands, submit);
   release(commands);
+}
+
+/**
+ * @fn void Buffer::uploadWithPass(Buffer *self, CopyPass *copyPass, const void *data, Uint32 size, Uint32 offset, bool cycle)
+ * @memberof Buffer
+ */
+static void uploadWithPass(Buffer *self, CopyPass *copyPass, const void *data, Uint32 size, Uint32 offset, bool cycle) {
+
+  assert(self);
+  assert(copyPass);
+  assert(data);
+  assert(size);
+
+  $(copyPass, uploadData, self->buffer, data, size, offset, cycle);
 }
 
 #pragma mark - Class lifecycle
@@ -159,6 +165,7 @@ static void initialize(Class *clazz) {
   ((BufferInterface *) clazz->interface)->initWithDevice = initWithDevice;
   ((BufferInterface *) clazz->interface)->setName = setName;
   ((BufferInterface *) clazz->interface)->upload = upload;
+  ((BufferInterface *) clazz->interface)->uploadWithPass = uploadWithPass;
 }
 
 /**

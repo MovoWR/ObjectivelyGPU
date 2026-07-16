@@ -35,6 +35,7 @@
  * @brief Buffer wraps an `SDL_GPUBuffer`, owning its handle and metadata.
  */
 
+typedef struct CopyPass CopyPass;
 typedef struct RenderDevice RenderDevice;
 typedef struct Buffer Buffer;
 typedef struct BufferInterface BufferInterface;
@@ -162,10 +163,10 @@ struct BufferInterface {
   /**
    * @fn void Buffer::upload(Buffer *self, const void *data, Uint32 size, Uint32 offset, bool cycle)
    * @brief Uploads raw CPU data into this buffer.
-   * @details Acquires a command buffer, creates a temporary transfer buffer, records a
-   *   copy pass, submits, and releases the transfer buffer. Use this for dynamic buffers
-   *   re-uploaded each frame. To batch multiple uploads into one command buffer, use
-   *   `CopyPass::uploadData` instead.
+   * @details Acquires a CommandBuffer, opens an ephemeral CopyPass, uploads via
+   *   `uploadWithPass`, then submits and releases. Use this for standalone buffers
+   *   uploaded outside of a shared CopyPass. To batch multiple uploads into one
+   *   CopyPass, use `uploadWithPass` instead.
    * @param self The Buffer.
    * @param data CPU pointer to the source data. Must not be NULL.
    * @param size Number of bytes to upload.
@@ -174,6 +175,23 @@ struct BufferInterface {
    * @memberof Buffer
    */
   void (*upload)(Buffer *self, const void *data, Uint32 size, Uint32 offset, bool cycle);
+
+  /**
+   * @fn void Buffer::uploadWithPass(Buffer *self, CopyPass *copyPass, const void *data, Uint32 size, Uint32 offset, bool cycle)
+   * @brief Uploads raw CPU data into this buffer using an existing CopyPass.
+   * @details Use this to batch uploads for multiple buffers into a single shared
+   *   CopyPass, e.g. across subsystems that each populate their own Buffer once per
+   *   frame. `upload` is a convenience that opens an ephemeral CopyPass on its own
+   *   CommandBuffer and delegates to this method.
+   * @param self The Buffer.
+   * @param copyPass The CopyPass to record the upload against.
+   * @param data CPU pointer to the source data. Must not be NULL.
+   * @param size Number of bytes to upload.
+   * @param offset Byte offset into this buffer where the data is written.
+   * @param cycle When true, the buffer is cycled to avoid pipeline stalls.
+   * @memberof Buffer
+   */
+  void (*uploadWithPass)(Buffer *self, CopyPass *copyPass, const void *data, Uint32 size, Uint32 offset, bool cycle);
 };
 
 /**
