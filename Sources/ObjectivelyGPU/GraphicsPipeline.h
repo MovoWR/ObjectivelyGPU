@@ -154,7 +154,7 @@ OBJECTIVELYGPU_EXPORT const SDL_GPUColorTargetBlendState GPU_BlendStateAlpha;
 OBJECTIVELYGPU_EXPORT const SDL_GPUColorTargetBlendState GPU_BlendStatePremultipliedAlpha;
 
 /**
- * @brief Additive blending: `src·srcA + dst`, for glow, particles, and light accumulation.
+ * @brief Additive blending: `src + dst`, for glow, particles, and light accumulation.
  */
 OBJECTIVELYGPU_EXPORT const SDL_GPUColorTargetBlendState GPU_BlendStateAdditive;
 

@@ -56,7 +56,7 @@ OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUColorTargetBlendState GPU_BlendStatePrem
 
 OBJECTIVELYGPU_EXPORT_DATA const SDL_GPUColorTargetBlendState GPU_BlendStateAdditive = {
   .enable_blend = true,
-  .src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+  .src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE,
   .dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE,
   .color_blend_op = SDL_GPU_BLENDOP_ADD,
   .src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE,
