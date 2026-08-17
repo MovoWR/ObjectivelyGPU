@@ -63,13 +63,15 @@ static bool acquireSwapchainTexture(const CommandBuffer *self, SwapchainTexture 
                                                  self->device->window,
                                                  &swapchain->texture,
                                                  &w, &h);
-
-  if (ok) {
-    swapchain->size = (SDL_Size) { (int) w, (int) h };
-    swapchain->format = SDL_GetGPUSwapchainTextureFormat(self->device->device, self->device->window);
+  if (!ok || swapchain->texture == NULL) {
+    *swapchain = (SwapchainTexture) { 0 };
+    return false;
   }
-  
-  return ok;
+
+  swapchain->size = (SDL_Size) { (int) w, (int) h };
+  swapchain->format = SDL_GetGPUSwapchainTextureFormat(self->device->device, self->device->window);
+
+  return true;
 }
 
 /**
@@ -305,12 +307,16 @@ static bool waitAndAcquireSwapchainTexture(const CommandBuffer *self, SwapchainT
                                                         self->device->window,
                                                         &swapchain->texture,
                                                         &w, &h);
-  if (ok) {
-    swapchain->size = (SDL_Size) { (int) w, (int) h };
-    swapchain->format = SDL_GetGPUSwapchainTextureFormat(self->device->device, self->device->window);
+
+  if (!ok || swapchain->texture == NULL) {
+    *swapchain = (SwapchainTexture) { 0 };
+    return false;
   }
-  
-  return ok;
+
+  swapchain->size = (SDL_Size) { (int) w, (int) h };
+  swapchain->format = SDL_GetGPUSwapchainTextureFormat(self->device->device, self->device->window);
+
+  return true;
 }
 
 #pragma mark - Class lifecycle

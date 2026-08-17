@@ -152,19 +152,19 @@ static CommandBuffer *acquireCommandBuffer(const RenderDevice *self) {
  */
 static CommandBuffer *beginFrame(RenderDevice *self) {
 
+  GPU_Assert(self->window, "no SDL_Window for RenderDevice");
   GPU_Assert(self->framebuffer, "no framebuffer set; call setFramebuffer first");
+
+  int w = 0, h = 0;
+  if (!SDL_GetWindowSizeInPixels(self->window, &w, &h) || w <= 0 || h <= 0) {
+    return NULL;
+  }
+  
+  $(self->framebuffer, resize, &(SDL_Size) { w, h });
+
   GPU_Assert(self->commands == NULL, "beginFrame called with a frame already in flight");
 
   self->commands = $(self, acquireCommandBuffer);
-
-  const bool ok = $(self->commands, waitAndAcquireSwapchainTexture, &self->swapchain);
-  if (ok) {
-    $(self->framebuffer, resize, &self->swapchain.size);
-  } else {
-    $(self->commands, cancel);
-    self->commands = release(self->commands);
-  }
-
   return self->commands;
 }
 
@@ -179,25 +179,26 @@ static Fence *endFrameAndFence(RenderDevice *self) {
   Texture *color = $(self->framebuffer, resolveColorTexture, 0);
   GPU_Assert(color, "framebuffer has no color attachment to present");
 
-  $(self->commands, blitTexture, &(SDL_GPUBlitInfo) {
-    .source = {
-      .texture = color->texture,
-      .w = (Uint32) self->swapchain.size.w,
-      .h = (Uint32) self->swapchain.size.h,
-    },
-    .destination = {
-      .texture = self->swapchain.texture,
-      .w = (Uint32) self->swapchain.size.w,
-      .h = (Uint32) self->swapchain.size.h,
-    },
-    .load_op = SDL_GPU_LOADOP_DONT_CARE,
-    .filter = SDL_GPU_FILTER_NEAREST,
-  });
+  if ($(self->commands, waitAndAcquireSwapchainTexture, &self->swapchain)) {
+    $(self->commands, blitTexture, &(SDL_GPUBlitInfo) {
+      .source = {
+        .texture = color->texture,
+        .w = (Uint32) self->framebuffer->size.w,
+        .h = (Uint32) self->framebuffer->size.h,
+      },
+      .destination = {
+        .texture = self->swapchain.texture,
+        .w = (Uint32) self->swapchain.size.w,
+        .h = (Uint32) self->swapchain.size.h,
+      },
+      .load_op = SDL_GPU_LOADOP_DONT_CARE,
+      .filter = SDL_GPU_FILTER_NEAREST,
+    });
+  }
 
   Fence *fence = $(self->commands, submitAndFence);
 
   self->commands = release(self->commands);
-
   self->swapchain = (SwapchainTexture) { 0 };
 
   return fence;
