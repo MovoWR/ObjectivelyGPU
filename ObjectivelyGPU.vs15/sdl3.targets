@@ -9,7 +9,7 @@
     Bump SDL3Version to upgrade; delete libs/ to force a re-download.
   -->
   <PropertyGroup>
-    <SDL3Version>3.4.2</SDL3Version>
+    <SDL3Version>3.4.12</SDL3Version>
     <SDL3Dir>$(MSBuildThisFileDirectory)libs\SDL3-$(SDL3Version)\</SDL3Dir>
     <SDL3LibArch Condition="'$(Platform)' == 'Win32'">x86</SDL3LibArch>
     <SDL3LibArch Condition="'$(SDL3LibArch)' == ''">x64</SDL3LibArch>
