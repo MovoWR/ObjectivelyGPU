@@ -95,7 +95,7 @@ static void unmap(const TransferBuffer *self) {
  * @fn void TransferBuffer::write(const TransferBuffer *self, const void *data, Uint32 size, bool cycle)
  * @memberof TransferBuffer
  */
-static void write(const TransferBuffer *self, const void *data, Uint32 size, bool cycle) {
+static void writeData(const TransferBuffer *self, const void *data, Uint32 size, bool cycle) {
 
   assert(data);
   assert(size <= self->size);
@@ -117,7 +117,7 @@ static void initialize(Class *clazz) {
   ((TransferBufferInterface *) clazz->interface)->initWithDevice = initWithDevice;
   ((TransferBufferInterface *) clazz->interface)->map = map;
   ((TransferBufferInterface *) clazz->interface)->unmap = unmap;
-  ((TransferBufferInterface *) clazz->interface)->write = write;
+  ((TransferBufferInterface *) clazz->interface)->write = writeData;
 }
 
 /**
