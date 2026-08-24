@@ -39,7 +39,6 @@ static void dealloc(Object *self) {
 
   if (this->device) {
     SDL_ReleaseGPUComputePipeline(this->device->device, this->pipeline);
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -58,7 +57,7 @@ static ComputePipeline *initWithDevice(ComputePipeline *self, RenderDevice *devi
 
   self = (ComputePipeline *) super(Object, self, init);
   if (self) {
-    self->device = retain(device);
+    self->device = device;
 
     SDL_Log("Assembling ComputePipeline (threads %ux%ux%u, %u samplers, %u storage textures, %u storage buffers)",
             info->threadcount_x, info->threadcount_y, info->threadcount_z,

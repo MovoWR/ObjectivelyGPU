@@ -41,7 +41,6 @@ static void dealloc(Object *self) {
     if (this->fence) {
       SDL_ReleaseGPUFence(this->device->device, this->fence);
     }
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -60,7 +59,7 @@ static Fence *initWithDevice(Fence *self, RenderDevice *device, SDL_GPUFence *fe
 
   self = (Fence *) super(Object, self, init);
   if (self) {
-    self->device = retain(device);
+    self->device = device;
     self->fence = fence;
   }
 

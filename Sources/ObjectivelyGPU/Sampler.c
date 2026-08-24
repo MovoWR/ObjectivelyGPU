@@ -39,7 +39,6 @@ static void dealloc(Object *self) {
 
   if (this->device) {
     SDL_ReleaseGPUSampler(this->device->device, this->sampler);
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -59,7 +58,7 @@ static Sampler *initWithDevice(Sampler *self, RenderDevice *device, const SDL_GP
   self = (Sampler *) super(Object, self, init);
   if (self) {
 
-    self->device = retain(device);
+    self->device = device;
 
     self->sampler = SDL_CreateGPUSampler(device->device, info);
     GPU_Assert(self->sampler, "SDL_CreateGPUSampler");

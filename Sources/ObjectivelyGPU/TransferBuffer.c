@@ -41,7 +41,6 @@ static void dealloc(Object *self) {
     if (this->buffer) {
       SDL_ReleaseGPUTransferBuffer(this->device->device, this->buffer);
     }
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -61,7 +60,7 @@ static TransferBuffer *initWithDevice(TransferBuffer *self, RenderDevice *device
   self = (TransferBuffer *) super(Object, self, init);
   if (self) {
 
-    self->device = retain(device);
+    self->device = device;
     self->size = info->size;
 
     self->buffer = SDL_CreateGPUTransferBuffer(device->device, info);

@@ -44,7 +44,6 @@ static void dealloc(Object *self) {
 
   if (this->device) {
     SDL_ReleaseGPUTexture(this->device->device, this->texture);
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -141,7 +140,7 @@ static Texture *initWithDevice(Texture *self, RenderDevice *device, const SDL_GP
   self = (Texture *) super(Object, self, init);
   if (self) {
 
-    self->device = retain(device);
+    self->device = device;
 
     self->texture = SDL_CreateGPUTexture(device->device, info);
     GPU_Assert(self->texture, "SDL_CreateGPUTexture");

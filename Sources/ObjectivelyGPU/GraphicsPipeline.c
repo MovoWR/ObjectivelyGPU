@@ -105,7 +105,6 @@ static void dealloc(Object *self) {
 
   if (this->device) {
     SDL_ReleaseGPUGraphicsPipeline(this->device->device, this->pipeline);
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -125,7 +124,7 @@ static GraphicsPipeline *initWithDevice(GraphicsPipeline *self, RenderDevice *de
   self = (GraphicsPipeline *) super(Object, self, init);
   if (self) {
 
-    self->device = retain(device);
+    self->device = device;
 
     SDL_Log("Assembling GraphicsPipeline (%u color targets, %ux MSAA, %s)",
             info->target_info.num_color_targets,

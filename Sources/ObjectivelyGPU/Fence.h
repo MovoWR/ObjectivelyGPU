@@ -72,6 +72,7 @@ struct Fence {
 
   /**
    * @brief The RenderDevice that owns this fence.
+   * @remarks Weak: a resource MUST NOT outlive the device that owns it.
    * @private
    */
   RenderDevice *device;

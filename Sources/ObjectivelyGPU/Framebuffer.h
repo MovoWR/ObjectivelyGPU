@@ -189,6 +189,7 @@ struct Framebuffer {
 
   /**
    * @brief The owning RenderDevice, used for texture allocation and dealloc.
+   * @remarks Weak: a resource MUST NOT outlive the device that owns it.
    */
   RenderDevice *device;
 

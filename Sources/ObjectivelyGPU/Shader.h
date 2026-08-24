@@ -63,6 +63,7 @@ struct Shader {
 
   /**
    * @brief The RenderDevice that owns this shader.
+   * @remarks Weak: a resource MUST NOT outlive the device that owns it.
    * @private
    */
   RenderDevice *device;

@@ -43,7 +43,6 @@ static void dealloc(Object *self) {
       SDL_ReleaseGPUQueryPool(this->device->device, this->pool);
     }
 #endif
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -63,7 +62,7 @@ static QueryPool *initWithDevice(QueryPool *self, RenderDevice *device, const SD
   self = (QueryPool *) super(Object, self, init);
   if (self) {
 
-    self->device = retain(device);
+    self->device = device;
     self->type = info->type;
     self->queryCount = info->query_count;
 

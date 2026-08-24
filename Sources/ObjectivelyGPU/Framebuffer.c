@@ -47,8 +47,6 @@ static void dealloc(Object *self) {
   release(this->depthAttachment.textures[0]);
   release(this->depthAttachment.resolveTextures[0]);
 
-  release(this->device);
-
   super(Object, self, dealloc);
 }
 
@@ -147,7 +145,7 @@ static Framebuffer *initWithDevice(Framebuffer *self, RenderDevice *device, cons
 
   self = (Framebuffer *) super(Object, self, init);
   if (self) {
-    self->device = retain(device);
+    self->device = device;
 
     self->numColorAttachments = info->numColorTargets;
     for (Uint32 i = 0; i < info->numColorTargets; i++) {

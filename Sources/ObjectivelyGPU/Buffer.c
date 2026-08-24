@@ -42,7 +42,6 @@ static void dealloc(Object *self) {
 
   if (this->device) {
     SDL_ReleaseGPUBuffer(this->device->device, this->buffer);
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -96,7 +95,7 @@ static Buffer *initWithDevice(Buffer *self, RenderDevice *device, const SDL_GPUB
   self = (Buffer *) super(Object, self, init);
   if (self) {
 
-    self->device = retain(device);
+    self->device = device;
 
     self->buffer = SDL_CreateGPUBuffer(device->device, info);
     GPU_Assert(self->buffer, "SDL_CreateGPUBuffer");

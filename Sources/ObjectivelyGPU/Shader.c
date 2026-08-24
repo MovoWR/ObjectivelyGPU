@@ -39,7 +39,6 @@ static void dealloc(Object *self) {
 
   if (this->device) {
     SDL_ReleaseGPUShader(this->device->device, this->shader);
-    release(this->device);
   }
 
   super(Object, self, dealloc);
@@ -58,7 +57,7 @@ static Shader *initWithDevice(Shader *self, RenderDevice *device, const SDL_GPUS
 
   self = (Shader *) super(Object, self, init);
   if (self) {
-    self->device = retain(device);
+    self->device = device;
 
     self->stage = info->stage;
     self->format = info->format;

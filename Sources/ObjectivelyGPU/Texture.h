@@ -112,6 +112,7 @@ struct Texture {
 
   /**
    * @brief The RenderDevice that owns this texture.
+   * @remarks Weak: a resource MUST NOT outlive the device that owns it.
    * @private
    */
   RenderDevice *device;
