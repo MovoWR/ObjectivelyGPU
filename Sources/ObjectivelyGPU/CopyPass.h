@@ -162,6 +162,8 @@ struct CopyPassInterface {
    *   the upload, and releases the transfer buffer — all within this call. Use this
    *   to batch multiple buffer uploads into a single copy pass without manual transfer
    *   buffer management.
+   * @remarks An upload performed every frame SHOULD own a TransferBuffer for its lifetime
+   *   and use `uploadBuffer` instead, rather than allocating one per frame here.
    * @param self The CopyPass.
    * @param dst The GPU buffer to upload into.
    * @param data CPU pointer to the source data.

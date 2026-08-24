@@ -148,12 +148,21 @@ static void uploadData(const CopyPass *self, SDL_GPUBuffer *dst, const void *dat
   assert(data);
   assert(size);
 
-  const TransferBuffer *tbuf = $(self->commands->device, stageData, data, size);
+  TransferBuffer *staging = $(self->commands->device, createTransferBuffer, &(SDL_GPUTransferBufferCreateInfo) {
+    .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+    .size = size,
+  });
+
+  void *mapped = $(staging, map, false);
+  memcpy(mapped, data, size);
+  $(staging, unmap);
 
   SDL_UploadToGPUBuffer(self->pass,
-    &(SDL_GPUTransferBufferLocation) { .transfer_buffer = tbuf->buffer },
+    &(SDL_GPUTransferBufferLocation) { .transfer_buffer = staging->buffer },
     &(SDL_GPUBufferRegion) { .buffer = dst, .offset = offset, .size = size },
     cycle);
+
+  release(staging);
 }
 
 /**
