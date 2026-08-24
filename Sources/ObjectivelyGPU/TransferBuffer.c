@@ -22,6 +22,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
 #include "RenderDevice.h"
 #include "TransferBuffer.h"
@@ -90,6 +91,20 @@ static void unmap(const TransferBuffer *self) {
   SDL_UnmapGPUTransferBuffer(self->device->device, self->buffer);
 }
 
+/**
+ * @fn void TransferBuffer::write(const TransferBuffer *self, const void *data, Uint32 size, bool cycle)
+ * @memberof TransferBuffer
+ */
+static void write(const TransferBuffer *self, const void *data, Uint32 size, bool cycle) {
+
+  assert(data);
+  assert(size <= self->size);
+
+  void *mapped = $(self, map, cycle);
+  memcpy(mapped, data, size);
+  $(self, unmap);
+}
+
 #pragma mark - Class lifecycle
 
 /**
@@ -102,6 +117,7 @@ static void initialize(Class *clazz) {
   ((TransferBufferInterface *) clazz->interface)->initWithDevice = initWithDevice;
   ((TransferBufferInterface *) clazz->interface)->map = map;
   ((TransferBufferInterface *) clazz->interface)->unmap = unmap;
+  ((TransferBufferInterface *) clazz->interface)->write = write;
 }
 
 /**

@@ -153,9 +153,7 @@ static void uploadData(const CopyPass *self, SDL_GPUBuffer *dst, const void *dat
     .size = size,
   });
 
-  void *mapped = $(staging, map, false);
-  memcpy(mapped, data, size);
-  $(staging, unmap);
+  $(staging, write, data, size, false);
 
   SDL_UploadToGPUBuffer(self->pass,
     &(SDL_GPUTransferBufferLocation) { .transfer_buffer = staging->buffer },

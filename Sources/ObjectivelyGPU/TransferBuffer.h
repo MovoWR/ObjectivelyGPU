@@ -130,6 +130,20 @@ struct TransferBufferInterface {
    * @memberof TransferBuffer
    */
   void (*unmap)(const TransferBuffer *self);
+
+  /**
+   * @fn void TransferBuffer::write(const TransferBuffer *self, const void *data, Uint32 size, bool cycle)
+   * @brief Writes @p size bytes of @p data into this transfer buffer.
+   * @details Maps, copies and unmaps in one call, which is all that sourcing an upload from
+   *   CPU data amounts to. Pass `cycle = true` when this buffer may still be in use by the
+   *   GPU, as it will be for one held across frames.
+   * @param self The TransferBuffer.
+   * @param data The data to write. Must hold at least @p size bytes.
+   * @param size The number of bytes to write. Must not exceed this buffer's size.
+   * @param cycle If `true`, the driver may cycle to a new backing allocation.
+   * @memberof TransferBuffer
+   */
+  void (*write)(const TransferBuffer *self, const void *data, Uint32 size, bool cycle);
 };
 
 /**
